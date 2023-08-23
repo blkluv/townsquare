@@ -22,8 +22,10 @@ import { ProfilesCache } from "./cache/profiles-view";
 import { RewardsModel } from "state/rewards";
 import { SessionModel } from "./session";
 import { ShellUiModel } from "./ui/shell";
+import { SplxApiModel } from './api';
 import { SplxReactionModel } from "./media/reactions";
 import { SplxWallet } from '../splx-wallet';
+import { actions } from './actions';
 // TEMPORARY (APP-700)
 // remove after backend testing finishes
 // -prf
@@ -42,6 +44,8 @@ export const appInfo = z.object({
 export type AppInfo = z.infer<typeof appInfo>;
 
 export class RootStoreModel {
+  actions = actions;
+  api = new SplxApiModel(this);
   agent: BskyAgent;
   appInfo?: AppInfo;
   log = new LogModel();
@@ -61,6 +65,7 @@ export class RootStoreModel {
 
   constructor(agent: BskyAgent) {
     this.agent = agent;
+    this.actions.setRootStore(this);
     makeAutoObservable(this, {
       agent: false,
       serialize: false,

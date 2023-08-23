@@ -1,4 +1,4 @@
-type BundledFn<Args extends readonly unknown[], Res> = (
+export type BundledFn<Args extends readonly unknown[], Res> = (
   ...args: Args
 ) => Promise<Res>
 
