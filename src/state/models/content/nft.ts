@@ -47,13 +47,13 @@ export class NftModel {
       const attributes = item?.content?.metadata?.attributes;
       for (const attribute of attributes) {
         // console.log("attribute", attribute);
+        // console.log("reaction", reactionsMap, attribute);
         if (
-          attribute.trait_type === "trait" &&
+          (attribute.trait_type === "trait" || attribute.trait_type === "Trait") &&
           !seenAttributes.has(attribute.value)
         ) {
           seenAttributes.add(attribute.value);
           const reaction = reactionsMap[attribute.value];
-          // console.log("reaction", reaction, attribute);
           if (!reactions[reaction?.collection_id]) {
             reactions[reaction?.collection_id] = [];
           }
