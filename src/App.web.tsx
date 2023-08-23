@@ -17,6 +17,7 @@ import {
 } from "@solana/wallet-adapter-react";
 import React, { useEffect, useMemo, useState } from "react";
 import { RootStoreModel, RootStoreProvider, setupState } from "./state";
+import { WalletAdapter, WalletAdapterNetwork } from "@solana/wallet-adapter-base";
 import {
   WalletDisconnectButton,
   WalletModalProvider,
@@ -29,7 +30,6 @@ import { Shell } from "./view/shell/index";
 import { Text } from "react-native";
 import { ThemeProvider } from "lib/ThemeContext";
 import { ToastContainer } from "./view/com/util/Toast.web";
-import { WalletAdapterNetwork } from "@solana/wallet-adapter-base";
 import { clusterApiUrl } from "@solana/web3.js";
 import { observer } from "mobx-react-lite";
 import { useFonts } from "expo-font";
@@ -68,13 +68,13 @@ const App = observer(() => {
     return null;
   }
 
-  // const wallets = [
+  const wallets: WalletAdapter[] = [
   //   new PhantomWalletAdapter(),
   // new SolflareWalletAdapter(),
   // new BackpackWalletAdapter(),
   // new GlowWalletAdapter(),
   // new BraveWalletAdapter(),
-  // ];
+  ];
 
   return (
     <ThemeProvider theme={rootStore.shell.colorMode}>
@@ -82,7 +82,7 @@ const App = observer(() => {
         <analytics.Provider>
           <RootStoreProvider value={rootStore}>
             <ConnectionProvider endpoint={endpoint}>
-              <WalletProvider wallets={[]} autoConnect>
+              <WalletProvider wallets={wallets} autoConnect>
                 <WalletModalProvider>
                   <SafeAreaProvider>
                     <Shell />
