@@ -1,6 +1,7 @@
 import { BundledFn, bundleAsync } from '../../lib/async/bundle';
 import { makeAutoObservable, runInAction } from "mobx";
 
+import { debouncer } from 'lib/splx-utils/functions';
 import isEmpty from 'lodash.isempty';
 import { register } from 'lib/splx-utils/singleton';
 
@@ -51,6 +52,16 @@ export class SplxActionModel {
     ct: 0,
     currentExecutingActionId: 0,
     executingActions: {},
+  }
+
+  constructor() {
+    makeAutoObservable(
+      this,
+      {
+        rootStore: false,
+      },
+      { autoBind: true },
+    );
   }
 
   setRootStore(rootStore: any) {
@@ -386,11 +397,10 @@ export class SplxActionModel {
         // Get the key so it doesn't need to be recalculated.
         this.setExecutingAction(statePayload);
         const executingActionId = statePayload.executingActionId as number;
-        const method = bundleAsync(async (key: string) => {
+        debouncer.execute(async () => {
           this.setBusy(statePayload);
           return await wrappedAction(statePayload);
-        });
-        method(statePayload.key as string).then((result) => {
+        }, statePayload.key as string).then((result) => {
           this.setCurrentExecutingActionId(executingActionId);
           resolve(result as Res);
         }).catch((err) => {

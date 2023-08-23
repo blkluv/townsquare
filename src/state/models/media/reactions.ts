@@ -5,10 +5,12 @@ import {
   SQUID_REACTION_EMOJIS,
 } from "lib/constants";
 import { hasProp, isObj } from "lib/type-guards";
+import { makeAutoObservable, reaction, runInAction } from "mobx";
 
 import { EmojiItemProp } from "react-native-reactions/lib/components/ReactionView/types";
 import { RootStoreModel } from "../root-store";
-import { makeAutoObservable } from "mobx";
+import { actions } from "../actions";
+import merge from 'lodash.merge'
 
 export interface Reaction {
   post_id: string;
@@ -89,61 +91,64 @@ export class SplxReactionModel {
     }
   }
 
-  async fetch() {
-    const reactionPacksRequest = await fetch(
-      `${SOLARPLEX_FEED_API}/splx/get_reaction_packs`,
-      {
-        method: "GET",
-        headers: {
-          "content-type": "application/json",
-          "Access-Control-Allow-Origin": "no-cors",
-        },
-      },
-    );
-    const reactionPacks = (await reactionPacksRequest.json()).data;
-    this.reactionSets = reactionPacks;
-    Object.values(reactionPacks).forEach((reactionPack: any) => {
-      reactionPack.forEach((reaction: any) => {
-        this.reactionTypes[reaction.id] = reaction;
-        this.reactionNameToCollectionId[reaction.name] = reaction.collection_id;
-      });
-    });
-    this.earnedReactions["default"] = reactionPacks["default"];
-
-    const allReactions = await fetch(
-      `${SOLARPLEX_FEED_API}/splx/get_all_reactions`,
-      {
-        method: "GET",
-        headers: {
-          "content-type": "application/json",
-          "Access-Control-Allow-Origin": "no-cors",
-        },
-      },
-    );
-    for (const reaction of (await allReactions.json()).data as Reaction[]) {
-      if (this.reactionMap[reaction.post_id]) {
-        this.reactionMap[reaction.post_id][reaction.user_id] =
-          reaction.reaction_id;
-      } else {
-        this.reactionMap[reaction.post_id] = {};
-        this.reactionMap[reaction.post_id][reaction.user_id] =
-          reaction.reaction_id;
-      }
+  fetchPacks = actions.wrapAction(async () => {
+    const url = `${SOLARPLEX_FEED_API}/splx/get_reaction_packs`;
+    const response = await this.rootStore.api.get<{ data: { [reactionSet: string]: SolarplexReaction[] } }>(url);
+    if (this.rootStore.api.getError(url) || !response) {
+      return;
     }
+    const reactionSets = response.data;
+    runInAction(() => {
+      this.reactionSets = merge(this.reactionSets, reactionSets);
+      Object.values(reactionSets).forEach((reactionPack: any) => {
+        reactionPack.forEach((reaction: any) => {
+          this.reactionTypes[reaction.id] = reaction;
+          this.reactionNameToCollectionId[reaction.name] = reaction.collection_id;
+        });
+      });
+      this.earnedReactions['default'] = reactionSets['default'];
+    })
+  }, this, 'fetchPacks');
+
+
+  fetchAll = actions.wrapAction(async () => {
+    const url = `${SOLARPLEX_FEED_API}/splx/get_all_reactions`;
+    const response = await this.rootStore.api.get<{ data: Reaction[] }>(url);
+    if (this.rootStore.api.getError(url) || !response) {
+      return;
+    }
+    runInAction(() => {
+      for (const reaction of response.data) {
+        if (this.reactionMap[reaction.post_id]) {
+          this.reactionMap[reaction.post_id][reaction.user_id] =
+            reaction.reaction_id;
+        } else {
+          this.reactionMap[reaction.post_id] = {};
+          this.reactionMap[reaction.post_id][reaction.user_id] =
+            reaction.reaction_id;
+        }
+      }
+    });
+  }, this, 'fetchAll');
+
+  async fetch() {
+    Promise.all([this.fetchPacks(), this.fetchAll()]).finally(() => {});
   }
 
   async update(reactions: { [collectionId: string]: SolarplexReaction[] }) {
-    if (this.rootStore.me.nft.assets.length) {
-      // console.log("updating reactions", reactions);
-      this.earnedReactions = { ...this.earnedReactions, ...reactions };
+    if (!this.rootStore.me.nft.assets.length) {
+      return;
     }
+    runInAction(() => {
+      this.earnedReactions = merge(this.earnedReactions, reactions);
+    });
   }
   async selectReactionSet(reactionSet: string) {
-    if (
-      this.reactionSets[reactionSet] &&
-      this.reactionSets[reactionSet].length
-    ) {
-      this.curReactionsSet = reactionSet;
+    if (!this.reactionSets[reactionSet]?.length || this.curReactionsSet === reactionSet) {
+      return;
     }
+    runInAction(() => {
+      this.curReactionsSet = reactionSet;
+    });
   }
 }

@@ -18,7 +18,7 @@ export class SplxApiModel {
     try {
       const response = await fetch(input, init);
       const json = await response.json();
-      return json?.data;
+      return json;
     } catch (err) {
       console.error('request failed')
     } finally {
@@ -57,7 +57,7 @@ export class SplxApiModel {
   }, this, 'get');
 
   getError(url: string, init?: RequestInit) {
-    return this.rootStore.actions.error('get', this, [url, init]);
+    return actions.error('get', this, [url, init]);
   }
 
   post = actions.wrapAction(async <T>(url: string, init?: RequestInit): Promise<T | undefined> => {
@@ -65,7 +65,7 @@ export class SplxApiModel {
   }, this, 'post');
 
   postError(url: string, init?: RequestInit) {
-    return this.rootStore.actions.error('post', this, [url, init]);
+    return actions.error('post', this, [url, init]);
   }
 
 }
