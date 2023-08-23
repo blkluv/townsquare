@@ -152,7 +152,11 @@ const DisplayReactions = observer(function DisplayReactions() {
               <View style={styles.horizontalContainer}>
                 <UserAvatar
                   size={25}
-                  avatar={"https://i.ibb.co/NLkvySY/blob.png"}
+                  avatar={
+                    reactionPack === "gaming"
+                      ? "https://live.solarplex.xyz/image/agIRkUaOAo7UKR83WhTqnSYMBUGILjWmXEKhlw0lhrc/rs:fill:1000:1000:1:0/plain/bafkreihko7w6unxciovmrzsou2naohht5zb7jst2op4hqaoi573m6bzh3m@jpeg"
+                      : "https://i.ibb.co/NLkvySY/blob.png"
+                  }
                 />
 
                 <View
