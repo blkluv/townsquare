@@ -56,7 +56,6 @@ function getReactionPackTitle(reactionPack: string): string {
 }
 
 function getReactionPackStyle(reactionPack: string) {
-  console.log("reactionPack", reactionPack);
   if (reactionPack == "default") {
     return {
       width: isMobileWeb ? 40 : 50,
@@ -125,11 +124,6 @@ const DisplayReactions = observer(function DisplayReactions() {
       ? store.reactions.selectReactionSet(reactionPack)
       : {};
   };
-
-  console.log(
-    "store.reactions.reactionSets[reactionPack]",
-    store.reactions.reactionSets,
-  );
 
   return (
     <View>
