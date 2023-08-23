@@ -36,6 +36,8 @@ const PROD_CONSTANTS = {
   HELIUS_RPC_API: "https://rpc.helius.xyz",
   SPLX_UI_URL: "https://v2.solarplex.xyz",
   SPLX_FEED_API: "https://feed.solarplex.xyz",
+  GENESIS_COLLECTION: "7soPY36PaM8Ck1EycPq5WJ3CVHjZK47aneFniK5GNFyQ",
+  GAMING_COLLECTION: "ofUvbBBKGG9X3YKQ8Xyv1s2GqQyUgwyk37XxuiNQY45"
 };
 
 const STAGING_CONSTANTS = {
@@ -48,6 +50,8 @@ const STAGING_CONSTANTS = {
   HELIUS_RPC_API: "https://devnet.helius-rpc.com",
   SPLX_UI_URL: "staging.v2.solarplex.xyz",
   SPLX_FEED_API: "https://staging.feed.solarplex.xyz",
+  GENESIS_COLLECTION: "7soPY36PaM8Ck1EycPq5WJ3CVHjZK47aneFniK5GNFyQ",
+  GAMING_COLLECTION: "BXHRjXaTwLoGdXGuoUzbaeUuBQ21E5vWjCqyUGLsD8fM",
 };
 
 const LOCALHOST_CONSTANTS = {
@@ -181,10 +185,9 @@ export const SOLARPLEX_FEED_URI_PATH = `at://${SOLARPLEX_USER_DID}/app.bsky.feed
 
 // TODO(zfaizal2): eventually move this to an API call
 export const GENESIS_COLLECTION =
-  "7soPY36PaM8Ck1EycPq5WJ3CVHjZK47aneFniK5GNFyQ";
+  ACTIVE_CONSTANTS.GENESIS_COLLECTION;
 export const GAMING_COLLECTION = 
-  "BXHRjXaTwLoGdXGuoUzbaeUuBQ21E5vWjCqyUGLsD8fM";
-
+ ACTIVE_CONSTANTS.GAMING_COLLECTION;
 export function LINK_META_PROXY(serviceUrl: string) {
   if (IS_LOCAL_DEV(serviceUrl)) {
     return STAGING_LINK_META_PROXY;
