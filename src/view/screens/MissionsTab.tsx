@@ -166,7 +166,10 @@ const DisplayReactions = observer(function DisplayReactions() {
                 >
                   <Text type="lg-heavy" style={[pal.text, styles.textPadding]}>
                     {reactionPack === "gaming" ? (
-                      <Link> {getReactionPackTitle(reactionPack)}</Link>
+                      <Link href="/profile/zenrepublic.live.solarplex.xyz">
+                        {" "}
+                        {getReactionPackTitle(reactionPack)}
+                      </Link>
                     ) : (
                       <>{getReactionPackTitle(reactionPack)}</>
                     )}
