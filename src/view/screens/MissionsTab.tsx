@@ -45,7 +45,48 @@ const InfoText = ({ text }: { text: string }) => {
   );
 };
 
-export const GrayedImage = ({ image }: { image: any }) => {
+function getReactionPackTitle(reactionPack: string): string {
+  if (reactionPack == "gaming") {
+    return `Rubian Reactions by Zen Republic`;
+  } else {
+    return `Solarplex ${
+      reactionPack.charAt(0).toUpperCase() + reactionPack.slice(1)
+    } Reactions`;
+  }
+}
+
+function getReactionPackStyle(reactionPack: string) {
+  console.log("reactionPack", reactionPack);
+  if (reactionPack == "default") {
+    return {
+      width: isMobileWeb ? 40 : 50,
+      height: isMobileWeb ? 40 : 50,
+    };
+  } else if (reactionPack == "gaming") {
+    return {
+      width: isMobileWeb ? 60 : 60,
+      height: isMobileWeb ? 60 : 60,
+    };
+  } else if (reactionPack == "squid") {
+    return {
+      width: isMobileWeb ? 100 : 100,
+      height: isMobileWeb ? 100 : 100,
+    };
+  } else {
+    return {
+      width: isMobileWeb ? 75 : 70,
+      height: isMobileWeb ? 75 : 70,
+    };
+  }
+}
+
+export const GrayedImage = ({
+  image,
+  reactionpack,
+}: {
+  image: any;
+  reactionpack: string;
+}) => {
   return (
     <View>
       <Image
@@ -54,8 +95,7 @@ export const GrayedImage = ({ image }: { image: any }) => {
         }}
         style={{
           tintColor: "gray",
-          width: isMobileWeb ? 50 : 100,
-          height: isMobileWeb ? 50 : 100,
+          ...getReactionPackStyle(reactionpack),
         }}
       />
       <Image
@@ -65,8 +105,7 @@ export const GrayedImage = ({ image }: { image: any }) => {
         style={{
           position: "absolute",
           opacity: 0.17,
-          width: isMobileWeb ? 50 : 100,
-          height: isMobileWeb ? 50 : 100,
+          ...getReactionPackStyle(reactionpack),
         }}
       />
     </View>
@@ -87,163 +126,146 @@ const DisplayReactions = observer(function DisplayReactions() {
       : {};
   };
 
+  console.log(
+    "store.reactions.reactionSets[reactionPack]",
+    store.reactions.reactionSets,
+  );
+
   return (
     <View>
-      <View style={s.p10}>
+      {/* <View style={s.p10}>
         <InfoText text="Reaction packs are on chain collectibles that allow you to uniquely express yourself on Solarplex posts. Engage with/create posts to win points and unlock packs!" />
-      </View>
-      {Object.keys(store.reactions.reactionSets).map((reactionPack) => (
-        <View
-        key={reactionPack}
-          style={[
-            pal.view,
-            !store.reactions.earnedReactions[reactionPack]?.length && {
-              opacity: 0.2,
-            },
-          ]}
-        >
-          <View style={styles.HeaderRow}>
-            <View style={styles.horizontalContainer}>
-              <UserAvatar
-                size={25}
-                avatar={"https://i.ibb.co/NLkvySY/blob.png"}
-              />
+      </View> */}
+      {Object.keys(store.reactions.reactionSets)
+        .sort((a, b) => (a === "gaming" ? -1 : b === "gaming" ? 1 : 0))
+        .map((reactionPack) => (
+          <View
+            key={reactionPack}
+            style={[
+              pal.view,
+              !store.reactions.earnedReactions[reactionPack]?.length && {
+                opacity: 0.2,
+              },
+            ]}
+          >
+            <View style={styles.HeaderRow}>
+              <View style={styles.horizontalContainer}>
+                <UserAvatar
+                  size={25}
+                  avatar={"https://i.ibb.co/NLkvySY/blob.png"}
+                />
 
-              <View
-                style={
-                  isMobileWeb ? styles.verticalView : styles.horizontalView
-                }
-              >
-                <Text type="lg-heavy" style={[pal.text, styles.textPadding]}>
-                  Solarplex {reactionPack.charAt(0).toUpperCase() + reactionPack.slice(1)} Reactions
-                </Text>
-                <Text
-                  type="sm-heavy"
-                  style={[pal.text, styles.textPadding, styles.reaction]}
+                <View
+                  style={
+                    isMobileWeb ? styles.verticalView : styles.horizontalView
+                  }
                 >
-                  {Math.min(
-                    store.reactions.earnedReactions[reactionPack]?.length ?? 0,
-                    11,
-                  )}
-                  /{store.reactions.reactionSets[reactionPack]?.length} Reactions
-                </Text>
+                  <Text type="lg-heavy" style={[pal.text, styles.textPadding]}>
+                    {reactionPack === "gaming" ? (
+                      <Link> {getReactionPackTitle(reactionPack)}</Link>
+                    ) : (
+                      <>{getReactionPackTitle(reactionPack)}</>
+                    )}
+                  </Text>
+                  <Text
+                    type="sm-heavy"
+                    style={[pal.text, styles.textPadding, styles.reaction]}
+                  >
+                    {Math.min(
+                      store.reactions.earnedReactions[reactionPack]?.length ??
+                        0,
+                      11,
+                    )}
+                    /{store.reactions.reactionSets[reactionPack]?.length}{" "}
+                    Reactions
+                  </Text>
+                </View>
               </View>
+
+              <ToggleButton
+                type="default-light"
+                isSelected={store.reactions.curReactionsSet === reactionPack}
+                onPress={() => onPressReactionPack(reactionPack)}
+                label=""
+              />
             </View>
-
-            <ToggleButton
-              type="default-light"
-              isSelected={store.reactions.curReactionsSet === reactionPack}
-              onPress={() => onPressReactionPack(reactionPack)}
-              label=""
-            />
-          </View>
-          <View style={styles.reactionList}>
-            {/* <RadioButton
-            label={""}
-            isSelected={store.reactions.curReactionsSet === reactionPack}
-            onPress={() => {}}
-          /> */}
-
-            <FlatList
-              data={store.reactions.reactionSets[reactionPack]}
-              numColumns={isMobileWeb ? 4 : 4}
-              key={4}
-              renderItem={({ item }) => {
-                if (
-                  store.reactions.earnedReactions[reactionPack]?.find(
-                    (reaction) => reaction.reaction_id === item.reaction_id,
-                  )
-                ) {
-                  return (
-                    <View style={{ paddingHorizontal: isMobileWeb ? 8 : 12 }}>
-                      <Image
-                        source={{
-                          uri: item.nft_metadata.image,
-                        }}
+            <View style={styles.reactionList}>
+              <FlatList
+                data={store.reactions.reactionSets[reactionPack]}
+                numColumns={isMobileWeb ? 4 : 4}
+                key={4}
+                renderItem={({ item }) => {
+                  if (
+                    store.reactions.earnedReactions[reactionPack]?.find(
+                      (reaction) => reaction.reaction_id === item.reaction_id,
+                    )
+                  ) {
+                    return (
+                      <View
                         style={{
-                          width: isMobileWeb ? 50 : 100,
-                          height: isMobileWeb ? 50 : 100,
+                          width: 100,
+                          height: 100,
+                          flexDirection: "row",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          paddingHorizontal: isMobileWeb ? 8 : 12,
                         }}
-                      />
-                    </View>
-                  );
-                } else {
-                  return (
-                    <View style={{ paddingHorizontal: isMobileWeb ? 8 : 12 }}>
-                      <GrayedImage image={item.nft_metadata.image} />
-                    </View>
-                  );
-                }
-              }}
-            />
+                      >
+                        <Image
+                          source={{
+                            uri: item.nft_metadata.image,
+                          }}
+                          style={getReactionPackStyle(reactionPack)}
+                        />
+                      </View>
+                    );
+                  } else {
+                    return (
+                      <View
+                        style={{
+                          width: 100,
+                          height: 100,
+                          flexDirection: "row",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          paddingHorizontal: isMobileWeb ? 8 : 12,
+                        }}
+                      >
+                        <GrayedImage
+                          reactionpack={reactionPack}
+                          image={item.nft_metadata.image}
+                        />
+                      </View>
+                    );
+                  }
+                }}
+              />
+            </View>
           </View>
-        </View>
-      ))}
+        ))}
+      <View style={styles.spacer20} />
     </View>
   );
 });
 
 type Props = NativeStackScreenProps<CommonNavigatorParams, "Missions">;
 export const MissionsTab = withAuthRequired(
-  observer(() => {
+  observer(function Missions({}: Props) {
     const pal = usePalette("default");
     const store = useStores();
 
     return (
-      <View style={pal.view}>
-        <View testID="communitiesScreen" style={s.hContentRegion}>
+      <View testID="communitiesScreen" style={s.hContentRegion}>
+        <ScrollView
+          style={[s.hContentRegion]}
+          contentContainerStyle={!isDesktopWeb && pal.viewLight}
+          scrollIndicatorInsets={{ right: 1 }}
+        >
+          <ViewHeader title="Reactions" canGoBack={false} />
           <CenteredView style={styles.container}>
-            <ScrollView
-              style={[s.hContentRegion]}
-              contentContainerStyle={!isDesktopWeb && pal.viewLight}
-              scrollIndicatorInsets={{ right: 1 }}
-            >
-              <ViewHeader title="Reactions" canGoBack={false} />
-              {/* <View style={styles.HeaderRow}>
-            <View style={styles.horizontalView}>
-              <UserAvatar size={40} avatar={"https://picsum.photos/300/300"} />
-
-              <Text type="lg-heavy" style={[pal.text, styles.textPadding]}>
-                @squids.live.solarplex.xyz
-              </Text>
-            </View>
-            <View>
-              <Text type="sm-bold" style={[pal.text, styles.reaction]}>
-                1/11 Reactions
-              </Text>
-            </View>
-          </View>
-
-          <View style={styles.reactionList}>
-            <FlatList
-              data={squidzReactionsList}
-              numColumns={4}
-              key={4}
-              renderItem={({ item }) => {
-                if (item.isClaimed) {
-                  return (
-                    <Image source={item.src} style={styles.reactionImage} />
-                  );
-                } else {
-                  return <GrayedImage image={item.src} />;
-                }
-              }}
-            />
-          </View> */}
-              {/* TODO: (Pratik) We should surely work on improving this
-              {!store.reactions.earnedReactions[reactionPack]?.length && (
-                <Text type="lg-heavy" style={[pal.text, styles.textPadding]}>
-                  {" "}
-                  Request Genesis NFTs from{" "}
-                  <Link href="/profile/viksit.live.solarplex.xyz">
-                    @viksit.live.solarplex.xyz
-                  </Link>{" "}
-                </Text>
-              )} */}
-              <DisplayReactions />
-            </ScrollView>
+            <DisplayReactions />
           </CenteredView>
-        </View>
+        </ScrollView>
       </View>
     );
   }),
@@ -344,11 +366,15 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     paddingBottom: 10,
+    paddingHorizontal: 12,
   },
   reaction: {
     backgroundColor: colors.gray2,
     borderRadius: 32,
     paddingHorizontal: 8,
     paddingVertical: 4,
+  },
+  spacer20: {
+    height: 20,
   },
 });

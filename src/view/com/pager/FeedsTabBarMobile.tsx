@@ -43,7 +43,7 @@ export const FeedsTabBar = observer(
       }).start();
     }, [interp, store.shell.minimalShellMode]);
     const transform = {
-      transform: [{ translateY: Animated.multiply(interp, -140) }],
+      transform: [{ translateY: Animated.multiply(interp, -100) }],
     };
 
     const brandBlue = useColorSchemeStyle(s.brandBlue, s.blue3);
@@ -52,13 +52,6 @@ export const FeedsTabBar = observer(
       store.shell.openDrawer();
     }, [store]);
 
-    const items = useMemo(
-      () => [
-        store.session.hasSession ? "Following" : "Home",
-        ...store.me.savedFeeds.pinnedFeedNames,
-      ],
-      [store.me.savedFeeds.pinnedFeedNames],
-    );
     // Get the user's joined communities from joinedCommunities.communities
     // Get the names of that community from this list for display here
     // For each, we can construct the URL of that feed.
@@ -81,7 +74,7 @@ export const FeedsTabBar = observer(
     return (
       <Animated.View style={[pal.view, pal.border, styles.tabBar, transform]}>
         <View style={[pal.view, styles.topBar]}>
-          <View style={[pal.view, { flexDirection: "row" }]}>
+          <View style={[pal.view]}>
             <TouchableOpacity
               testID="viewHeaderDrawerBtn"
               onPress={onPressAvi}
@@ -92,10 +85,18 @@ export const FeedsTabBar = observer(
             >
               <UserAvatar avatar={store.me.avatar} size={27} />
             </TouchableOpacity>
-            <View style={{ width: 150, height: 25, marginLeft: "3rem" }}>
-              <SolarplexLogo />
-            </View>
           </View>
+          <View
+            style={{
+              width: 150,
+              height: 25,
+              flexDirection: "row",
+              alignItems: "center",
+            }}
+          >
+            <SolarplexLogo />
+          </View>
+          <View></View>
           {/* {!store.session.isSolarplexSession && (
             <View style={[pal.view]}>
               <TouchableOpacity
