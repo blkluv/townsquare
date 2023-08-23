@@ -94,6 +94,7 @@ const DisplayReactions = observer(function DisplayReactions() {
       </View>
       {Object.keys(store.reactions.reactionSets).map((reactionPack) => (
         <View
+        key={reactionPack}
           style={[
             pal.view,
             !store.reactions.earnedReactions[reactionPack]?.length && {
@@ -114,7 +115,7 @@ const DisplayReactions = observer(function DisplayReactions() {
                 }
               >
                 <Text type="lg-heavy" style={[pal.text, styles.textPadding]}>
-                  Solarplex {reactionPack} Reactions
+                  Solarplex {reactionPack.charAt(0).toUpperCase() + reactionPack.slice(1)} Reactions
                 </Text>
                 <Text
                   type="sm-heavy"
@@ -148,11 +149,6 @@ const DisplayReactions = observer(function DisplayReactions() {
               numColumns={isMobileWeb ? 4 : 4}
               key={4}
               renderItem={({ item }) => {
-                console.log(
-                  "check",
-                  store.reactions.earnedReactions[reactionPack],
-                  item.reaction_id,
-                );
                 if (
                   store.reactions.earnedReactions[reactionPack]?.find(
                     (reaction) => reaction.reaction_id === item.reaction_id,

@@ -66,7 +66,6 @@ export const ComposePost = observer(function ComposePost({
   const store = useStores();
   const isThisSharing = store.shell.isSharing;
   const sharingText = store.shell.sharingText;
-  console.log("sharingText", sharingText);
   const uri = store.shell.sharedUri;
   const textInput = useRef<TextInputRef>(null);
   const [isProcessing, setIsProcessing] = useState(false);

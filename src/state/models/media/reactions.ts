@@ -24,7 +24,7 @@ export interface SolarplexReaction {
     name: string;
     symbol: string;
     image: string;
-  }
+  };
   project_id: string;
 }
 
@@ -44,6 +44,7 @@ export class SplxReactionModel {
   earnedReactions: { [reactionSet: string]: SolarplexReaction[] } = {
     // default: DEFAULT_REACTION_EMOJIS,
   };
+  reactionNameToCollectionId: { [reactionName: string]: string } = {};
   curReactionsSet: string = "default";
 
   constructor(public rootStore: RootStoreModel) {
@@ -104,9 +105,10 @@ export class SplxReactionModel {
     Object.values(reactionPacks).forEach((reactionPack: any) => {
       reactionPack.forEach((reaction: any) => {
         this.reactionTypes[reaction.id] = reaction;
+        this.reactionNameToCollectionId[reaction.name] = reaction.collection_id;
       });
     });
-    this.earnedReactions['default'] = reactionPacks["default"]
+    this.earnedReactions["default"] = reactionPacks["default"];
 
     const allReactions = await fetch(
       `${SOLARPLEX_FEED_API}/splx/get_all_reactions`,
@@ -130,13 +132,17 @@ export class SplxReactionModel {
     }
   }
 
-  async update(reactions: SolarplexReaction[]) {
+  async update(reactions: { [collectionId: string]: SolarplexReaction[] }) {
     if (this.rootStore.me.nft.assets.length) {
-      this.earnedReactions["genesis"] = reactions;
+      // console.log("updating reactions", reactions);
+      this.earnedReactions = { ...this.earnedReactions, ...reactions };
     }
   }
   async selectReactionSet(reactionSet: string) {
-    if (this.reactionSets[reactionSet] && this.reactionSets[reactionSet].length) {
+    if (
+      this.reactionSets[reactionSet] &&
+      this.reactionSets[reactionSet].length
+    ) {
       this.curReactionsSet = reactionSet;
     }
   }

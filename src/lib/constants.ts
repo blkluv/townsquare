@@ -179,8 +179,11 @@ export const SOLARPLEX_FEED_URI_PATH = `at://${SOLARPLEX_USER_DID}/app.bsky.feed
 // export const SOLARPLEX_FEED_API_LOCAL = "http://localhost:58194";
 // // export const SOLARPLEX_V1_API = "http://localhost:3001";
 
+// TODO(zfaizal2): eventually move this to an API call
 export const GENESIS_COLLECTION =
   "7soPY36PaM8Ck1EycPq5WJ3CVHjZK47aneFniK5GNFyQ";
+export const GAMING_COLLECTION = 
+  "BXHRjXaTwLoGdXGuoUzbaeUuBQ21E5vWjCqyUGLsD8fM";
 
 export function LINK_META_PROXY(serviceUrl: string) {
   if (IS_LOCAL_DEV(serviceUrl)) {
