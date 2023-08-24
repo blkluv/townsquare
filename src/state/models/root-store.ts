@@ -156,9 +156,9 @@ export class RootStoreModel {
     this.me.clear();
     /* dont await */ this.preferences.sync();
     await this.me.load();
-    if (!hadSession) {
-      resetNavigation();
-    }
+    // if (!hadSession) {
+    //   resetNavigation();
+    // }
     this.me.did && await this.rewards.fetchMissions(this.me.did);
   }
 
