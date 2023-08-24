@@ -17,16 +17,8 @@ export function isStateAtTabRoot(state: State | undefined) {
     return true;
   }
   const currentRoute = getCurrentRoute(state);
-  return (
-    isTab(currentRoute.name, "Home") ||
-    isTab(currentRoute.name, "Search") ||
-    isTab(currentRoute.name, "Feeds") ||
-    isTab(currentRoute.name, "Notifications") ||
-    isTab(currentRoute.name, "MyProfile") ||
-    isTab(currentRoute.name, "Communities") ||
-    isTab(currentRoute.name, "Rewards") || 
-    isTab(currentRoute.name, "Wallets")
-  );
+
+  return isTab(currentRoute.name, "PostThread");
 }
 
 export function isTab(current: string, route: string) {

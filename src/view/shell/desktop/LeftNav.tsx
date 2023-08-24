@@ -65,7 +65,8 @@ function BackBtn() {
   const pal = usePalette("default");
   const store = useStores();
   const navigation = useNavigation<NavigationProp>();
-  const shouldShow = useNavigationState((state) => !isStateAtTabRoot(state));
+  const shouldShow = useNavigationState((state) => isStateAtTabRoot(state));
+
   const onPressBack = React.useCallback(() => {
     if (navigation.canGoBack()) {
       navigation.goBack();
@@ -242,7 +243,7 @@ export const DesktopLeftNav = observer(function DesktopLeftNav() {
           <ProfileCard />
         </>
       )}
-      {/* <BackBtn /> */}
+      <BackBtn />
       <NavItem
         href="/"
         icon={<HomeIcon size={24} style={pal.text} />}
