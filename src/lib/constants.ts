@@ -54,7 +54,7 @@ const STAGING_CONSTANTS = {
   SPLX_FEED_API: "https://staging.feed.solarplex.xyz",
   GENESIS_COLLECTION: "7soPY36PaM8Ck1EycPq5WJ3CVHjZK47aneFniK5GNFyQ",
   GAMING_COLLECTION: "BXHRjXaTwLoGdXGuoUzbaeUuBQ21E5vWjCqyUGLsD8fM",
-  S3_IMAGE_BUCKET: "https://splx-prod.s3.amazonaws.com",
+  S3_IMAGE_BUCKET: "https://splx-staging.s3.amazonaws.com",
   CLOUDFRONT_IMAGE_BUCKET: "https://d30z0599kmgs5o.cloudfront.net"
 };
 
