@@ -37,7 +37,9 @@ const PROD_CONSTANTS = {
   SPLX_UI_URL: "https://v2.solarplex.xyz",
   SPLX_FEED_API: "https://feed.solarplex.xyz",
   GENESIS_COLLECTION: "7soPY36PaM8Ck1EycPq5WJ3CVHjZK47aneFniK5GNFyQ",
-  GAMING_COLLECTION: "ofUvbBBKGG9X3YKQ8Xyv1s2GqQyUgwyk37XxuiNQY45"
+  GAMING_COLLECTION: "ofUvbBBKGG9X3YKQ8Xyv1s2GqQyUgwyk37XxuiNQY45",
+  S3_IMAGE_BUCKET: "https://splx-prod.s3.amazonaws.com",
+  CLOUDFRONT_IMAGE_BUCKET: "https://d2pys5jca4hywh.cloudfront.net",
 };
 
 const STAGING_CONSTANTS = {
@@ -52,6 +54,8 @@ const STAGING_CONSTANTS = {
   SPLX_FEED_API: "https://staging.feed.solarplex.xyz",
   GENESIS_COLLECTION: "7soPY36PaM8Ck1EycPq5WJ3CVHjZK47aneFniK5GNFyQ",
   GAMING_COLLECTION: "BXHRjXaTwLoGdXGuoUzbaeUuBQ21E5vWjCqyUGLsD8fM",
+  S3_IMAGE_BUCKET: "https://splx-prod.s3.amazonaws.com",
+  CLOUDFRONT_IMAGE_BUCKET: "https://d30z0599kmgs5o.cloudfront.net"
 };
 
 const LOCALHOST_CONSTANTS = {
@@ -176,6 +180,9 @@ export const SOLARPLEX_FEEDS = [
   `at://${SOLARPLEX_USER_DID}/app.bsky.feed.generator/splx-solarplex`,
   `at://${SOLARPLEX_USER_DID}/app.bsky.feed.generator/wearesquidz`,
 ];
+
+export const S3_IMAGE_BUCKET = ACTIVE_CONSTANTS.S3_IMAGE_BUCKET;
+export const CLOUDFRONT_IMAGE_BUCKET = ACTIVE_CONSTANTS.CLOUDFRONT_IMAGE_BUCKET;
 
 export const SOLARPLEX_FEED_URI_PATH = `at://${SOLARPLEX_USER_DID}/app.bsky.feed.generator/`;
 

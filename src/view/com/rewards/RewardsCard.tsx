@@ -1,3 +1,4 @@
+import { CLOUDFRONT_IMAGE_BUCKET, S3_IMAGE_BUCKET } from "lib/constants";
 import { Image, ImageSourcePropType, StyleSheet, TouchableOpacity, View } from "react-native";
 import React, { useEffect } from "react";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
@@ -50,6 +51,9 @@ function ClaimWeeklyButton({ setDisplayWeekly }: UserRewardProps) {
 
 function ShareButton({ rewardsImg, isWeekly}: RewardClaimedProps) {
   const store = useStores();
+  if (rewardsImg.includes(S3_IMAGE_BUCKET)) {
+    rewardsImg = rewardsImg.replace(S3_IMAGE_BUCKET, CLOUDFRONT_IMAGE_BUCKET);
+  }
   const onPressCompose = React.useCallback(() => {
     store.shell.openComposer({
       isSharing: true,
