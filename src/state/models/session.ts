@@ -84,7 +84,6 @@ export class SessionModel {
       hydrate: false,
       hasSession: false,
     });
-
   }
 
   get currentSession() {
@@ -299,6 +298,11 @@ export class SessionModel {
       this._log(
         "SessionModel:resumeSession aborted due to lack of access tokens",
       );
+      return false;
+    }
+
+    if (account.service !== DEFAULT_SERVICE) {
+      this._log("SessionModel:resumeSession aborted due service mismatch  ");
       return false;
     }
 
