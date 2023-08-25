@@ -110,7 +110,11 @@ const ProfileHeaderLoaded = observer(
     const { track } = useAnalytics();
 
     const onPressBack = React.useCallback(() => {
-      navigation.goBack();
+      if (navigation.canGoBack()) {
+        navigation.goBack();
+      } else {
+        navigation.navigate("Home");
+      }
     }, [navigation]);
 
     const onPressAvi = React.useCallback(() => {
