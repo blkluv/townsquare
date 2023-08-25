@@ -2,7 +2,7 @@ import { makeAutoObservable, runInAction } from "mobx";
 
 import { RootStoreModel } from "./models/root-store";
 import { SOLARPLEX_V1_API } from "lib/constants";
-import merge from 'lodash.merge'
+import merge from "lodash.merge";
 
 interface Reward {
   image: string;
@@ -68,6 +68,14 @@ export class RewardsModel {
       { autoBind: true },
     );
   }
+  
+  getScore(userId: string) {
+    const user = this.users[userId]?.user;
+    if (!user) {
+      return undefined; 
+    }
+    return user.score;
+  }
 
   dailyMissionId(userId: string) {
     return this.users[userId]?.daily?.id ?? "";
@@ -95,7 +103,7 @@ export class RewardsModel {
         if (!this.inFlight["claims"]) {
           this.inFlight["claims"] = {};
         }
-        
+
         this.inFlight["claims"][missionId] = 1;
 
         const response = await fetch(
@@ -177,13 +185,17 @@ export class RewardsModel {
 
   isClaimingDaily(userId: string) {
     return (
-      !!this.dailyInFlight(userId) || !!this.users[userId]?.daily?.isClaiming || (!this.hasClaimedDaily(userId) && !!this.dailyReward(userId))
+      !!this.dailyInFlight(userId) ||
+      !!this.users[userId]?.daily?.isClaiming ||
+      (!this.hasClaimedDaily(userId) && !!this.dailyReward(userId))
     );
   }
 
   isClaimingWeekly(userId: string) {
     return (
-      !!this.weeklyInFlight(userId) || !!this.users[userId]?.weekly?.isClaiming || (!this.hasClaimedWeekly(userId) && !!this.weeklyReward(userId))
+      !!this.weeklyInFlight(userId) ||
+      !!this.users[userId]?.weekly?.isClaiming ||
+      (!this.hasClaimedWeekly(userId) && !!this.weeklyReward(userId))
     );
   }
 
@@ -249,6 +261,7 @@ export class RewardsModel {
         const response = await fetch(
           `${SOLARPLEX_V1_API}${apiUrls.rewards.getMissions(userId)}`,
         );
+
         if (!response.ok) {
           throw new Error(
             `API request failed with status: ${response.statusText}`,

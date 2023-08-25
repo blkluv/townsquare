@@ -47,6 +47,7 @@ import { Banner } from "./Banner";
 import { FEEDBACK_FORM_URL } from "lib/constants";
 import { NavItem } from "./desktop/LeftNav";
 import { NavigationProp } from "lib/routes/types";
+import { ScoreCard } from "../com/rewards/ScoreCard";
 import { Text } from "view/com/util/text/Text";
 import { UserAvatar } from "view/com/util/UserAvatar";
 import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
@@ -175,18 +176,7 @@ export const DrawerContent = observer(() => {
                 onPress={onPressProfile}
               >
                 <UserAvatar size={80} avatar={store.me.avatar} />
-                <Text
-                  type="title-lg"
-                  style={[pal.text, s.bold, styles.profileCardDisplayName]}
-                >
-                  {store.me.displayName || store.me.handle}
-                </Text>
-                <Text
-                  type="2xl"
-                  style={[pal.textLight, styles.profileCardHandle]}
-                >
-                  @{store.me.handle}
-                </Text>
+                <ScoreCard handleTextStyle={styles.profileCardDisplayName} />
                 <Text
                   type="xl"
                   style={[pal.textLight, styles.profileCardFollowers]}

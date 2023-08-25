@@ -39,9 +39,9 @@ import { Banner } from "../Banner";
 import { Link } from "view/com/util/Link";
 import { PressableWithHover } from "view/com/util/PressableWithHover";
 import React from "react";
+import { ScoreCard } from "view/com/rewards/ScoreCard";
 import { Text } from "view/com/util/text/Text";
 import { UserAvatar } from "view/com/util/UserAvatar";
-import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
 import { observer } from "mobx-react-lite";
 import { router } from "../../../routes";
 import { useAnalytics } from "lib/analytics/analytics";
@@ -50,14 +50,20 @@ import { useStores } from "state/index";
 
 const ProfileCard = observer(() => {
   const store = useStores();
+
   return (
-    <Link
-      href={`/profile/${store.me.handle}`}
-      style={styles.profileCard}
-      asAnchor
-    >
-      <UserAvatar avatar={store.me.avatar} size={64} />
-    </Link>
+    <View>
+      <Link
+        href={`/profile/${store.me.handle}`}
+        style={styles.profileCard}
+        asAnchor
+      >
+        <UserAvatar avatar={store.me.avatar} size={64} />
+      </Link>
+      <View style={{ paddingLeft: 12 }}>
+        <ScoreCard />
+      </View>
+    </View>
   );
 });
 
