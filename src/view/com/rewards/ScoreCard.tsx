@@ -21,7 +21,8 @@ export const ScoreCard = observer(({ handleTextStyle }: ScoreCardProps) => {
   return (
     <View>
       <Text type="title-lg" style={[pal.text, s.bold, handleTextStyle]}>
-        {store.me.displayName || store.me.handle}
+        {store.me.displayName || store.me.handle.replace("live.solarplex.xyz", "")}
+
       </Text>
       <Text type="md-thin" style={styles.scoreText}>
         {score !== undefined ? `⭐️ ${score} Points` : "⭐️ 0 Points"}
