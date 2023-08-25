@@ -176,7 +176,7 @@ export const DrawerContent = observer(() => {
                 onPress={onPressProfile}
               >
                 <UserAvatar size={80} avatar={store.me.avatar} />
-                <ScoreCard handleTextStyle={styles.profileCardDisplayName} />
+                {/* <ScoreCard handleTextStyle={styles.profileCardDisplayName} /> */}
                 <Text
                   type="xl"
                   style={[pal.textLight, styles.profileCardFollowers]}

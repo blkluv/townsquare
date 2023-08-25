@@ -60,9 +60,9 @@ const ProfileCard = observer(() => {
       >
         <UserAvatar avatar={store.me.avatar} size={64} />
       </Link>
-      <View style={{ paddingLeft: 12 }}>
+      {/* <View style={{ paddingLeft: 12 }}>
         <ScoreCard />
-      </View>
+      </View> */}
     </View>
   );
 });
