@@ -1,12 +1,13 @@
-import {makeAutoObservable} from 'mobx'
 import {
-  AppBskyGraphGetLists as GetLists,
   AppBskyGraphGetListMutes as GetListMutes,
+  AppBskyGraphGetLists as GetLists,
   AppBskyGraphDefs as GraphDefs,
 } from '@atproto/api'
+
 import {RootStoreModel} from '../root-store'
-import {cleanError} from 'lib/strings/errors'
 import {bundleAsync} from 'lib/async/bundle'
+import {cleanError} from 'lib/strings/errors'
+import {makeAutoObservable} from 'mobx'
 
 const PAGE_SIZE = 30
 
@@ -48,8 +49,23 @@ export class ListsListModel {
     return this.hasLoaded && !this.hasContent
   }
 
+  /**
+   * Removes posts from the feed upon deletion.
+   */
+  onListDeleted(uri: string) {
+    this.lists = this.lists.filter(l => l.uri !== uri)
+  }
+
   // public api
   // =
+
+  /**
+   * Register any event listeners. Returns a cleanup function.
+   */
+  registerListeners() {
+    const sub = this.rootStore.onListDeleted(this.onListDeleted.bind(this))
+    return () => sub.remove()
+  }
 
   async refresh() {
     return this.loadMore(true)

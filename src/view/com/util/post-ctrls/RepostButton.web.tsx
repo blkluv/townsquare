@@ -1,10 +1,11 @@
 import React, {useMemo} from 'react'
 import {StyleProp, StyleSheet, View, ViewStyle} from 'react-native'
-import {RepostIcon} from 'lib/icons'
+
 import {DropdownButton} from '../forms/DropdownButton'
+import {RepostIcon} from 'lib/icons'
+import {Text} from '../text/Text'
 import {colors} from 'lib/styles'
 import {useTheme} from 'lib/ThemeContext'
-import {Text} from '../text/Text'
 
 interface Props {
   isReposted: boolean
@@ -52,6 +53,7 @@ export const RepostButton = ({
       <View
         style={[
           styles.control,
+          !big && styles.controlPad,
           (isReposted
             ? styles.reposted
             : defaultControlColor) as StyleProp<ViewStyle>,
@@ -76,6 +78,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
+  },
+  controlPad: {
+    padding: 5,
   },
   reposted: {
     color: colors.green3,

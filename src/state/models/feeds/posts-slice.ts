@@ -2,9 +2,6 @@ import {FeedViewPostsSlice} from 'lib/api/feed-manip'
 import {PostsFeedItemModel} from './post'
 import {RootStoreModel} from '../root-store'
 import {makeAutoObservable} from 'mobx'
-import {mergePostModerations} from 'lib/labeling/helpers'
-
-let _idCounter = 0
 
 export class PostsFeedSliceModel {
   // ui state
@@ -13,16 +10,17 @@ export class PostsFeedSliceModel {
   // data
   items: PostsFeedItemModel[] = []
 
-  constructor(
-    public rootStore: RootStoreModel,
-    reactKey: string,
-    slice: FeedViewPostsSlice,
-  ) {
-    this._reactKey = reactKey
-    for (const item of slice.items) {
-      const reactions = this.rootStore.reactions.reactionMap[item.post.uri] ? Object.values(this.rootStore.reactions.reactionMap[item.post.uri]) : [];
+  constructor(public rootStore: RootStoreModel, slice: FeedViewPostsSlice) {
+    this._reactKey = slice._reactKey
+    for (let i = 0; i < slice.items.length; i++) {
+      const reactions = this.rootStore.reactions.reactionMap[slice.items[i].post.uri] ? Object.values(this.rootStore.reactions.reactionMap[slice.items[i].post.uri]) : []
       this.items.push(
-        new PostsFeedItemModel(rootStore, `slice-${_idCounter++}`, item, reactions.length ? reactions : undefined),
+        new PostsFeedItemModel(
+          rootStore,
+          `${this._reactKey} - ${i}`,
+          slice.items[i],
+          reactions.length ? reactions : undefined
+        ),
       )
     }
     makeAutoObservable(this, {rootStore: false})
@@ -56,7 +54,20 @@ export class PostsFeedSliceModel {
   }
 
   get moderation() {
-    return mergePostModerations(this.items.map(item => item.moderation))
+    // prefer the most stringent item
+    const topItem = this.items.find(item => item.moderation.content.filter)
+    if (topItem) {
+      return topItem.moderation
+    }
+    // otherwise just use the first one
+    return this.items[0].moderation
+  }
+
+  shouldFilter(ignoreFilterForDid: string | undefined): boolean {
+    const mods = this.items
+      .filter(item => item.post.author.did !== ignoreFilterForDid)
+      .map(item => item.moderation)
+    return !!mods.find(mod => mod.content.filter)
   }
 
   containsUri(uri: string) {

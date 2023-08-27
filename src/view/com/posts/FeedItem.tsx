@@ -1,321 +1,271 @@
-import * as Toast from "../util/Toast";
+import * as Toast from '../util/Toast'
 
-import {
-  AccessibilityActionEvent,
-  Linking,
-  StyleSheet,
-  View,
-} from "react-native";
-import { DesktopWebTextLink, Link } from "../util/Link";
+import {DesktopWebTextLink, Link} from '../util/Link'
 import {
   FontAwesomeIcon,
   FontAwesomeIconStyle,
-} from "@fortawesome/react-native-fontawesome";
-import React, { useCallback, useMemo, useState } from "react";
-import { getTranslatorLink, isPostInLanguage } from "../../../locale/helpers";
+} from '@fortawesome/react-native-fontawesome'
+import {Linking, StyleSheet, View} from 'react-native'
+import React, {useMemo, useState} from 'react'
+import {getTranslatorLink, isPostInLanguage} from '../../../locale/helpers'
 
-import { AtUri } from "@atproto/api";
-import Clipboard from "@react-native-clipboard/clipboard";
-import { ContentHider } from "../util/moderation/ContentHider";
-import { ImageHider } from "../util/moderation/ImageHider";
-import { ModerationBehaviorCode } from "lib/labeling/types";
-import { NavigationProp } from "lib/routes/types";
-import { PostCtrls } from "../util/post-ctrls/PostCtrls";
-import { PostEmbeds } from "../util/post-embeds";
-import { PostHider } from "../util/moderation/PostHider";
-import { PostMeta } from "../util/PostMeta";
-import { PostSandboxWarning } from "../util/PostSandboxWarning";
-import { PostsFeedItemModel } from "state/models/feeds/post";
-import { RichText } from "../util/text/RichText";
-import { Text } from "../util/text/Text";
-import { UserAvatar } from "../util/UserAvatar";
-import { UserInfoText } from "../util/UserInfoText";
-import { observer } from "mobx-react-lite";
-import { s } from "lib/styles";
-import { sanitizeDisplayName } from "lib/strings/display-names";
-import { useAnalytics } from "lib/analytics/analytics";
-import { useNavigation } from "@react-navigation/native";
-import { usePalette } from "lib/hooks/usePalette";
-import { useStores } from "state/index";
+import {AtUri} from '@atproto/api'
+import Clipboard from '@react-native-clipboard/clipboard'
+import {ContentHider} from '../util/moderation/ContentHider'
+import { NavigationProp } from 'lib/routes/types'
+import {PostAlerts} from '../util/moderation/PostAlerts'
+import {PostCtrls} from '../util/post-ctrls/PostCtrls'
+import {PostEmbeds} from '../util/post-embeds'
+import {PostMeta} from '../util/PostMeta'
+import {PostSandboxWarning} from '../util/PostSandboxWarning'
+import {PostsFeedItemModel} from 'state/models/feeds/post'
+import {PreviewableUserAvatar} from '../util/UserAvatar'
+import {RichText} from '../util/text/RichText'
+import {Text} from '../util/text/Text'
+import {UserInfoText} from '../util/UserInfoText'
+import {makeProfileLink} from 'lib/routes/links'
+import {observer} from 'mobx-react-lite'
+import {s} from 'lib/styles'
+import {sanitizeDisplayName} from 'lib/strings/display-names'
+import {sanitizeHandle} from 'lib/strings/handles'
+import {useAnalytics} from 'lib/analytics/analytics'
+import { useNavigation } from '@react-navigation/native'
+import {usePalette} from 'lib/hooks/usePalette'
+import {useStores} from 'state/index'
 
 export const FeedItem = observer(function ({
   item,
   isThreadChild,
+  isThreadLastChild,
   isThreadParent,
-  showFollowBtn,
-  showReplyLine,
-  ignoreMuteFor,
-  hideChild
 }: {
-  item: PostsFeedItemModel;
-  isThreadChild?: boolean;
-  isThreadParent?: boolean;
-  showReplyLine?: boolean;
-  showFollowBtn?: boolean;
-  hideChild?: boolean;
-  ignoreMuteFor?: string;
+  item: PostsFeedItemModel
+  isThreadChild?: boolean
+  isThreadLastChild?: boolean
+  isThreadParent?: boolean
+  showReplyLine?: boolean
 }) {
-
-  if (hideChild && item.parentUri) {
-    return null;
-  }
-  const store = useStores();
-  const pal = usePalette("default");
-  const { track } = useAnalytics();
+  const store = useStores()
+  const pal = usePalette('default')
+  const {track} = useAnalytics()
   const navigation = useNavigation<NavigationProp>();
-  const [deleted, setDeleted] = useState(false);
-  const record = item.postRecord;
-  const itemUri = item.post.uri;
-  const itemCid = item.post.cid;
+  const [deleted, setDeleted] = useState(false)
+  const record = item.postRecord
+  const itemUri = item.post.uri
+  const itemCid = item.post.cid
   const itemHref = useMemo(() => {
-    const urip = new AtUri(item.post.uri);
-    return `/profile/${item.post.author.handle}/post/${urip.rkey}`;
-  }, [item.post.uri, item.post.author.handle]);
-  const itemTitle = `Post by ${item.post.author.handle}`;
-  const authorHref = `/profile/${item.post.author.handle}`;
+    const urip = new AtUri(item.post.uri)
+    return makeProfileLink(item.post.author, 'post', urip.rkey)
+  }, [item.post.uri, item.post.author])
+  const itemTitle = `Post by ${item.post.author.handle}`
   const replyAuthorDid = useMemo(() => {
     if (!record?.reply) {
-      return "";
+      return ''
     }
-    const urip = new AtUri(record.reply.parent?.uri || record.reply.root.uri);
-    return urip.hostname;
-  }, [record?.reply]);
-  const primaryLanguage = store.preferences.contentLanguages[0] || "en";
-  const translatorUrl = getTranslatorLink(primaryLanguage, record?.text || "");
+    const urip = new AtUri(record.reply.parent?.uri || record.reply.root.uri)
+    return urip.hostname
+  }, [record?.reply])
+  const translatorUrl = getTranslatorLink(record?.text || '')
   const needsTranslation = useMemo(
     () =>
       store.preferences.contentLanguages.length > 0 &&
       !isPostInLanguage(item.post, store.preferences.contentLanguages),
     [item.post, store.preferences.contentLanguages],
-  );
+  )
 
-  const onPressReply = React.useCallback(async () => {
-    track("FeedItem:PostReply");
+  const onPressReply = React.useCallback(() => {
+    track('FeedItem:PostReply')
     store.session.isSolarplexSession
       ? navigation.navigate("SignIn")
       : store.shell.openComposer({
-          replyTo: {
-            uri: item.post.uri,
-            cid: item.post.cid,
-            text: record?.text || "",
-            author: {
-              handle: item.post.author.handle,
-              displayName: item.post.author.displayName,
-              avatar: item.post.author.avatar,
-            },
-          },
-        });
-  }, [item, track, record, store, navigation]);
+      replyTo: {
+        uri: item.post.uri,
+        cid: item.post.cid,
+        text: record?.text || '',
+        author: {
+          handle: item.post.author.handle,
+          displayName: item.post.author.displayName,
+          avatar: item.post.author.avatar,
+        },
+      },
+    })
+  }, [item, track, record, store, navigation])
 
-  const onPressToggleRepost = React.useCallback(async () => {
-    track("FeedItem:PostRepost");
-    return store.session.isSolarplexSession
-      ? await navigation.navigate("SignIn")
-      : item
-          .toggleRepost()
-          .catch((e) => store.log.error("Failed to toggle repost", e));
-  }, [track, item, store, navigation]);
+  const onPressToggleRepost = React.useCallback(() => {
+    track('FeedItem:PostRepost')
+    return item
+      .toggleRepost()
+      .catch(e => store.log.error('Failed to toggle repost', e))
+  }, [track, item, store])
 
-  const onPressToggleLike = React.useCallback(async () => {
-    track("FeedItem:PostLike");
-    return store.session.isSolarplexSession
-      ? await navigation.navigate("SignIn")
-      : item
-          .toggleLike()
-          .catch((e) => store.log.error("Failed to toggle like", e));
-  }, [track, item, store, navigation]);
-
+  const onPressToggleLike = React.useCallback(() => {
+    track('FeedItem:PostLike')
+    return item
+      .toggleLike()
+      .catch(e => store.log.error('Failed to toggle like', e))
+  }, [track, item, store])
   const onPressReaction = React.useCallback(async (reactionId: string, remove?: boolean) => {
     track("FeedItem:PostLike");
     // console.log("reactionId", reactionId);
     return store.session.isSolarplexSession
-      ? await navigation.navigate("SignIn")
+      ? navigation.navigate("SignIn")
       : item
           .react(reactionId, remove)
           .catch((e) => store.log.error("Failed to add reaction", e));
-  }, [track, item, store, navigation]);
-
+  }, [track, item, store, navigation])
   const onCopyPostText = React.useCallback(() => {
-    Clipboard.setString(record?.text || "");
-    Toast.show("Copied to clipboard");
-  }, [record]);
+    Clipboard.setString(record?.text || '')
+    Toast.show('Copied to clipboard')
+  }, [record])
 
   const onOpenTranslate = React.useCallback(() => {
-    Linking.openURL(translatorUrl);
-  }, [translatorUrl]);
+    Linking.openURL(translatorUrl)
+  }, [translatorUrl])
 
   const onToggleThreadMute = React.useCallback(async () => {
-    track("FeedItem:ThreadMute");
+    track('FeedItem:ThreadMute')
     try {
-      await item.toggleThreadMute();
+      await item.toggleThreadMute()
       if (item.isThreadMuted) {
-        Toast.show("You will no longer receive notifications for this thread");
+        Toast.show('You will no longer receive notifications for this thread')
       } else {
-        Toast.show("You will now receive notifications for this thread");
+        Toast.show('You will now receive notifications for this thread')
       }
     } catch (e) {
-      store.log.error("Failed to toggle thread mute", e);
+      store.log.error('Failed to toggle thread mute', e)
     }
-  }, [track, item, store]);
+  }, [track, item, store])
 
   const onDeletePost = React.useCallback(() => {
-    track("FeedItem:PostDelete");
+    track('FeedItem:PostDelete')
     item.delete().then(
       () => {
-        setDeleted(true);
-        Toast.show("Post deleted");
+        setDeleted(true)
+        Toast.show('Post deleted')
       },
-      (e) => {
-        store.log.error("Failed to delete post", e);
-        Toast.show("Failed to delete post, please try again");
+      e => {
+        store.log.error('Failed to delete post', e)
+        Toast.show('Failed to delete post, please try again')
       },
-    );
-  }, [track, item, setDeleted, store]);
+    )
+  }, [track, item, setDeleted, store])
 
-  const isSmallTop = isThreadChild;
   const outerStyles = [
     styles.outer,
     pal.view,
-    { borderColor: pal.colors.border },
-    isSmallTop ? styles.outerSmallTop : undefined,
-    isThreadParent ? styles.outerNoBottom : undefined,
-  ];
-
-  // moderation override
-  let moderation = item.moderation.list;
-  if (
-    ignoreMuteFor === item.post.author.did &&
-    moderation.isMute &&
-    !moderation.noOverride
-  ) {
-    moderation = { behavior: ModerationBehaviorCode.Show };
-  }
-
-  const accessibilityActions = useMemo(
-    () => [
-      {
-        name: "reply",
-        label: "Reply",
-      },
-      {
-        name: "repost",
-        label: item.post.viewer?.repost ? "Undo repost" : "Repost",
-      },
-      { name: "like", label: item.post.viewer?.like ? "Unlike" : "Like" },
-      { name: 'reaction', label: 'Reaction'}
-    ],
-    [item.post.viewer?.like, item.post.viewer?.repost, item.hasReacted],
-  );
-
-  const onAccessibilityAction = useCallback(
-    (event: AccessibilityActionEvent) => {
-      switch (event.nativeEvent.actionName) {
-        case "like":
-          onPressToggleLike();
-          break;
-        case "reply":
-          onPressReply();
-          break;
-        case "repost":
-          onPressToggleRepost();
-          break;
-        case "reaction":
-          break;
-        default:
-          break;
-      }
+    {
+      borderColor: pal.colors.border,
+      paddingBottom:
+        isThreadLastChild || (!isThreadChild && !isThreadParent)
+          ? 6
+          : undefined,
     },
-    [onPressReply, onPressToggleLike, onPressToggleRepost],
-  );
+    isThreadChild ? styles.outerSmallTop : undefined,
+  ]
 
   if (!record || deleted) {
-    return <View />;
+    return <View />
   }
+
   return (
-    <PostHider
+    <Link
       testID={`feedItem-by-${item.post.author.handle}`}
       style={outerStyles}
       href={itemHref}
-      moderation={moderation}
-      accessibilityActions={accessibilityActions}
-      onAccessibilityAction={onAccessibilityAction}
-    >
-      {isThreadChild && (
-        <View
-          style={[styles.topReplyLine, { borderColor: pal.colors.replyLine }]}
-        />
-      )}
-      {isThreadParent && showReplyLine && (
-        <View
-          style={[
-            styles.bottomReplyLine,
-            { borderColor: pal.colors.replyLine },
-          ]}
-        />
-      )}
-      {item.reasonRepost && (
-        <Link
-          style={styles.includeReason}
-          href={`/profile/${item.reasonRepost.by.handle}`}
-          title={sanitizeDisplayName(
-            item.reasonRepost.by.displayName || item.reasonRepost.by.handle,
-          )}
-        >
-          <FontAwesomeIcon
-            icon="retweet"
-            style={[
-              styles.includeReasonIcon,
-              { color: pal.colors.textLight } as FontAwesomeIconStyle,
-            ]}
-          />
-          <Text
-            type="sm-bold"
-            style={pal.textLight}
-            lineHeight={1.2}
-            numberOfLines={1}
-          >
-            Reposted by{" "}
-            <DesktopWebTextLink
-              type="sm-bold"
-              style={pal.textLight}
-              lineHeight={1.2}
-              numberOfLines={1}
-              text={sanitizeDisplayName(
-                item.reasonRepost.by.displayName || item.reasonRepost.by.handle,
-              )}
-              href={`/profile/${item.reasonRepost.by.handle}`}
+      noFeedback
+      accessible={false}>
+      <PostSandboxWarning />
+
+      <View style={{flexDirection: 'row', gap: 10, paddingLeft: 8}}>
+        <View style={{width: 52}}>
+          {isThreadChild && (
+            <View
+              style={[
+                styles.replyLine,
+                {
+                  flexGrow: 1,
+                  backgroundColor: pal.colors.replyLine,
+                  marginBottom: 4,
+                },
+              ]}
             />
-          </Text>
-        </Link>
-      )}
-      {/* <PostSandboxWarning /> */}
+          )}
+        </View>
+
+        <View style={{paddingTop: 12}}>
+          {item.reasonRepost && (
+            <Link
+              style={styles.includeReason}
+              href={makeProfileLink(item.reasonRepost.by)}
+              title={sanitizeDisplayName(
+                item.reasonRepost.by.displayName || item.reasonRepost.by.handle,
+              )}>
+              <FontAwesomeIcon
+                icon="retweet"
+                style={[
+                  styles.includeReasonIcon,
+                  {color: pal.colors.textLight} as FontAwesomeIconStyle,
+                ]}
+              />
+              <Text
+                type="sm-bold"
+                style={pal.textLight}
+                lineHeight={1.2}
+                numberOfLines={1}>
+                Reposted by{' '}
+                <DesktopWebTextLink
+                  type="sm-bold"
+                  style={pal.textLight}
+                  lineHeight={1.2}
+                  numberOfLines={1}
+                  text={sanitizeDisplayName(
+                    item.reasonRepost.by.displayName ||
+                      sanitizeHandle(item.reasonRepost.by.handle),
+                  )}
+                  href={makeProfileLink(item.reasonRepost.by)}
+                />
+              </Text>
+            </Link>
+          )}
+        </View>
+      </View>
+
       <View style={styles.layout}>
         <View style={styles.layoutAvi}>
-          <Link href={authorHref} title={item.post.author.handle} asAnchor>
-            <UserAvatar
-              size={52}
-              avatar={item.post.author.avatar}
-              moderation={item.moderation.avatar}
+          <PreviewableUserAvatar
+            size={52}
+            did={item.post.author.did}
+            handle={item.post.author.handle}
+            avatar={item.post.author.avatar}
+            moderation={item.moderation.avatar}
+          />
+          {isThreadParent && (
+            <View
+              style={[
+                styles.replyLine,
+                {
+                  flexGrow: 1,
+                  backgroundColor: pal.colors.replyLine,
+                  marginTop: 4,
+                },
+              ]}
             />
-          </Link>
+          )}
         </View>
         <View style={styles.layoutContent}>
           <PostMeta
-            authorHandle={item.post.author.handle}
-            authorDisplayName={item.post.author.displayName}
+            author={item.post.author}
             authorHasWarning={!!item.post.author.labels?.length}
             timestamp={item.post.indexedAt}
             postHref={itemHref}
-            did={item.post.author.did}
-            showFollowBtn={showFollowBtn}
           />
-          {!isThreadChild && replyAuthorDid !== "" && (
+          {!isThreadChild && replyAuthorDid !== '' && (
             <View style={[s.flexRow, s.mb2, s.alignCenter]}>
               <FontAwesomeIcon
                 icon="reply"
                 size={9}
                 style={[
-                  { color: pal.colors.textLight } as FontAwesomeIconStyle,
+                  {color: pal.colors.textLight} as FontAwesomeIconStyle,
                   s.mr5,
                 ]}
               />
@@ -323,9 +273,8 @@ export const FeedItem = observer(function ({
                 type="md"
                 style={[pal.textLight, s.mr2]}
                 lineHeight={1.2}
-                numberOfLines={1}
-              >
-                Reply to{" "}
+                numberOfLines={1}>
+                Reply to{' '}
                 <UserInfoText
                   type="md"
                   did={replyAuthorDid}
@@ -336,9 +285,14 @@ export const FeedItem = observer(function ({
             </View>
           )}
           <ContentHider
-            moderation={moderation}
-            containerStyle={styles.contentHider}
-          >
+            testID="contentHider-post"
+            moderation={item.moderation.content}
+            ignoreMute
+            childContainerStyle={styles.contentHiderChild}>
+            <PostAlerts
+              moderation={item.moderation.content}
+              style={styles.alert}
+            />
             {item.richText?.text ? (
               <View style={styles.postTextContainer}>
                 <RichText
@@ -349,9 +303,17 @@ export const FeedItem = observer(function ({
                 />
               </View>
             ) : undefined}
-            <ImageHider moderation={item.moderation.list} style={styles.embed}>
-              <PostEmbeds embed={item.post.embed} style={styles.embed} />
-            </ImageHider>
+            {item.post.embed ? (
+              <ContentHider
+                testID="contentHider-embed"
+                moderation={item.moderation.embed}
+                style={styles.embed}>
+                <PostEmbeds
+                  embed={item.post.embed}
+                  moderation={item.moderation.embed}
+                />
+              </ContentHider>
+            ) : null}
             {needsTranslation && (
               <View style={[pal.borderDark, styles.translateLink]}>
                 <Link href={translatorUrl} title="Translate">
@@ -363,16 +325,11 @@ export const FeedItem = observer(function ({
             )}
           </ContentHider>
           <PostCtrls
-            style={styles.ctrls}
             itemUri={itemUri}
             itemCid={itemCid}
             itemHref={itemHref}
             itemTitle={itemTitle}
-            author={{
-              avatar: item.post.author.avatar!,
-              handle: item.post.author.handle,
-              displayName: item.post.author.displayName!,
-            }}
+            author={item.post.author}
             text={item.richText?.text || record.text}
             indexedAt={item.post.indexedAt}
             isAuthor={item.post.author.did === store.me.did}
@@ -395,66 +352,56 @@ export const FeedItem = observer(function ({
           />
         </View>
       </View>
-    </PostHider>
-  );
-});
+    </Link>
+  )
+})
 
 const styles = StyleSheet.create({
   outer: {
     borderTopWidth: 1,
-    padding: 10,
+    paddingLeft: 10,
     paddingRight: 15,
-    paddingBottom: 8,
   },
   outerSmallTop: {
     borderTopWidth: 0,
   },
-  outerNoBottom: {
-    paddingBottom: 2,
-  },
-  topReplyLine: {
-    position: "absolute",
-    left: 42,
-    top: 0,
-    height: 6,
-    borderLeftWidth: 2,
-  },
-  bottomReplyLine: {
-    position: "absolute",
-    left: 42,
-    top: 72,
-    bottom: 0,
-    borderLeftWidth: 2,
+  replyLine: {
+    width: 2,
+    marginLeft: 'auto',
+    marginRight: 'auto',
   },
   includeReason: {
-    flexDirection: "row",
-    paddingLeft: 50,
-    paddingRight: 20,
+    flexDirection: 'row',
     marginTop: 2,
-    marginBottom: 2,
+    marginBottom: 4,
+    marginLeft: -20,
   },
   includeReasonIcon: {
     marginRight: 4,
   },
   layout: {
-    flexDirection: "row",
+    flexDirection: 'row',
     marginTop: 1,
+    gap: 10,
   },
   layoutAvi: {
-    width: 70,
     paddingLeft: 8,
   },
   layoutContent: {
     flex: 1,
   },
+  alert: {
+    marginTop: 6,
+    marginBottom: 6,
+  },
   postTextContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    flexWrap: "wrap",
+    flexDirection: 'row',
+    alignItems: 'center',
+    flexWrap: 'wrap',
     paddingBottom: 4,
   },
-  contentHider: {
-    marginTop: 4,
+  contentHiderChild: {
+    marginTop: 6,
   },
   embed: {
     marginBottom: 6,
@@ -462,7 +409,4 @@ const styles = StyleSheet.create({
   translateLink: {
     marginBottom: 6,
   },
-  ctrls: {
-    marginTop: 4,
-  },
-});
+})

@@ -65,8 +65,8 @@ function ShareButton({ rewardsImg, isWeekly }: RewardClaimedProps) {
       isSharing: true,
       uri: rewardsImg,
       sharingText: isWeekly
-        ? "Just got my reward from my Weekly Streak!"
-        : "Freshly Minted!",
+        ? "Just got my reward from my Weekly Streak! " // Spaces at end = hack to get cursor positioned correctly
+        : "Freshly Minted! ",
     });
   }, [store]);
 

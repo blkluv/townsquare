@@ -1,13 +1,15 @@
+import * as ImageManipulator from 'expo-image-manipulator'
+
+import {ActionCrop, FlipType, SaveFormat} from 'expo-image-manipulator'
+import {makeAutoObservable, runInAction} from 'mobx'
+
+import {Dimensions} from 'lib/media/types'
+import {POST_IMG_MAX} from 'lib/constants'
+import {Position} from 'react-avatar-editor'
 import {Image as RNImage} from 'react-native-image-crop-picker'
 import {RootStoreModel} from 'state/index'
-import {makeAutoObservable, runInAction} from 'mobx'
-import {POST_IMG_MAX} from 'lib/constants'
-import * as ImageManipulator from 'expo-image-manipulator'
 import {getDataUriSize} from 'lib/media/util'
 import {openCropper} from 'lib/media/picker'
-import {ActionCrop, FlipType, SaveFormat} from 'expo-image-manipulator'
-import {Position} from 'react-avatar-editor'
-import {Dimensions} from 'lib/media/types'
 
 export interface ImageManipulationAttributes {
   aspectRatio?: '4:3' | '1:1' | '3:4' | 'None'

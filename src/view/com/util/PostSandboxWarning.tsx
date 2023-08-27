@@ -1,8 +1,9 @@
-import React from 'react'
 import {StyleSheet, View} from 'react-native'
+
+import React from 'react'
 import {Text} from './text/Text'
-import {useStores} from 'state/index'
 import {usePalette} from 'lib/hooks/usePalette'
+import {useStores} from 'state/index'
 
 export function PostSandboxWarning() {
   const store = useStores()
@@ -10,7 +11,10 @@ export function PostSandboxWarning() {
   if (store.session.isSandbox) {
     return (
       <View style={styles.container}>
-        <Text type="title-2xl" style={[pal.text, styles.text]}>
+        <Text
+          type="title-2xl"
+          style={[pal.text, styles.text]}
+          accessible={false}>
           SANDBOX
         </Text>
       </View>

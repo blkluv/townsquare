@@ -1,33 +1,37 @@
-import React from 'react'
 import {
-  StyleSheet,
-  StyleProp,
-  View,
-  ViewStyle,
-  Image as RNImage,
-  Text,
-} from 'react-native'
-import {
-  AppBskyEmbedImages,
   AppBskyEmbedExternal,
+  AppBskyEmbedImages,
   AppBskyEmbedRecord,
   AppBskyEmbedRecordWithMedia,
-  AppBskyFeedPost,
   AppBskyFeedDefs,
   AppBskyGraphDefs,
+  ModerationUI,
 } from '@atproto/api'
-import {Link} from '../Link'
-import {ImageLayoutGrid} from '../images/ImageLayoutGrid'
-import {ImagesLightbox} from 'state/models/ui/shell'
-import {useStores} from 'state/index'
-import {usePalette} from 'lib/hooks/usePalette'
-import {YoutubeEmbed} from './YoutubeEmbed'
-import {ExternalLinkEmbed} from './ExternalLinkEmbed'
-import {getYoutubeVideoId} from 'lib/strings/url-helpers'
-import QuoteEmbed from './QuoteEmbed'
+import {
+  InteractionManager,
+  StyleProp,
+  StyleSheet,
+  Text,
+  View,
+  ViewStyle,
+} from 'react-native'
+
 import {AutoSizedImage} from '../images/AutoSizedImage'
 import {CustomFeedEmbed} from './CustomFeedEmbed'
+import {ExternalLinkEmbed} from './ExternalLinkEmbed'
+import {Image} from 'expo-image'
+import {ImageLayoutGrid} from '../images/ImageLayoutGrid'
+import {ImagesLightbox} from 'state/models/ui/shell'
+import {Link} from '../Link'
 import {ListEmbed} from './ListEmbed'
+import {MaybeQuoteEmbed} from './QuoteEmbed'
+import React from 'react'
+import {YoutubeEmbed} from './YoutubeEmbed'
+import {getYoutubeVideoId} from 'lib/strings/url-helpers'
+import {isCauseALabelOnUri} from 'lib/moderation'
+import {isDesktopWeb} from 'platform/detection'
+import {usePalette} from 'lib/hooks/usePalette'
+import {useStores} from 'state/index'
 
 type Embed =
   | AppBskyEmbedRecord.View
@@ -38,9 +42,11 @@ type Embed =
 
 export function PostEmbeds({
   embed,
+  moderation,
   style,
 }: {
   embed?: Embed
+  moderation: ModerationUI
   style?: StyleProp<ViewStyle>
 }) {
   const pal = usePalette('default')
@@ -48,51 +54,37 @@ export function PostEmbeds({
 
   // quote post with media
   // =
-  if (
-    AppBskyEmbedRecordWithMedia.isView(embed) &&
-    AppBskyEmbedRecord.isViewRecord(embed.record.record) &&
-    AppBskyFeedPost.isRecord(embed.record.record.value) &&
-    AppBskyFeedPost.validateRecord(embed.record.record.value).success
-  ) {
+  if (AppBskyEmbedRecordWithMedia.isView(embed)) {
+    const isModOnQuote =
+      AppBskyEmbedRecord.isViewRecord(embed.record.record) &&
+      isCauseALabelOnUri(moderation.cause, embed.record.record.uri)
+    const mediaModeration = isModOnQuote ? {} : moderation
+    const quoteModeration = isModOnQuote ? moderation : {}
     return (
       <View style={[styles.stackContainer, style]}>
-        <PostEmbeds embed={embed.media} />
-        <QuoteEmbed
-          quote={{
-            author: embed.record.record.author,
-            cid: embed.record.record.cid,
-            uri: embed.record.record.uri,
-            indexedAt: embed.record.record.indexedAt,
-            text: embed.record.record.value.text,
-            embeds: embed.record.record.embeds,
-          }}
-        />
+        <PostEmbeds embed={embed.media} moderation={mediaModeration} />
+        <MaybeQuoteEmbed embed={embed.record} moderation={quoteModeration} />
       </View>
     )
   }
 
-  // quote post
-  // =
   if (AppBskyEmbedRecord.isView(embed)) {
-    if (
-      AppBskyEmbedRecord.isViewRecord(embed.record) &&
-      AppBskyFeedPost.isRecord(embed.record.value) &&
-      AppBskyFeedPost.validateRecord(embed.record.value).success
-    ) {
-      return (
-        <QuoteEmbed
-          quote={{
-            author: embed.record.author,
-            cid: embed.record.cid,
-            uri: embed.record.uri,
-            indexedAt: embed.record.indexedAt,
-            text: embed.record.value.text,
-            embeds: embed.record.embeds,
-          }}
-          style={style}
-        />
-      )
+    // custom feed embed (i.e. generator view)
+    // =
+    if (AppBskyFeedDefs.isGeneratorView(embed.record)) {
+      return <CustomFeedEmbed record={embed.record} />
     }
+
+    // list embed (e.g. mute lists; i.e. ListView)
+    if (AppBskyGraphDefs.isListView(embed.record)) {
+      return <ListEmbed item={embed.record} />
+    }
+
+    // quote post
+    // =
+    return (
+      <MaybeQuoteEmbed embed={embed} style={style} moderation={moderation} />
+    )
   }
 
   // image embed
@@ -105,14 +97,9 @@ export function PostEmbeds({
       const openLightbox = (index: number) => {
         store.shell.openLightbox(new ImagesLightbox(items, index))
       }
-      const onPressIn = (index: number) => {
-        const firstImageToShow = items[index].uri
-        RNImage.prefetch(firstImageToShow)
-        items.forEach(item => {
-          if (firstImageToShow !== item.uri) {
-            // First image already prefetched above
-            RNImage.prefetch(item.uri)
-          }
+      const onPressIn = (_: number) => {
+        InteractionManager.runAfterInteractions(() => {
+          Image.prefetch(items.map(i => i.uri))
         })
       }
 
@@ -128,7 +115,9 @@ export function PostEmbeds({
               style={styles.singleImage}>
               {alt === '' ? null : (
                 <View style={styles.altContainer}>
-                  <Text style={styles.alt}>ALT</Text>
+                  <Text style={styles.alt} accessible={false}>
+                    ALT
+                  </Text>
                 </View>
               )}
             </AutoSizedImage>
@@ -149,23 +138,6 @@ export function PostEmbeds({
     }
   }
 
-  // custom feed embed (i.e. generator view)
-  // =
-  if (
-    AppBskyEmbedRecord.isView(embed) &&
-    AppBskyFeedDefs.isGeneratorView(embed.record)
-  ) {
-    return <CustomFeedEmbed record={embed.record} />
-  }
-
-  // list embed (e.g. mute lists; i.e. ListView)
-  if (
-    AppBskyEmbedRecord.isView(embed) &&
-    AppBskyGraphDefs.isListView(embed.record)
-  ) {
-    return <ListEmbed item={embed.record} />
-  }
-
   // external link embed
   // =
   if (AppBskyEmbedExternal.isView(embed)) {
@@ -178,9 +150,9 @@ export function PostEmbeds({
 
     return (
       <Link
+        asAnchor
         style={[styles.extOuter, pal.view, pal.border, style]}
-        href={link.uri}
-        noFeedback>
+        href={link.uri}>
         <ExternalLinkEmbed link={link} />
       </Link>
     )
@@ -198,7 +170,7 @@ const styles = StyleSheet.create({
   },
   singleImage: {
     borderRadius: 8,
-    maxHeight: 500,
+    maxHeight: isDesktopWeb ? 1000 : 500,
   },
   extOuter: {
     borderWidth: 1,

@@ -1,18 +1,21 @@
 import {
-  AppBskyEmbedImages,
   AppBskyEmbedExternal,
+  AppBskyEmbedImages,
   AppBskyEmbedRecord,
   AppBskyEmbedRecordWithMedia,
   AppBskyRichtextFacet,
+  ComAtprotoLabelDefs,
   ComAtprotoRepoUploadBlob,
   RichText,
 } from '@atproto/api'
+
 import {AtUri} from '@atproto/api'
+import {ImageModel} from 'state/models/media/image'
+import {LinkMeta} from '../link-meta/link-meta'
 import {RootStoreModel} from 'state/models/root-store'
 import {isNetworkError} from 'lib/strings/errors'
-import {LinkMeta} from '../link-meta/link-meta'
 import {isWeb} from 'platform/detection'
-import {ImageModel} from 'state/models/media/image'
+import {shortenLinks} from 'lib/strings/rich-text-manip'
 
 export interface ExternalEmbedDraft {
   uri: string
@@ -29,10 +32,24 @@ export async function resolveName(store: RootStoreModel, didOrHandle: string) {
   if (didOrHandle.startsWith('did:')) {
     return didOrHandle
   }
-  const res = await store.agent.resolveHandle({
-    handle: didOrHandle,
-  })
-  return res.data.did
+
+  // we run the resolution always to ensure freshness
+  const promise = store.agent
+    .resolveHandle({
+      handle: didOrHandle,
+    })
+    .then(res => {
+      store.handleResolutions.cache.set(didOrHandle, res.data.did)
+      return res.data.did
+    })
+
+  // but we can return immediately if it's cached
+  const cached = store.handleResolutions.cache.get(didOrHandle)
+  if (cached) {
+    return cached
+  }
+
+  return promise
 }
 
 export async function uploadBlob(
@@ -63,6 +80,7 @@ interface PostOpts {
   }
   extLink?: ExternalEmbedDraft
   images?: ImageModel[]
+  labels?: string[]
   knownHandles?: Set<string>
   onStateChange?: (state: string) => void
   langs?: string[]
@@ -76,7 +94,7 @@ export async function post(store: RootStoreModel, opts: PostOpts) {
     | AppBskyEmbedRecordWithMedia.Main
     | undefined
   let reply
-  const rt = new RichText(
+  let rt = new RichText(
     {text: opts.rawText.trim()},
     {
       cleanNewlines: true,
@@ -85,6 +103,7 @@ export async function post(store: RootStoreModel, opts: PostOpts) {
 
   opts.onStateChange?.('Processing...')
   await rt.detectFacets(store.agent)
+  rt = shortenLinks(rt)
 
   // filter out any mention facets that didn't map to a user
   rt.facets = rt.facets?.filter(facet => {
@@ -220,6 +239,15 @@ export async function post(store: RootStoreModel, opts: PostOpts) {
     }
   }
 
+  // set labels
+  let labels: ComAtprotoLabelDefs.SelfLabels | undefined
+  if (opts.labels?.length) {
+    labels = {
+      $type: 'com.atproto.label.defs#selfLabels',
+      values: opts.labels.map(val => ({val})),
+    }
+  }
+
   // add top 3 languages from user preferences if langs is provided
   let langs = opts.langs
   if (opts.langs) {
@@ -234,6 +262,7 @@ export async function post(store: RootStoreModel, opts: PostOpts) {
       reply,
       embed,
       langs,
+      labels,
     })
   } catch (e: any) {
     console.error(`Failed to create post: ${e.toString()}`)

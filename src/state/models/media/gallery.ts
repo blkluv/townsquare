@@ -1,10 +1,11 @@
 import {makeAutoObservable, runInAction} from 'mobx'
-import {RootStoreModel} from 'state/index'
+
 import {ImageModel} from './image'
 import {Image as RNImage} from 'react-native-image-crop-picker'
-import {openPicker} from 'lib/media/picker'
+import {RootStoreModel} from 'state/index'
 import {getImageDim} from 'lib/media/manip'
 import {isNative} from 'platform/detection'
+import {openPicker} from 'lib/media/picker'
 
 export class GalleryModel {
   images: ImageModel[] = []
@@ -21,6 +22,10 @@ export class GalleryModel {
 
   get size() {
     return this.images.length
+  }
+
+  get needsAltText() {
+    return this.images.some(image => image.altText.trim() === '')
   }
 
   async add(image_: Omit<RNImage, 'size'>) {

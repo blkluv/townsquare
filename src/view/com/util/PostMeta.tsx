@@ -1,110 +1,48 @@
-import { StyleSheet, View } from "react-native";
+import {StyleSheet, View} from 'react-native'
 
-import { DesktopWebTextLink } from "./Link";
-import { FollowButton } from "../profile/FollowButton";
-import { FollowState } from "state/models/cache/my-follows";
-import React from "react";
-import { Text } from "./text/Text";
-import { UserAvatar } from "./UserAvatar";
-import { ago } from "lib/strings/time";
-import { observer } from "mobx-react-lite";
-import { sanitizeDisplayName } from "lib/strings/display-names";
-import { usePalette } from "lib/hooks/usePalette";
-import { useStores } from "state/index";
+import {DesktopWebTextLink} from './Link'
+import React from 'react'
+import {Text} from './text/Text'
+import {TimeElapsed} from './TimeElapsed'
+import {UserAvatar} from './UserAvatar'
+import {isAndroid} from 'platform/detection'
+import {makeProfileLink} from 'lib/routes/links'
+import {niceDate} from 'lib/strings/time'
+import {observer} from 'mobx-react-lite'
+import {sanitizeDisplayName} from 'lib/strings/display-names'
+import {sanitizeHandle} from 'lib/strings/handles'
+import {usePalette} from 'lib/hooks/usePalette'
 
 interface PostMetaOpts {
-  authorAvatar?: string;
-  authorHandle: string;
-  authorDisplayName: string | undefined;
-  authorHasWarning: boolean;
-  postHref: string;
-  timestamp: string;
-  did?: string;
-  showFollowBtn?: boolean;
+  author: {
+    avatar?: string
+    did: string
+    handle: string
+    displayName?: string | undefined
+  }
+  showAvatar?: boolean
+  authorHasWarning: boolean
+  postHref: string
+  timestamp: string
 }
 
 export const PostMeta = observer(function (opts: PostMetaOpts) {
-  const pal = usePalette("default");
-  const displayName = opts.authorDisplayName || opts.authorHandle;
-  const handle = opts.authorHandle;
-  const store = useStores();
-  const isMe = opts.did === store.me.did;
-  const followState =
-    typeof opts.did === "string"
-      ? store.me.follows.getFollowState(opts.did)
-      : FollowState.Unknown;
+  const pal = usePalette('default')
+  const displayName = opts.author.displayName || opts.author.handle
+  const handle = opts.author.handle
 
-  const [didFollow, setDidFollow] = React.useState(false);
-  const onToggleFollow = React.useCallback(() => {
-    setDidFollow(true);
-  }, [setDidFollow]);
-
-  if (
-    opts.showFollowBtn &&
-    !isMe &&
-    (followState === FollowState.NotFollowing || didFollow) &&
-    opts.did
-  ) {
-    // two-liner with follow button
-    return (
-      <View style={styles.metaTwoLine}>
-        <View style={styles.metaTwoLineLeft}>
-          <View style={styles.metaTwoLineTop}>
-            <DesktopWebTextLink
-              type="lg-bold"
-              style={pal.text}
-              numberOfLines={1}
-              lineHeight={1.2}
-              text={sanitizeDisplayName(displayName)}
-              href={`/profile/${opts.authorHandle}`}
-            />
-            <Text type="md" style={pal.textLight} lineHeight={1.2}>
-              &nbsp;&middot;&nbsp;
-            </Text>
-            <DesktopWebTextLink
-              type="md"
-              style={[styles.metaItem, pal.textLight]}
-              lineHeight={1.2}
-              text={ago(opts.timestamp)}
-              href={opts.postHref}
-            />
-          </View>
-          <DesktopWebTextLink
-            type="md"
-            style={[styles.metaItem, pal.textLight]}
-            lineHeight={1.2}
-            numberOfLines={1}
-            text={`@${handle}`}
-            href={`/profile/${opts.authorHandle}`}
-          />
-        </View>
-
-        <View>
-          {!store.session.isSolarplexSession && (
-            <FollowButton
-              unfollowedType="default"
-              did={opts.did}
-              onToggleFollow={onToggleFollow}
-            />
-          )}
-        </View>
-      </View>
-    );
-  }
-
-  // one-liner
   return (
-    <View style={styles.meta}>
-      {typeof opts.authorAvatar !== "undefined" && (
-        <View style={[styles.metaItem, styles.avatar]}>
+    <View style={styles.metaOneLine}>
+      {opts.showAvatar && typeof opts.author.avatar !== 'undefined' && (
+        <View style={styles.avatar}>
           <UserAvatar
-            avatar={opts.authorAvatar}
+            avatar={opts.author.avatar}
             size={16}
             // TODO moderation
           />
         </View>
       )}
-      <View style={[styles.metaItem, styles.maxWidth]}>
+      <View style={styles.maxWidth}>
         <DesktopWebTextLink
           type="lg-bold"
           style={pal.text}
@@ -112,61 +50,59 @@ export const PostMeta = observer(function (opts: PostMetaOpts) {
           lineHeight={1.2}
           text={
             <>
-              {sanitizeDisplayName(displayName)}
+              {sanitizeDisplayName(displayName)}&nbsp;
               <Text
                 type="md"
-                style={[pal.textLight]}
                 numberOfLines={1}
                 lineHeight={1.2}
-              >
-                &nbsp;@{handle}
+                style={pal.textLight}>
+                {sanitizeHandle(handle, '@')}
               </Text>
             </>
           }
-          href={`/profile/${opts.authorHandle}`}
+          href={makeProfileLink(opts.author)}
         />
       </View>
-      <Text type="md" style={pal.textLight} lineHeight={1.2}>
-        &middot;&nbsp;
-      </Text>
-      <DesktopWebTextLink
-        type="md"
-        style={[styles.metaItem, pal.textLight]}
-        lineHeight={1.2}
-        text={ago(opts.timestamp)}
-        href={opts.postHref}
-      />
+      {!isAndroid && (
+        <Text
+          type="md"
+          style={pal.textLight}
+          lineHeight={1.2}
+          accessible={false}>
+          &middot;
+        </Text>
+      )}
+      <TimeElapsed timestamp={opts.timestamp}>
+        {({timeElapsed}) => (
+          <DesktopWebTextLink
+            type="md"
+            style={pal.textLight}
+            lineHeight={1.2}
+            text={timeElapsed}
+            accessibilityLabel={niceDate(opts.timestamp)}
+            title={niceDate(opts.timestamp)}
+            accessibilityHint=""
+            href={opts.postHref}
+          />
+        )}
+      </TimeElapsed>
     </View>
-  );
-});
+  )
+})
 
 const styles = StyleSheet.create({
-  meta: {
-    flexDirection: "row",
+  metaOneLine: {
+    flexDirection: 'row',
+    alignItems: isAndroid ? 'center' : 'baseline',
     paddingBottom: 2,
-  },
-  metaTwoLine: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    width: "100%",
-    paddingBottom: 4,
-  },
-  metaTwoLineLeft: {
-    flex: 1,
-    paddingRight: 40,
-  },
-  metaTwoLineTop: {
-    flexDirection: "row",
-    alignItems: "baseline",
-  },
-  metaItem: {
-    paddingRight: 5,
+    gap: 4,
+    zIndex: 1,
   },
   avatar: {
-    alignSelf: "center",
+    alignSelf: 'center',
   },
   maxWidth: {
-    maxWidth: "80%",
+    flex: isAndroid ? 1 : undefined,
+    maxWidth: !isAndroid ? '80%' : undefined,
   },
-});
+})

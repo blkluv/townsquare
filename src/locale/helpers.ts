@@ -1,8 +1,10 @@
-import {AppBskyFeedDefs, AppBskyFeedPost} from '@atproto/api'
-import lande from 'lande'
-import {hasProp} from 'lib/type-guards'
 import * as bcp47Match from 'bcp-47-match'
+
+import {AppBskyFeedDefs, AppBskyFeedPost} from '@atproto/api'
 import {LANGUAGES_MAP_CODE2, LANGUAGES_MAP_CODE3} from './languages'
+
+import {hasProp} from 'lib/type-guards'
+import lande from 'lande'
 
 export function code2ToCode3(lang: string): string {
   if (lang.length === 2) {
@@ -16,6 +18,11 @@ export function code3ToCode2(lang: string): string {
     return LANGUAGES_MAP_CODE3[lang]?.code2 || lang
   }
   return lang
+}
+
+export function codeToLanguageName(lang: string): string {
+  const lang2 = code3ToCode2(lang)
+  return LANGUAGES_MAP_CODE2[lang2]?.name || lang
 }
 
 export function getPostLanguage(
@@ -74,8 +81,6 @@ export function isPostInLanguage(
   return bcp47Match.basicFilter(lang, targetLangs).length > 0
 }
 
-export function getTranslatorLink(lang: string, text: string): string {
-  return encodeURI(
-    `https://translate.google.com/?sl=auto&tl=${lang}&text=${text}`,
-  )
+export function getTranslatorLink(text: string): string {
+  return encodeURI(`https://translate.google.com/?sl=auto&text=${text}`)
 }

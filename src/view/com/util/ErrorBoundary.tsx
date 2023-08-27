@@ -1,6 +1,7 @@
 import React, {Component, ErrorInfo, ReactNode} from 'react'
-import {ErrorScreen} from './error/ErrorScreen'
+
 import {CenteredView} from './Views'
+import {ErrorScreen} from './error/ErrorScreen'
 
 interface Props {
   children?: ReactNode
@@ -27,6 +28,7 @@ export class ErrorBoundary extends Component<Props, State> {
 
   public render() {
     if (this.state.hasError) {
+      console.trace(this.state.error);
       return (
         <CenteredView>
           <ErrorScreen

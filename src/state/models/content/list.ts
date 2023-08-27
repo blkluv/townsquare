@@ -1,16 +1,18 @@
-import {makeAutoObservable} from 'mobx'
+import * as apilib from 'lib/api/index'
+
 import {
+  AppBskyGraphList,
+  AppBskyGraphListitem,
   AtUri,
   AppBskyGraphGetList as GetList,
   AppBskyGraphDefs as GraphDefs,
-  AppBskyGraphList,
-  AppBskyGraphListitem,
 } from '@atproto/api'
+import {makeAutoObservable, runInAction} from 'mobx'
+
 import {Image as RNImage} from 'react-native-image-crop-picker'
 import {RootStoreModel} from '../root-store'
-import * as apilib from 'lib/api/index'
-import {cleanError} from 'lib/strings/errors'
 import {bundleAsync} from 'lib/async/bundle'
+import {cleanError} from 'lib/strings/errors'
 import {track} from 'lib/analytics/analytics'
 
 const PAGE_SIZE = 30
@@ -115,6 +117,7 @@ export class ListModel {
     }
     this._xLoading(replace)
     try {
+      await this._resolveUri()
       const res = await this.rootStore.agent.app.bsky.graph.getList({
         list: this.uri,
         limit: PAGE_SIZE,
@@ -146,6 +149,7 @@ export class ListModel {
     if (!this.isOwner) {
       throw new Error('Cannot edit this list')
     }
+    await this._resolveUri()
 
     // get the current record
     const {rkey} = new AtUri(this.uri)
@@ -179,6 +183,7 @@ export class ListModel {
     if (!this.list) {
       return
     }
+    await this._resolveUri()
 
     // fetch all the listitem records that belong to this list
     let cursor
@@ -214,12 +219,15 @@ export class ListModel {
         records.map(record => createDel(record.uri)),
       ),
     })
+
+    this.rootStore.emitListDeleted(this.uri)
   }
 
   async subscribe() {
     if (!this.list) {
       return
     }
+    await this._resolveUri()
     await this.rootStore.agent.app.bsky.graph.muteActorList({
       list: this.list.uri,
     })
@@ -231,6 +239,7 @@ export class ListModel {
     if (!this.list) {
       return
     }
+    await this._resolveUri()
     await this.rootStore.agent.app.bsky.graph.unmuteActorList({
       list: this.list.uri,
     })
@@ -273,6 +282,22 @@ export class ListModel {
   // helper functions
   // =
 
+  async _resolveUri() {
+    const urip = new AtUri(this.uri)
+    if (!urip.host.startsWith('did:')) {
+      try {
+        urip.host = await apilib.resolveName(this.rootStore, urip.host)
+      } catch (e: any) {
+        runInAction(() => {
+          this.error = e.toString()
+        })
+      }
+    }
+    runInAction(() => {
+      this.uri = urip.toString()
+    })
+  }
+
   _replaceAll(res: GetList.Response) {
     this.items = []
     this._appendAll(res)
@@ -283,7 +308,7 @@ export class ListModel {
     this.hasMore = !!this.loadMoreCursor
     this.list = res.data.list
     this.items = this.items.concat(
-      res.data.items.map(item => ({...item, _reactKey: item.subject})),
+      res.data.items.map(item => ({...item, _reactKey: item.subject.did})),
     )
   }
 }

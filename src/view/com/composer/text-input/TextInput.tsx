@@ -1,33 +1,34 @@
-import React, {
-  forwardRef,
-  useCallback,
-  useRef,
-  useMemo,
-  ComponentProps,
-} from 'react'
+import {AppBskyRichtextFacet, RichText} from '@atproto/api'
 import {
   NativeSyntheticEvent,
-  StyleSheet,
   TextInput as RNTextInput,
+  StyleSheet,
   TextInputSelectionChangeEventData,
   View,
 } from 'react-native'
 import PasteInput, {
-  PastedFile,
   PasteInputRef,
+  PastedFile,
 } from '@mattermost/react-native-paste-input'
-import {AppBskyRichtextFacet, RichText} from '@atproto/api'
-import isEqual from 'lodash.isequal'
-import {UserAutocompleteModel} from 'state/models/discovery/user-autocomplete'
-import {Autocomplete} from './mobile/Autocomplete'
-import {Text} from 'view/com/util/text/Text'
-import {cleanError} from 'lib/strings/errors'
+import React, {
+  ComponentProps,
+  forwardRef,
+  useCallback,
+  useMemo,
+  useRef,
+} from 'react'
 import {getMentionAt, insertMentionAt} from 'lib/strings/mention-manip'
+
+import {Autocomplete} from './mobile/Autocomplete'
+import {POST_IMG_MAX} from 'lib/constants'
+import {Text} from 'view/com/util/text/Text'
+import {UserAutocompleteModel} from 'state/models/discovery/user-autocomplete'
+import {cleanError} from 'lib/strings/errors'
+import {downloadAndResize} from 'lib/media/manip'
+import isEqual from 'lodash.isequal'
+import {isUriImage} from 'lib/media/util'
 import {usePalette} from 'lib/hooks/usePalette'
 import {useTheme} from 'lib/ThemeContext'
-import {isUriImage} from 'lib/media/util'
-import {downloadAndResize} from 'lib/media/manip'
-import {POST_IMG_MAX} from 'lib/constants'
 
 export interface TextInputRef {
   focus: () => void
@@ -79,52 +80,64 @@ export const TextInput = forwardRef(
     }))
 
     const onChangeText = useCallback(
-      async (newText: string) => {
-        const newRt = new RichText({text: newText})
-        newRt.detectFacetsWithoutResolution()
-        setRichText(newRt)
+      (newText: string) => {
+        /*
+         * This is a hack to bump the rendering of our styled
+         * `textDecorated` to _after_ whatever processing is happening
+         * within the `PasteInput` library. Without this, the elements in
+         * `textDecorated` are not correctly painted to screen.
+         *
+         * NB: we tried a `0` timeout as well, but only positive values worked.
+         *
+         * @see https://github.com/bluesky-social/social-app/issues/929
+         */
+        setTimeout(async () => {
+          const newRt = new RichText({text: newText})
+          newRt.detectFacetsWithoutResolution()
+          setRichText(newRt)
 
-        const prefix = getMentionAt(
-          newText,
-          textInputSelection.current?.start || 0,
-        )
-        if (prefix) {
-          autocompleteView.setActive(true)
-          autocompleteView.setPrefix(prefix.value)
-        } else {
-          autocompleteView.setActive(false)
-        }
+          const prefix = getMentionAt(
+            newText,
+            textInputSelection.current?.start || 0,
+          )
+          if (prefix) {
+            autocompleteView.setActive(true)
+            autocompleteView.setPrefix(prefix.value)
+          } else {
+            autocompleteView.setActive(false)
+          }
 
-        const set: Set<string> = new Set()
+          const set: Set<string> = new Set()
 
-        if (newRt.facets) {
-          for (const facet of newRt.facets) {
-            for (const feature of facet.features) {
-              if (AppBskyRichtextFacet.isLink(feature)) {
-                if (isUriImage(feature.uri)) {
-                  const res = await downloadAndResize({
-                    uri: feature.uri,
-                    width: POST_IMG_MAX.width,
-                    height: POST_IMG_MAX.height,
-                    mode: 'contain',
-                    maxSize: POST_IMG_MAX.size,
-                    timeout: 15e3,
-                  })
+          if (newRt.facets) {
+            for (const facet of newRt.facets) {
+              for (const feature of facet.features) {
+                if (AppBskyRichtextFacet.isLink(feature)) {
+                  if (isUriImage(feature.uri)) {
+                    const res = await downloadAndResize({
+                      uri: feature.uri,
+                      width: POST_IMG_MAX.width,
+                      height: POST_IMG_MAX.height,
+                      mode: 'contain',
+                      maxSize: POST_IMG_MAX.size,
+                      timeout: 15e3,
+                    })
 
-                  if (res !== undefined) {
-                    onPhotoPasted(res.path)
+                    if (res !== undefined) {
+                      onPhotoPasted(res.path)
+                    }
+                  } else {
+                    set.add(feature.uri)
                   }
-                } else {
-                  set.add(feature.uri)
                 }
               }
             }
           }
-        }
 
-        if (!isEqual(set, suggestedLinks)) {
-          onSuggestedLinksChanged(set)
-        }
+          if (!isEqual(set, suggestedLinks)) {
+            onSuggestedLinksChanged(set)
+          }
+        }, 1)
       },
       [
         setRichText,

@@ -1,5 +1,5 @@
-import {FeedTuner, FeedViewPostsSlice} from 'lib/api/feed-manip'
 import {
+  AppBskyFeedGetActorLikes as GetActorLikes,
   AppBskyFeedGetAuthorFeed as GetAuthorFeed,
   AppBskyFeedGetFeed as GetCustomFeed,
   AppBskyFeedGetTimeline as GetTimeline,
@@ -7,6 +7,8 @@ import {
 import {makeAutoObservable, runInAction} from 'mobx'
 
 import AwaitLock from 'await-lock'
+import {FeedTuner} from 'lib/api/feed-manip'
+import {FeedViewPostsSlice} from 'lib/api/feed-manip'
 import {PostsFeedSliceModel} from './posts-slice'
 import {RootStoreModel} from '../root-store'
 import {bundleAsync} from 'lib/async/bundle'
@@ -14,7 +16,14 @@ import {cleanError} from 'lib/strings/errors'
 import {track} from 'lib/analytics/analytics'
 
 const PAGE_SIZE = 30
-let _idCounter = 0
+
+type Options = {
+  /**
+   * Formats the feed in a flat array with no threading of replies, just
+   * top-level posts.
+   */
+  isSimpleFeed?: boolean
+}
 
 type QueryParams =
   | GetTimeline.QueryParams
@@ -37,6 +46,7 @@ export class PostsFeedModel {
   pollCursor: string | undefined
   tuner = new FeedTuner()
   pageSize = PAGE_SIZE
+  options: Options = {}
 
   // used to linearize async modifications to state
   lock = new AwaitLock()
@@ -49,8 +59,9 @@ export class PostsFeedModel {
 
   constructor(
     public rootStore: RootStoreModel,
-    public feedType: 'home' | 'author' | 'custom',
+    public feedType: 'home' | 'author' | 'custom' | 'likes',
     params: QueryParams,
+    options?: Options,
   ) {
     makeAutoObservable(
       this,
@@ -62,6 +73,7 @@ export class PostsFeedModel {
       {autoBind: true},
     )
     this.params = params
+    this.options = options || {}
   }
 
   get hasContent() {
@@ -74,24 +86,6 @@ export class PostsFeedModel {
 
   get isEmpty() {
     return this.hasLoaded && !this.hasContent
-  }
-
-  get nonReplyFeed() {
-    if (this.feedType === 'author') {
-      return this.slices.filter(slice => {
-        const params = this.params as GetAuthorFeed.QueryParams
-        const item = slice.rootItem
-        const isRepost =
-          item?.reasonRepost?.by?.handle === params.actor ||
-          item?.reasonRepost?.by?.did === params.actor
-        const allow =
-          !item.postRecord?.reply || // not a reply
-          isRepost // but allow if it's a repost
-        return allow
-      })
-    } else {
-      return this.slices
-    }
   }
 
   setHasNewLatest(v: boolean) {
@@ -279,35 +273,30 @@ export class PostsFeedModel {
    * Check if new posts are available
    */
   async checkForLatest() {
-    if (this.hasNewLatest || this.isLoading) {
+    if (!this.hasLoaded || this.hasNewLatest || this.isLoading) {
       return
     }
-    const res = await this._getFeed({limit: PAGE_SIZE})
-    this.setHasNewLatest(res.data.feed[0]?.post.uri !== this.pollCursor)
+    const res = await this._getFeed({limit: 1})
+    if (res.data.feed[0]) {
+      const slices = this.tuner.tune(res.data.feed, this.feedTuners)
+      if (slices[0]) {
+        const sliceModel = new PostsFeedSliceModel(this.rootStore, slices[0])
+        if (sliceModel.moderation.content.filter) {
+          return
+        }
+        this.setHasNewLatest(sliceModel.uri !== this.pollCursor)
+      }
+    }
   }
 
   /**
-   * Fetches the given post and adds it to the top
-   * Used by the composer to add their new posts
+   * Updates the UI after the user has created a post
    */
-  async addPostToTop(uri: string) {
+  onPostCreated() {
     if (!this.slices.length) {
       return this.refresh()
-    }
-    try {
-      const res = await this.rootStore.agent.app.bsky.feed.getPosts({
-        uris: [uri],
-      })
-      const toPrepend = new PostsFeedSliceModel(
-        this.rootStore,
-        uri,
-        new FeedViewPostsSlice(res.data.posts.map(post => ({post}))),
-      )
-      runInAction(() => {
-        this.slices = [toPrepend].concat(this.slices)
-      })
-    } catch (e) {
-      this.rootStore.log.error('Failed to load post to prepend', {e})
+    } else {
+      this.setHasNewLatest(true)
     }
   }
 
@@ -375,16 +364,17 @@ export class PostsFeedModel {
     this.rootStore.me.follows.hydrateProfiles(
       res.data.feed.map(item => item.post.author),
     )
+    for (const item of res.data.feed) {
+      this.rootStore.posts.fromFeedItem(item)
+    }
 
-    const slices = this.tuner.tune(res.data.feed, this.feedTuners)
+    const slices = this.options.isSimpleFeed
+      ? res.data.feed.map(item => new FeedViewPostsSlice([item]))
+      : this.tuner.tune(res.data.feed, this.feedTuners)
 
     const toAppend: PostsFeedSliceModel[] = []
     for (const slice of slices) {
-      const sliceModel = new PostsFeedSliceModel(
-        this.rootStore,
-        `item-${_idCounter++}`,
-        slice,
-      )
+      const sliceModel = new PostsFeedSliceModel(this.rootStore, slice)
       toAppend.push(sliceModel)
     }
     runInAction(() => {
@@ -406,6 +396,7 @@ export class PostsFeedModel {
     res: GetTimeline.Response | GetAuthorFeed.Response | GetCustomFeed.Response,
   ) {
     for (const item of res.data.feed) {
+      this.rootStore.posts.fromFeedItem(item)
       const existingSlice = this.slices.find(slice =>
         slice.containsUri(item.post.uri),
       )
@@ -440,9 +431,13 @@ export class PostsFeedModel {
         res.data.feed = res.data.feed.slice(0, params.limit)
       }
       return res
-    } else {
+    } else if (this.feedType === 'author') {
       return this.rootStore.agent.getAuthorFeed(
         params as GetAuthorFeed.QueryParams,
+      )
+    } else {
+      return this.rootStore.agent.getActorLikes(
+        params as GetActorLikes.QueryParams,
       )
     }
   }

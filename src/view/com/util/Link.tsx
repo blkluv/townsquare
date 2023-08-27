@@ -1,28 +1,32 @@
-import React, {ComponentProps, useMemo} from 'react'
-import {observer} from 'mobx-react-lite'
 import {
-  Linking,
   GestureResponderEvent,
+  Linking,
   Platform,
+  Pressable,
   StyleProp,
-  TouchableWithoutFeedback,
-  TouchableOpacity,
+  TextProps,
   TextStyle,
+  TouchableOpacity,
+  TouchableWithoutFeedback,
   View,
   ViewStyle,
 } from 'react-native'
+import React, {ComponentProps, useMemo} from 'react'
+import {RootStoreModel, useStores} from 'state/index'
 import {
+  StackActions,
   useLinkProps,
   useNavigation,
-  StackActions,
 } from '@react-navigation/native'
+import {convertBskyAppUrlIfNeeded, isExternalUrl} from 'lib/strings/url-helpers'
+import {isAndroid, isDesktopWeb} from 'platform/detection'
+
+import FixedTouchableHighlight from '../pager/FixedTouchableHighlight'
+import {NavigationProp} from 'lib/routes/types'
 import {Text} from './text/Text'
 import {TypographyVariant} from 'lib/ThemeContext'
-import {NavigationProp} from 'lib/routes/types'
+import {observer} from 'mobx-react-lite'
 import {router} from '../../../routes'
-import {useStores, RootStoreModel} from 'state/index'
-import {convertBskyAppUrlIfNeeded, isExternalUrl} from 'lib/strings/url-helpers'
-import {isDesktopWeb} from 'platform/detection'
 import {sanitizeUrl} from '@braintree/sanitize-url'
 
 type Event =
@@ -65,16 +69,33 @@ export const Link = observer(function Link({
   )
 
   if (noFeedback) {
+    if (isAndroid) {
+      // workaround for Android not working well with left/right swipe gestures and TouchableWithoutFeedback
+      // https://github.com/callstack/react-native-pager-view/issues/424
+      return (
+        <FixedTouchableHighlight
+          testID={testID}
+          onPress={onPress}
+          // @ts-ignore web only -prf
+          href={asAnchor ? sanitizeUrl(href) : undefined}
+          accessible={accessible}
+          accessibilityRole="link"
+          {...props}>
+          <View style={style}>
+            {children ? children : <Text>{title || 'link'}</Text>}
+          </View>
+        </FixedTouchableHighlight>
+      )
+    }
     return (
       <TouchableWithoutFeedback
         testID={testID}
         onPress={onPress}
-        // @ts-ignore web only -prf
-        href={asAnchor ? sanitizeUrl(href) : undefined}
         accessible={accessible}
         accessibilityRole="link"
         {...props}>
-        <View style={style}>
+        {/* @ts-ignore web only -prf */}
+        <View style={style} href={asAnchor ? sanitizeUrl(href) : undefined}>
           {children ? children : <Text>{title || 'link'}</Text>}
         </View>
       </TouchableWithoutFeedback>
@@ -88,8 +109,12 @@ export const Link = observer(function Link({
     props.dataSet.noUnderline = 1
   }
 
+  if (title && !props.accessibilityLabel) {
+    props.accessibilityLabel = title
+  }
+
   return (
-    <TouchableOpacity
+    <Pressable
       testID={testID}
       style={style}
       onPress={onPress}
@@ -99,7 +124,7 @@ export const Link = observer(function Link({
       href={asAnchor ? sanitizeUrl(href) : undefined}
       {...props}>
       {children ? children : <Text>{title || 'link'}</Text>}
-    </TouchableOpacity>
+    </Pressable>
   )
 })
 
@@ -112,6 +137,7 @@ export const TextLink = observer(function TextLink({
   numberOfLines,
   lineHeight,
   dataSet,
+  title,
 }: {
   testID?: string
   type?: TypographyVariant
@@ -121,7 +147,8 @@ export const TextLink = observer(function TextLink({
   numberOfLines?: number
   lineHeight?: number
   dataSet?: any
-}) {
+  title?: string
+} & TextProps) {
   const {...props} = useLinkProps({to: sanitizeUrl(href)})
   const store = useStores()
   const navigation = useNavigation<NavigationProp>()
@@ -150,8 +177,8 @@ export const TextLink = observer(function TextLink({
       style={style}
       numberOfLines={numberOfLines}
       lineHeight={lineHeight}
-      // @ts-ignore web only -prf
       dataSet={dataSet}
+      title={title}
       // @ts-ignore web only -prf
       hrefAttrs={hrefAttrs} // hack to get open in new tab to work on safari. without this, safari will open in a new window
       {...props}>
@@ -163,6 +190,19 @@ export const TextLink = observer(function TextLink({
 /**
  * Only acts as a link on desktop web
  */
+interface DesktopWebTextLinkProps extends TextProps {
+  testID?: string
+  type?: TypographyVariant
+  style?: StyleProp<TextStyle>
+  href: string
+  text: string | JSX.Element
+  numberOfLines?: number
+  lineHeight?: number
+  accessible?: boolean
+  accessibilityLabel?: string
+  accessibilityHint?: string
+  title?: string
+}
 export const DesktopWebTextLink = observer(function DesktopWebTextLink({
   testID,
   type = 'md',
@@ -171,15 +211,8 @@ export const DesktopWebTextLink = observer(function DesktopWebTextLink({
   text,
   numberOfLines,
   lineHeight,
-}: {
-  testID?: string
-  type?: TypographyVariant
-  style?: StyleProp<TextStyle>
-  href: string
-  text: string | JSX.Element
-  numberOfLines?: number
-  lineHeight?: number
-}) {
+  ...props
+}: DesktopWebTextLinkProps) {
   if (isDesktopWeb) {
     return (
       <TextLink
@@ -190,6 +223,8 @@ export const DesktopWebTextLink = observer(function DesktopWebTextLink({
         text={text}
         numberOfLines={numberOfLines}
         lineHeight={lineHeight}
+        title={props.title}
+        {...props}
       />
     )
   }
@@ -199,7 +234,9 @@ export const DesktopWebTextLink = observer(function DesktopWebTextLink({
       type={type}
       style={style}
       numberOfLines={numberOfLines}
-      lineHeight={lineHeight}>
+      lineHeight={lineHeight}
+      title={props.title}
+      {...props}>
       {text}
     </Text>
   )

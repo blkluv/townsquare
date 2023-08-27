@@ -1,12 +1,12 @@
 import React, {useCallback} from 'react'
 import {StyleProp, StyleSheet, TouchableOpacity, ViewStyle} from 'react-native'
-import {RepostIcon} from 'lib/icons'
-import {s, colors} from 'lib/styles'
-import {useTheme} from 'lib/ThemeContext'
-import {Text} from '../text/Text'
-import {useStores} from 'state/index'
+import {colors, s} from 'lib/styles'
 
-const HITSLOP = {top: 5, left: 5, bottom: 5, right: 5}
+import {RepostIcon} from 'lib/icons'
+import {Text} from '../text/Text'
+import {pluralize} from 'lib/strings/helpers'
+import {useStores} from 'state/index'
+import {useTheme} from 'lib/ThemeContext'
 
 interface Props {
   isReposted: boolean
@@ -45,11 +45,12 @@ export const RepostButton = ({
   return (
     <TouchableOpacity
       testID="repostBtn"
-      hitSlop={HITSLOP}
       onPress={onPressToggleRepostWrapper}
-      style={styles.control}
+      style={[styles.control, !big && styles.controlPad]}
       accessibilityRole="button"
-      accessibilityLabel={isReposted ? 'Undo repost' : 'Repost'}
+      accessibilityLabel={`${
+        isReposted ? 'Undo repost' : 'Repost'
+      } (${repostCount} ${pluralize(repostCount || 0, 'repost')})`}
       accessibilityHint="">
       <RepostIcon
         style={
@@ -79,8 +80,9 @@ const styles = StyleSheet.create({
   control: {
     flexDirection: 'row',
     alignItems: 'center',
+  },
+  controlPad: {
     padding: 5,
-    margin: -5,
   },
   reposted: {
     color: colors.green3,

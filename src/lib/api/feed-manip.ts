@@ -1,9 +1,10 @@
 import {
+  AppBskyEmbedRecord,
+  AppBskyEmbedRecordWithMedia,
   AppBskyFeedDefs,
   AppBskyFeedPost,
-  AppBskyEmbedRecordWithMedia,
-  AppBskyEmbedRecord,
 } from '@atproto/api'
+
 import {isPostInLanguage} from '../../locale/helpers'
 type FeedViewPost = AppBskyFeedDefs.FeedViewPost
 
@@ -16,6 +17,12 @@ export class FeedViewPostsSlice {
   isFlattenedReply = false
 
   constructor(public items: FeedViewPost[] = []) {}
+
+  get _reactKey() {
+    return `slice-${this.items[0].post.uri}-${
+      this.items[0].reason?.indexedAt || this.items[0].post.indexedAt
+    }`
+  }
 
   get uri() {
     if (this.isFlattenedReply) {
@@ -237,7 +244,7 @@ export class FeedTuner {
   /**
    * This function filters a list of FeedViewPostsSlice items based on whether they contain text in a
    * preferred language.
-   * @param {string[]} preferredLangsCode2 - An array of prefered language codes in ISO 639-1 or ISO 639-2 format.
+   * @param {string[]} preferredLangsCode2 - An array of preferred language codes in ISO 639-1 or ISO 639-2 format.
    * @returns A function that takes in a `FeedTuner` and an array of `FeedViewPostsSlice` objects and
    * returns an array of `FeedViewPostsSlice` objects.
    */

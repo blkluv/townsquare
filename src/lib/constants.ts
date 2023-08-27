@@ -1,3 +1,5 @@
+import {Insets} from 'react-native'
+
 // Global constants
 export const FEEDBACK_FORM_URL =
   "https://twitter.com/intent/tweet?text=Hey%20@solarplex_xyz%20I%20have%20some%20feedback%20for%20Live%3A";
@@ -32,7 +34,7 @@ const PROD_CONSTANTS = {
   SPLX_PDS_URL: "https://live.solarplex.xyz",
   SPLX_USER_HANDLE: "solarplex.live.solarplex.xyz",
   SPLX_USER_DID: "did:plc:4srpaai54v3d35bigtfbtbd5",
-  SPLX_V1_API: "https://prod.api.solarplex.xyz",
+  SPLX_V1_API: "https://prod.api.solarplex.xyz", // "http://localhost:3001"
   HELIUS_RPC_API: "https://rpc.helius.xyz",
   SPLX_UI_URL: "https://v2.solarplex.xyz",
   SPLX_FEED_API: "https://feed.solarplex.xyz",
@@ -174,6 +176,18 @@ export const STAGING_LINK_META_PROXY =
   "https://cardyb.staging.bsky.dev/v1/extract?url=";
 
 export const PROD_LINK_META_PROXY = "https://cardyb.bsky.app/v1/extract?url=";
+
+// Hitslop constants
+export const createHitslop = (size: number): Insets => ({
+  top: size,
+  left: size,
+  bottom: size,
+  right: size,
+})
+export const HITSLOP_10 = createHitslop(10)
+export const HITSLOP_20 = createHitslop(20)
+export const HITSLOP_30 = createHitslop(30)
+export const BACK_HITSLOP = HITSLOP_30
 
 export const SOLARPLEX_FEEDS = [
   `at://${SOLARPLEX_USER_DID}/app.bsky.feed.generator/splx-solana`,
