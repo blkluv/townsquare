@@ -7,6 +7,8 @@ import {
   ComposeIcon2,
   HomeIcon,
   HomeIconSolid,
+  MagnifyingGlassIcon2,
+  MagnifyingGlassIcon2Solid,
   RegularRankingStarIcon,
   RegularReactionIcon,
   SolarplexLogo,
@@ -285,6 +287,24 @@ export const DesktopLeftNav = observer(function DesktopLeftNav() {
               />
             }
             label="Communities"
+          />
+          <NavItem
+            href={`/search`}
+            iconFilled={
+              <MagnifyingGlassIcon2Solid
+                style={pal.text as StyleProp<ViewStyle>}
+                size={24}
+                strokeWidth={1.7}
+              />
+            }
+            icon={
+              <MagnifyingGlassIcon2
+                style={pal.text as StyleProp<ViewStyle>}
+                size={24}
+                strokeWidth={1.7}
+              />
+            }
+            label="Search"
           />
 
           <NavItem
