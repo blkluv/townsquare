@@ -49,7 +49,7 @@ export function InputIssueDetails({
           numberOfLines={3}
           multiline={true}
           textAlignVertical="top"
-          maxLength={1000}
+          maxLength={300}
           style={[styles.detailsInput, pal.text]}
         />
         <View style={styles.detailsInputBottomBar}>

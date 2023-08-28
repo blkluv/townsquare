@@ -1,32 +1,35 @@
-import React from 'react'
-import {TouchableWithoutFeedback, StyleSheet, View} from 'react-native'
-import {observer} from 'mobx-react-lite'
-import {useStores} from 'state/index'
-import {usePalette} from 'lib/hooks/usePalette'
-import type {Modal as ModalIface} from 'state/models/ui/shell'
-import {isMobileWeb} from 'platform/detection'
-
-import * as ConfirmModal from './Confirm'
-import * as EditProfileModal from './EditProfile'
-import * as ServerInputModal from './ServerInput'
-import * as ReportPostModal from './report/ReportPost'
-import * as ReportAccountModal from './report/ReportAccount'
-import * as CreateOrEditMuteListModal from './CreateOrEditMuteList'
-import * as ListAddRemoveUserModal from './ListAddRemoveUser'
-import * as DeleteAccountModal from './DeleteAccount'
-import * as RepostModal from './Repost'
-import * as CropImageModal from './crop-image/CropImage.web'
-import * as AltTextImageModal from './AltImage'
-import * as EditImageModal from './EditImage'
-import * as ChangeHandleModal from './ChangeHandle'
-import * as WaitlistModal from './Waitlist'
-import * as InviteCodesModal from './InviteCodes'
 import * as AddAppPassword from './AddAppPasswords'
+import * as AltTextImageModal from './AltImage'
+import * as ChangeHandleModal from './ChangeHandle'
+import * as ConfirmModal from './Confirm'
 import * as ContentFilteringSettingsModal from './ContentFilteringSettings'
 import * as ContentLanguagesSettingsModal from './lang-settings/ContentLanguagesSettings'
+import * as CreateOrEditMuteListModal from './CreateOrEditMuteList'
+import * as CropImageModal from './crop-image/CropImage.web'
+import * as DeleteAccountModal from './DeleteAccount'
+import * as EditImageModal from './EditImage'
+import * as EditProfileModal from './EditProfile'
+import * as InviteCodesModal from './InviteCodes'
+import * as ListAddRemoveUserModal from './ListAddRemoveUser'
+import * as ModerationDetailsModal from './ModerationDetails'
+import * as OnboardingModal from './OnboardingModal'
 import * as PostLanguagesSettingsModal from './lang-settings/PostLanguagesSettings'
-
 import * as PreferencesHomeFeed from './PreferencesHomeFeed'
+import * as ProfilePreviewModal from './ProfilePreview'
+import * as ReportModal from './report/Modal'
+import * as RepostModal from './Repost'
+import * as SelfLabelModal from './SelfLabel'
+import * as ServerInputModal from './ServerInput'
+import * as WaitlistModal from './Waitlist'
+
+import {StyleSheet, TouchableWithoutFeedback, View} from 'react-native'
+
+import type {Modal as ModalIface} from 'state/models/ui/shell'
+import React from 'react'
+import {isMobileWeb} from 'platform/detection'
+import {observer} from 'mobx-react-lite'
+import {usePalette} from 'lib/hooks/usePalette'
+import {useStores} from 'state/index'
 
 export const ModalsContainer = observer(function ModalsContainer() {
   const store = useStores()
@@ -68,12 +71,12 @@ function Modal({modal}: {modal: ModalIface}) {
     element = <ConfirmModal.Component {...modal} />
   } else if (modal.name === 'edit-profile') {
     element = <EditProfileModal.Component {...modal} />
+  } else if (modal.name === 'profile-preview') {
+    element = <ProfilePreviewModal.Component {...modal} />
   } else if (modal.name === 'server-input') {
     element = <ServerInputModal.Component {...modal} />
-  } else if (modal.name === 'report-post') {
-    element = <ReportPostModal.Component {...modal} />
-  } else if (modal.name === 'report-account') {
-    element = <ReportAccountModal.Component {...modal} />
+  } else if (modal.name === 'report') {
+    element = <ReportModal.Component {...modal} />
   } else if (modal.name === 'create-or-edit-mute-list') {
     element = <CreateOrEditMuteListModal.Component {...modal} />
   } else if (modal.name === 'list-add-remove-user') {
@@ -84,6 +87,8 @@ function Modal({modal}: {modal: ModalIface}) {
     element = <DeleteAccountModal.Component />
   } else if (modal.name === 'repost') {
     element = <RepostModal.Component {...modal} />
+  } else if (modal.name === 'self-label') {
+    element = <SelfLabelModal.Component {...modal} />
   } else if (modal.name === 'change-handle') {
     element = <ChangeHandleModal.Component {...modal} />
   } else if (modal.name === 'waitlist') {
@@ -104,15 +109,19 @@ function Modal({modal}: {modal: ModalIface}) {
     element = <EditImageModal.Component {...modal} />
   } else if (modal.name === 'preferences-home-feed') {
     element = <PreferencesHomeFeed.Component />
+  } else if (modal.name === 'onboarding') {
+    element = <OnboardingModal.Component />
+  } else if (modal.name === 'moderation-details') {
+    element = <ModerationDetailsModal.Component {...modal} />
   } else {
     return null
   }
 
   return (
-    // eslint-disable-next-line
+    // eslint-disable-next-line react-native-a11y/has-valid-accessibility-descriptors
     <TouchableWithoutFeedback onPress={onPressMask}>
       <View style={styles.mask}>
-        {/* eslint-disable-next-line */}
+        {/* eslint-disable-next-line react-native-a11y/has-valid-accessibility-descriptors */}
         <TouchableWithoutFeedback onPress={onInnerPress}>
           <View
             style={[

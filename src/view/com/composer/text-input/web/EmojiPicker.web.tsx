@@ -5,7 +5,6 @@ import {StyleSheet, View} from 'react-native'
 
 import Picker from '@emoji-mart/react'
 import React from 'react'
-import { faSmile } from '@fortawesome/free-regular-svg-icons'
 import {textInputWebEmitter} from '../TextInput.web'
 import {usePalette} from '../../../../../lib/hooks/usePalette'
 
@@ -31,8 +30,8 @@ export function EmojiPickerButton() {
     <DropdownMenu.Root open={open} onOpenChange={onOpenChange}>
       <DropdownMenu.Trigger style={styles.trigger}>
         <FontAwesomeIcon
-          icon={faSmile}
-          style={pal.link as FontAwesomeIconStyle}
+          icon={['far', 'face-smile']}
+          color={pal.colors.link}
           size={22}
         />
       </DropdownMenu.Trigger>

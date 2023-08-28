@@ -1,13 +1,14 @@
-import React from 'react'
-import LinearGradient from 'react-native-linear-gradient'
 import {
   ActivityIndicator,
   StyleSheet,
   TouchableOpacity,
   View,
 } from 'react-native'
+import {colors, gradients, s} from 'lib/styles'
+
+import LinearGradient from 'react-native-linear-gradient'
+import React from 'react'
 import {Text} from '../../util/text/Text'
-import {s, gradients, colors} from 'lib/styles'
 
 export function SendReportButton({
   onPress,

@@ -1,31 +1,37 @@
-import React, {useRef, useEffect} from 'react'
-import {StyleSheet} from 'react-native'
-import {SafeAreaView} from 'react-native-safe-area-context'
-import {observer} from 'mobx-react-lite'
-import BottomSheet from '@gorhom/bottom-sheet'
-import {useStores} from 'state/index'
-import {createCustomBackdrop} from '../util/BottomSheetCustomBackdrop'
-import {usePalette} from 'lib/hooks/usePalette'
-
-import * as ConfirmModal from './Confirm'
-import * as EditProfileModal from './EditProfile'
-import * as ServerInputModal from './ServerInput'
-import * as ReportPostModal from './report/ReportPost'
-import * as RepostModal from './Repost'
-import * as CreateOrEditMuteListModal from './CreateOrEditMuteList'
-import * as ListAddRemoveUserModal from './ListAddRemoveUser'
-import * as AltImageModal from './AltImage'
-import * as EditImageModal from './AltImage'
-import * as ReportAccountModal from './report/ReportAccount'
-import * as DeleteAccountModal from './DeleteAccount'
-import * as ChangeHandleModal from './ChangeHandle'
-import * as WaitlistModal from './Waitlist'
-import * as InviteCodesModal from './InviteCodes'
 import * as AddAppPassword from './AddAppPasswords'
+import * as AltImageModal from './AltImage'
+import * as ChangeHandleModal from './ChangeHandle'
+import * as ConfirmModal from './Confirm'
 import * as ContentFilteringSettingsModal from './ContentFilteringSettings'
 import * as ContentLanguagesSettingsModal from './lang-settings/ContentLanguagesSettings'
+import * as CreateOrEditMuteListModal from './CreateOrEditMuteList'
+import * as DeleteAccountModal from './DeleteAccount'
+import * as EditImageModal from './AltImage'
+import * as EditProfileModal from './EditProfile'
+import * as InviteCodesModal from './InviteCodes'
+import * as ListAddRemoveUserModal from './ListAddRemoveUser'
+import * as ModerationDetailsModal from './ModerationDetails'
+import * as OnboardingModal from './OnboardingModal'
 import * as PostLanguagesSettingsModal from './lang-settings/PostLanguagesSettings'
 import * as PreferencesHomeFeed from './PreferencesHomeFeed'
+import * as ProfilePreviewModal from './ProfilePreview'
+import * as ReportModal from './report/Modal'
+import * as RepostModal from './Repost'
+import * as SelfLabelModal from './SelfLabel'
+import * as ServerInputModal from './ServerInput'
+import * as WaitlistModal from './Waitlist'
+
+import React, {useEffect, useRef} from 'react'
+
+import BottomSheet from '@gorhom/bottom-sheet'
+import {SafeAreaView} from 'react-native-safe-area-context'
+import {StyleSheet} from 'react-native'
+import {createCustomBackdrop} from '../util/BottomSheetCustomBackdrop'
+import {navigate} from '../../../Navigation'
+import {observer} from 'mobx-react-lite'
+import once from 'lodash.once'
+import {usePalette} from 'lib/hooks/usePalette'
+import {useStores} from 'state/index'
 
 const DEFAULT_SNAPPOINTS = ['90%']
 
@@ -33,8 +39,24 @@ export const ModalsContainer = observer(function ModalsContainer() {
   const store = useStores()
   const bottomSheetRef = useRef<BottomSheet>(null)
   const pal = usePalette('default')
+
+  const activeModal =
+    store.shell.activeModals[store.shell.activeModals.length - 1]
+
+  const navigateOnce = once(navigate)
+
+  const onBottomSheetAnimate = (fromIndex: number, toIndex: number) => {
+    if (activeModal?.name === 'profile-preview' && toIndex === 1) {
+      // begin loading the profile screen behind the scenes
+      navigateOnce('Profile', {name: activeModal.did})
+    }
+  }
   const onBottomSheetChange = (snapPoint: number) => {
     if (snapPoint === -1) {
+      store.shell.closeModal()
+    } else if (activeModal?.name === 'profile-preview' && snapPoint === 1) {
+      // ensure we navigate to Profile and close the modal
+      navigateOnce('Profile', {name: activeModal.did})
       store.shell.closeModal()
     }
   }
@@ -42,9 +64,6 @@ export const ModalsContainer = observer(function ModalsContainer() {
     bottomSheetRef.current?.close()
     store.shell.closeModal()
   }
-
-  const activeModal =
-    store.shell.activeModals[store.shell.activeModals.length - 1]
 
   useEffect(() => {
     if (store.shell.isModalActive) {
@@ -62,15 +81,15 @@ export const ModalsContainer = observer(function ModalsContainer() {
   } else if (activeModal?.name === 'edit-profile') {
     snapPoints = EditProfileModal.snapPoints
     element = <EditProfileModal.Component {...activeModal} />
+  } else if (activeModal?.name === 'profile-preview') {
+    snapPoints = ProfilePreviewModal.snapPoints
+    element = <ProfilePreviewModal.Component {...activeModal} />
   } else if (activeModal?.name === 'server-input') {
     snapPoints = ServerInputModal.snapPoints
     element = <ServerInputModal.Component {...activeModal} />
-  } else if (activeModal?.name === 'report-post') {
-    snapPoints = ReportPostModal.snapPoints
-    element = <ReportPostModal.Component {...activeModal} />
-  } else if (activeModal?.name === 'report-account') {
-    snapPoints = ReportAccountModal.snapPoints
-    element = <ReportAccountModal.Component {...activeModal} />
+  } else if (activeModal?.name === 'report') {
+    snapPoints = ReportModal.snapPoints
+    element = <ReportModal.Component {...activeModal} />
   } else if (activeModal?.name === 'create-or-edit-mute-list') {
     snapPoints = CreateOrEditMuteListModal.snapPoints
     element = <CreateOrEditMuteListModal.Component {...activeModal} />
@@ -83,6 +102,9 @@ export const ModalsContainer = observer(function ModalsContainer() {
   } else if (activeModal?.name === 'repost') {
     snapPoints = RepostModal.snapPoints
     element = <RepostModal.Component {...activeModal} />
+  } else if (activeModal?.name === 'self-label') {
+    snapPoints = SelfLabelModal.snapPoints
+    element = <SelfLabelModal.Component {...activeModal} />
   } else if (activeModal?.name === 'alt-text-image') {
     snapPoints = AltImageModal.snapPoints
     element = <AltImageModal.Component {...activeModal} />
@@ -113,6 +135,12 @@ export const ModalsContainer = observer(function ModalsContainer() {
   } else if (activeModal?.name === 'preferences-home-feed') {
     snapPoints = PreferencesHomeFeed.snapPoints
     element = <PreferencesHomeFeed.Component />
+  } else if (activeModal?.name === 'onboarding') {
+    snapPoints = OnboardingModal.snapPoints
+    element = <OnboardingModal.Component />
+  } else if (activeModal?.name === 'moderation-details') {
+    snapPoints = ModerationDetailsModal.snapPoints
+    element = <ModerationDetailsModal.Component {...activeModal} />
   } else {
     return null
   }
@@ -138,6 +166,7 @@ export const ModalsContainer = observer(function ModalsContainer() {
       }
       handleIndicatorStyle={{backgroundColor: pal.text.color}}
       handleStyle={[styles.handle, pal.view]}
+      onAnimate={onBottomSheetAnimate}
       onChange={onBottomSheetChange}>
       {element}
     </BottomSheet>
