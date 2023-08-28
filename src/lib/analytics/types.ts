@@ -132,6 +132,10 @@ interface TrackPropertiesMap {
   "CommunityFeed:Leave": {};
   "Claim:DailyReward": {};
   "Claim:WeeklyReward": {};
+  "Tip:TipButton": { token: string};
+  "Tip:TipConfirmation": { token: string};
+
+
 }
 
 interface ScreenPropertiesMap {

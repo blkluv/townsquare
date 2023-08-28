@@ -38,6 +38,10 @@ export const FeedItem = observer(function ({
   isThreadChild,
   isThreadLastChild,
   isThreadParent,
+  showFollowBtn,
+  showReplyLine,
+  ignoreMuteFor,
+  hideChild,
 }: {
   item: PostsFeedItemModel
   isThreadChild?: boolean
@@ -329,7 +333,12 @@ export const FeedItem = observer(function ({
             itemCid={itemCid}
             itemHref={itemHref}
             itemTitle={itemTitle}
-            author={item.post.author}
+            author={{
+              avatar: item.post.author.avatar!,
+              handle: item.post.author.handle,
+              displayName: item.post.author.displayName!,
+              did: item.post.author.did,
+            }}
             text={item.richText?.text || record.text}
             indexedAt={item.post.indexedAt}
             isAuthor={item.post.author.did === store.me.did}

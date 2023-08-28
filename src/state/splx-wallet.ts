@@ -98,6 +98,22 @@ export class SplxWallet {
     return this.state.connectedWallets[this.rootStore.me.did];
   }
 
+  async getConnectWalletFromdid(did: string | undefined) {
+    if (undefined) {
+      return null;
+    }
+    return this._execute(
+      async () => {
+        const { user } = await this._feedApiCall(`splx/get_user/${did}`);
+        
+        return user?.wallet ?? "";
+      },
+      "getConnectWalletFromdid",
+      did,
+    );
+  }
+
+
   async _feedApiCall(subDir: string, method: string = 'GET', body?: Json) {
     return this._execute(async () => {
       if (!subDir.startsWith('/')) {

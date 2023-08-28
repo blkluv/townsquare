@@ -14,7 +14,15 @@ import {isWeb} from 'platform/detection'
 export type ColorMode = 'system' | 'light' | 'dark'
 
 export function isColorMode(v: unknown): v is ColorMode {
-  return v === 'system' || v === 'light' || v === 'dark'
+  return v === "system" || v === "light" || v === "dark";
+}
+
+export interface TippingModal {
+  name: "tip-modal";
+  recipientName: string;
+  recipientAddress: string;
+  tokenName: string;
+
 }
 
 export interface ConfirmModal {
@@ -182,6 +190,9 @@ export type Modal =
 
   // Generic
   | ConfirmModal
+
+  // Tipping
+  | TippingModal;
 
 interface LightboxModel {}
 

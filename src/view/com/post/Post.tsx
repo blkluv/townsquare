@@ -183,15 +183,18 @@ const PostLoaded = observer(
         .catch(e => store.log.error('Failed to toggle like', e))
     }, [item, store, navigation])
 
-    const onPressReaction = React.useCallback(async (reactionId: string, remove?: boolean) => {
-      track("FeedItem:PostLike");
-      // console.log("reactionId", reactionId);
-      return store.session.isSolarplexSession
-        ? await navigation.navigate("SignIn")
-        : item
-            .react(reactionId, remove)
-            .catch((e) => store.log.error("Failed to add reaction", e));
-    }, [track, item, store, navigation]);
+    const onPressReaction = React.useCallback(
+      async (reactionId: string, remove?: boolean) => {
+        track("FeedItem:PostLike");
+        // console.log("reactionId", reactionId);
+        return store.session.isSolarplexSession
+          ? await navigation.navigate("SignIn")
+          : item
+              .react(reactionId, remove)
+              .catch((e) => store.log.error("Failed to add reaction", e));
+      },
+      [track, item, store, navigation],
+    );
 
     const onCopyPostText = React.useCallback(() => {
       Clipboard.setString(record.text)
@@ -314,7 +317,12 @@ const PostLoaded = observer(
               itemCid={itemCid}
               itemHref={itemHref}
               itemTitle={itemTitle}
-              author={item.post.author}
+              author={{
+                avatar: item.post.author.avatar!,
+                handle: item.post.author.handle,
+                displayName: item.post.author.displayName!,
+                did: item.post.author.did,
+              }}
               indexedAt={item.post.indexedAt}
               text={item.richText?.text || record.text}
               isAuthor={item.post.author.did === store.me.did}

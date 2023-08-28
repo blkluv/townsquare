@@ -352,55 +352,62 @@ export const PostThreadItem = observer(function PostThreadItem({
               ) : (
                 <></>
               )}
-                {item.post.repostCount ? (
-                  <Link
-                    style={styles.expandedInfoItem}
-                    href={repostsHref}
-                    title={repostsTitle}>
-                    <Text testID="repostCount" type="lg" style={pal.textLight}>
-                      <Text type="xl-bold" style={pal.text}>
-                        {formatCount(item.post.repostCount)}
-                      </Text>{' '}
-                      {pluralize(item.post.repostCount, 'repost')}
-                    </Text>
-                  </Link>
-                ) : (
-                  <></>
-                )}
-                {item.post.likeCount ? (
-                  <Link
-                    style={styles.expandedInfoItem}
-                    href={likesHref}
-                    title={likesTitle}>
-                    <Text testID="likeCount" type="lg" style={pal.textLight}>
-                      <Text type="xl-bold" style={pal.text}>
-                        {formatCount(item.post.likeCount)}
-                      </Text>{' '}
-                      {pluralize(item.post.likeCount, 'like')}
-                    </Text>
-                  </Link>
-                ) : (
-                  <></>
-                )}
-              </View>
-            ) : (
-              <></>
-            )}
-            <View style={[s.pl10, s.pb5]}>
-              <PostCtrls
-                big
-                itemUri={itemUri}
-                itemCid={itemCid}
-                itemHref={itemHref}
-                itemTitle={itemTitle}
-                author={item.post.author}
-                text={item.richText?.text || record.text}
-                indexedAt={item.post.indexedAt}
-                isAuthor={item.post.author.did === store.me.did}
-                isReposted={!!item.post.viewer?.repost}
-                isLiked={!!item.post.viewer?.like}
-                isThreadMuted={item.isThreadMuted}
-reactions={item.data.reactions}
+              {item.post.repostCount ? (
+                <Link
+                  style={styles.expandedInfoItem}
+                  href={repostsHref}
+                  title={repostsTitle}
+                >
+                  <Text testID="repostCount" type="lg" style={pal.textLight}>
+                    <Text type="xl-bold" style={pal.text}>
+                      {formatCount(item.post.repostCount)}
+                    </Text>{" "}
+                    {pluralize(item.post.repostCount, "repost")}
+                  </Text>
+                </Link>
+              ) : (
+                <></>
+              )}
+              {item.post.likeCount ? (
+                <Link
+                  style={styles.expandedInfoItem}
+                  href={likesHref}
+                  title={likesTitle}
+                >
+                  <Text testID="likeCount" type="lg" style={pal.textLight}>
+                    <Text type="xl-bold" style={pal.text}>
+                      {formatCount(item.post.likeCount)}
+                    </Text>{" "}
+                    {pluralize(item.post.likeCount, "like")}
+                  </Text>
+                </Link>
+              ) : (
+                <></>
+              )}
+            </View>
+          ) : (
+            <></>
+          )}
+          <View style={[s.pl10, s.pb5]}>
+            <PostCtrls
+              big
+              itemUri={itemUri}
+              itemCid={itemCid}
+              itemHref={itemHref}
+              itemTitle={itemTitle}
+              author={{
+                avatar: item.post.author.avatar!,
+                handle: item.post.author.handle,
+                displayName: item.post.author.displayName!,
+                did: item.post.author.did,
+              }}
+              text={item.richText?.text || record.text}
+              indexedAt={item.post.indexedAt}
+              isAuthor={item.post.author.did === store.me.did}
+              isReposted={!!item.post.viewer?.repost}
+              isLiked={!!item.post.viewer?.like}
+              isThreadMuted={item.isThreadMuted}
+              reactions={item.data.reactions}
               viewerReaction={item.data.viewerReaction}
                 onPressReply={onPressReply}
                 onPressToggleRepost={onPressToggleRepost}
@@ -524,7 +531,12 @@ onPressReaction={onPressReaction}
                 itemCid={itemCid}
                 itemHref={itemHref}
                 itemTitle={itemTitle}
-                author={item.post.author}
+                author={{
+                  avatar: item.post.author.avatar!,
+                  handle: item.post.author.handle,
+                  displayName: item.post.author.displayName!,
+                  did: item.post.author.did,
+                }}
                 text={item.richText?.text || record.text}
                 indexedAt={item.post.indexedAt}
                 isAuthor={item.post.author.did === store.me.did}

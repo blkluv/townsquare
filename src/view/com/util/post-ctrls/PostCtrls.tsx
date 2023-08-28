@@ -1,7 +1,9 @@
+import { BLAZE, BONK, BSOL, GUAC, SOL } from "lib/tipTokens";
 import {
   CommentBottomArrow,
   HeartIcon,
   HeartIconSolid,
+  MoneyBill,
   RegularFaceSmileIcon,
   SolidFaceSmileIcon,
 } from 'lib/icons'
@@ -9,7 +11,7 @@ import {
   FontAwesomeIcon,
   FontAwesomeIconStyle,
 } from '@fortawesome/react-native-fontawesome'
-import React, { useCallback, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import {
   StyleProp,
   StyleSheet,
@@ -29,13 +31,16 @@ import { ReactionList } from "view/com/reactions/ReactionList";
 import {RepostButton} from './RepostButton'
 import { SolarplexReaction } from 'state/models/media/reactions'
 import {Text} from '../text/Text'
+import { TipDropdownBtn } from "../forms/TipdropdownBtn";
 import { faSmile } from '@fortawesome/free-regular-svg-icons'
 import { faSmile as faSmileFilled } from '@fortawesome/free-solid-svg-icons'
 import { isMobileWeb } from "platform/detection";
+import { observer } from "mobx-react-lite";
 import {pluralize} from 'lib/strings/helpers'
 import { useNavigation } from "@react-navigation/native";
 import { useObserver } from "mobx-react-lite";
 import { usePalette } from "lib/hooks/usePalette";
+import { useSplxWallet } from "view/com/wallet/useSplxWallet";
 import {useStores} from 'state/index'
 import {useTheme} from 'lib/ThemeContext'
 
@@ -73,15 +78,42 @@ interface PostCtrlsOpts {
   onDeletePost: () => void
 }
 
-export function PostCtrls(opts: PostCtrlsOpts) {
+export const PostCtrls = (opts: PostCtrlsOpts) => {
   const store = useStores()
   const theme = useTheme()
   const pal = usePalette("default");
   const navigation = useNavigation<NavigationProp>();
+
+  const [postwallet, setpostWallet] = useState<string>("");
+  const [
+    visible,
+    setVisible,
+    linkedWallet,
+    walletAddressFromWalletConnect,
+    connectWalletIsBusy,
+    disconnectWalletIsBusy,
+  ] = useSplxWallet();
+
+  useEffect(() => {
+    (async () => {
+      const wallet = await store.wallet.getConnectWalletFromdid(
+        opts.author.did,
+      );
+
+      if (wallet !== null && wallet !== undefined && wallet !== "") {
+        setpostWallet(wallet);
+      }
+
+      console.log("wallet", `${wallet} --- ${opts.author.did}`);
+    })();
+  }, [opts]);
+
+
   const defaultReactions = useObserver(() => store.reactions.curReactionsSet);
   const reactionSet = useObserver(
     () => store.reactions.earnedReactions[defaultReactions],
   );
+
   const defaultCtrlColor = React.useMemo(
     () => ({
       color: theme.palette.default.postCtrl,
@@ -117,7 +149,29 @@ export function PostCtrls(opts: PostCtrlsOpts) {
     opts.itemUri,
     opts.text,
     store.shell,
-  ])
+    store.session.isSolarplexSession,
+    navigation,
+  ]);
+
+
+
+  function onTip({tokenName} : {tokenName: string}) {
+
+    if(store.session.isSolarplexSession){
+      navigation.navigate("SignIn")
+      return;
+    }
+
+    store.shell.openModal({
+       name: "tip-modal",
+       recipientName: opts.author.displayName
+       ? opts.author.displayName
+       : "this user",
+       recipientAddress: postwallet,
+       tokenName: tokenName,
+    })
+
+  }
 
   const onPressToggleLikeWrapper = async () => {
     if (!opts.isLiked) {
@@ -281,6 +335,41 @@ export function PostCtrls(opts: PostCtrlsOpts) {
           </ReactionDropdownButton>
         ) : undefined}
       </TouchableOpacity>
+      {/* TODO: Pratik :- Hide this when it's the user using it post i am not doing it right now cause it messes up the UI */}
+      {postwallet ? (
+        <TipDropdownBtn
+          testID="postDropdownBtn"
+          style={styles.ctrl}
+          onBonkTip={() =>
+            onTip({
+              tokenName: BONK.tokenName
+            })
+          }
+          onGuacTip={() =>
+            onTip({
+              tokenName: GUAC.tokenName
+            })
+          }
+          onBSOLTip={() =>
+            onTip({
+              tokenName: BSOL.tokenName
+            })
+          }
+          onBLZETip={() =>
+            onTip({
+              tokenName: BLAZE.tokenName
+            })
+          }
+          onSOLTip={() =>
+            onTip({
+              tokenName: SOL.tokenName
+            })
+          }
+        >
+          <MoneyBill size={opts.big ? 22 : 16} />
+        </TipDropdownBtn>
+      ) : undefined}
+
       <View>
       {opts.big ? undefined : (
         <PostDropdownBtn

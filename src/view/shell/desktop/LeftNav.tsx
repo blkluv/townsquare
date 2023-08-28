@@ -235,6 +235,7 @@ export const DesktopLeftNav = observer(function DesktopLeftNav() {
   const store = useStores();
   const pal = usePalette("default");
   const { track } = useAnalytics();
+  const walletAddress = store.me.splxWallet;
 
   const onPressSignout = React.useCallback(() => {
     track("Settings:SignOutButtonClicked");

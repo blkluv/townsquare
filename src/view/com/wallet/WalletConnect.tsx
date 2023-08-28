@@ -15,17 +15,26 @@ import { observer } from "mobx-react-lite";
 import { usePalette } from "lib/hooks/usePalette";
 import { useSplxWallet } from "./useSplxWallet";
 import { useStores } from "state/index";
+import { useWallet } from "@solana/wallet-adapter-react";
 
 export const WalletConnect = observer(function WalletConnect() {
   const store = useStores();
-  const [visible, setVisible, linkedWallet, connectedWallet, connectWalletIsBusy, disconnectWalletIsBusy] = useSplxWallet();
+  const [
+    visible,
+    setVisible,
+    linkedWallet,
+    connectedWallet,
+    connectWalletIsBusy,
+    disconnectWalletIsBusy,
+  ] = useSplxWallet();
   const pal = usePalette("default");
+  const wallet = useWallet();
 
   async function handleConnectWallet() {
     if (connectedWallet) {
       await store.wallet.linkWallet(connectedWallet);
     } else {
-      setVisible(true)
+      setVisible(true);
     }
   }
 
@@ -86,7 +95,7 @@ export const WalletConnect = observer(function WalletConnect() {
                         accessibilityHint={`Signs ${store.me.displayName} out of Solarplex`}
                       >
                         <Text type="lg" style={pal.link}>
-                          { connectWalletIsBusy ? 'Linking...' : 'Link Wallet' }
+                          {connectWalletIsBusy ? "Linking..." : "Link Wallet"}
                         </Text>
                       </TouchableOpacity>
                     </View>
@@ -114,7 +123,7 @@ export const WalletConnect = observer(function WalletConnect() {
                   />
                 </View>
                 <Text type="lg" style={pal.text}>
-                  { connectWalletIsBusy ? 'Connecting...' : 'Connect Wallet' }
+                  {connectWalletIsBusy ? "Connecting..." : "Connect Wallet"}
                 </Text>
               </TouchableOpacity>
             )
@@ -146,10 +155,6 @@ export const WalletConnect = observer(function WalletConnect() {
                         {store.me.splxWallet.slice(0, 5)}...
                         {store.me.splxWallet.slice(-5)}
                       </Text>
-                      {/* <Text type="sm" style={pal.textLight} numberOfLines={1}>
-                        {store.me.splxWallet.slice(0, 5)}...
-                        {store.me.splxWallet.slice(-5)}
-                      </Text> */}
                     </View>
                     <TouchableOpacity
                       testID="DisconnectWalletBtn"
@@ -160,7 +165,9 @@ export const WalletConnect = observer(function WalletConnect() {
                       disabled={disconnectWalletIsBusy}
                     >
                       <Text type="lg" style={pal.link}>
-                        { disconnectWalletIsBusy ? 'Disconnecting...' : 'Disconnect Wallet'}
+                        {disconnectWalletIsBusy
+                          ? "Disconnecting..."
+                          : "Disconnect Wallet"}
                       </Text>
                     </TouchableOpacity>
                   </View>

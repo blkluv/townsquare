@@ -55,6 +55,7 @@
     "@segment/analytics-react-native": "^2.10.1",
     "@segment/sovran-react-native": "^0.4.5",
     "@sentry/react-native": "4.13.0",
+    "@solana/spl-token": "^0.3.8",
     "@solana/wallet-adapter-base": "^0.9.22",
     "@solana/wallet-adapter-react": "^0.15.32",
     "@solana/wallet-adapter-react-ui": "^0.9.31",
