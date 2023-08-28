@@ -223,124 +223,31 @@ export const DrawerContent = observer(() => {
             <InviteCodes />
           </>
         )}
-        <ScrollView style={styles.main}>
-          <MenuItem
-            icon={
-              isAtSearch ? (
-                <MagnifyingGlassIcon2Solid
-                  style={pal.text as StyleProp<ViewStyle>}
-                  size={24}
-                  strokeWidth={1.7}
-                />
-              ) : (
-                <MagnifyingGlassIcon2
-                  style={pal.text as StyleProp<ViewStyle>}
-                  size={24}
-                  strokeWidth={1.7}
-                />
-              )
-            }
-            label="Search"
-            accessibilityLabel="Search"
-            accessibilityHint=""
-            bold={isAtSearch}
-            onPress={onPressSearch}
-          />
-          <MenuItem
-            icon={
-              isAtHome ? (
-                <HomeIconSolid
-                  style={pal.text as StyleProp<ViewStyle>}
-                  size="24"
-                  strokeWidth={3.25}
-                />
-              ) : (
-                <HomeIcon
-                  style={pal.text as StyleProp<ViewStyle>}
-                  size="24"
-                  strokeWidth={3.25}
-                />
-              )
-            }
-            label="Home"
-            accessibilityLabel="Home"
-            accessibilityHint=""
-            bold={isAtHome}
-            onPress={onPressHome}
-          />
+            <ScrollView style={styles.main}>
+        <MenuItem
+          icon={
+            isAtHome ? (
+              <HomeIconSolid
+                style={pal.text as StyleProp<ViewStyle>}
+                size="24"
+                strokeWidth={3.25}
+              />
+            ) : (
+              <HomeIcon
+                style={pal.text as StyleProp<ViewStyle>}
+                size="24"
+                strokeWidth={3.25}
+              />
+            )
+          }
+          label="Home"
+          accessibilityLabel="Home"
+          accessibilityHint=""
+          bold={isAtHome}
+          onPress={onPressHome}
+        />
           {!store.session.isSolarplexSession && (
             <>
-              <MenuItem
-                icon={
-                  isAtMyProfile ? (
-                    <UserIconSolid
-                      style={pal.text as StyleProp<ViewStyle>}
-                      size="26"
-                      strokeWidth={1.5}
-                    />
-                  ) : (
-                    <UserIcon
-                      style={pal.text as StyleProp<ViewStyle>}
-                      size="26"
-                      strokeWidth={1.5}
-                    />
-                  )
-                }
-                label="Profile"
-                accessibilityLabel="Profile"
-                accessibilityHint=""
-                onPress={onPressProfile}
-              />
-              <MenuItem
-                icon={
-                  isAtCommunities ? (
-                    <CommunitiesIconSolid />
-                  ) : (
-                    <CommunitiesIcon />
-                  )
-                }
-                label="Communities"
-                accessibilityLabel="Communities"
-                accessibilityHint=""
-                bold={isAtCommunities}
-                onPress={onPressCommunities}
-              />
-              {/* <MenuItem
-                icon={isAtRewards ? <GiftIconFilled /> : <GiftIcon />}
-                label="Rewards"
-                accessibilityLabel="Rewards"
-                accessibilityHint=""
-                bold={isAtRewards}
-                onPress={onPressRewards}
-              /> */}
-              <MenuItem
-                icon={
-                  isAtReactions ? (
-                    <SolidReactionIcon />
-                  ) : (
-                    <RegularReactionIcon />
-                  )
-                }
-                label="Reactions"
-                accessibilityLabel="Reactions"
-                accessibilityHint=""
-                bold={isAtReactions}
-                onPress={onPressReactions}
-              />
-              <MenuItem
-                icon={
-                  isAtMissions ? (
-                    <SolidRankingStarIcon />
-                  ) : (
-                    <RegularRankingStarIcon />
-                  )
-                }
-                label="Missions"
-                accessibilityLabel="Missions"
-                accessibilityHint=""
-                bold={isAtMissions}
-                onPress={onPressMissions}
-              />
               <MenuItem
                 icon={
                   isAtNotifications ? (
@@ -370,29 +277,17 @@ export const DrawerContent = observer(() => {
               />
               <MenuItem
                 icon={
-                  isAtWallets ? (
-                    <FontAwesomeIcon
-                      size={20}
-                      icon={fa.faWallet}
-                      style={
-                        { ...pal.text, marginLeft: 4 } as FontAwesomeIconStyle
-                      }
-                    />
+                  isAtCommunities ? (
+                    <CommunitiesIconSolid />
                   ) : (
-                    <FontAwesomeIcon
-                      size={20}
-                      icon={fa.faWallet}
-                      style={
-                        { ...pal.text, marginLeft: 4 } as FontAwesomeIconStyle
-                      }
-                    />
+                    <CommunitiesIcon />
                   )
                 }
-                label="Wallet"
-                accessibilityLabel="Wallet"
-                accessibilityHint="user wallets"
-                bold={isAtWallets}
-                onPress={onPressWallet}
+                label="Communities"
+                accessibilityLabel="Communities"
+                accessibilityHint=""
+                bold={isAtCommunities}
+                onPress={onPressCommunities}
               />
               {/* <MenuItem
                 icon={<HandIcon strokeWidth={5} style={pal.text} size={24} />}
@@ -437,6 +332,115 @@ export const DrawerContent = observer(() => {
               /> */}
           </>
         )}
+          <MenuItem
+            icon={
+              isAtSearch ? (
+                <MagnifyingGlassIcon2Solid
+                  style={pal.text as StyleProp<ViewStyle>}
+                  size={24}
+                  strokeWidth={1.7}
+                />
+              ) : (
+                <MagnifyingGlassIcon2
+                  style={pal.text as StyleProp<ViewStyle>}
+                  size={24}
+                  strokeWidth={1.7}
+                />
+              )
+            }
+            label="Search"
+            accessibilityLabel="Search"
+            accessibilityHint=""
+            bold={isAtSearch}
+            onPress={onPressSearch}
+          />
+          {!store.session.isSolarplexSession ? (
+            <>              
+
+          {/* <MenuItem
+            icon={isAtRewards ? <GiftIconFilled /> : <GiftIcon />}
+            label="Rewards"
+            accessibilityLabel="Rewards"
+            accessibilityHint=""
+            bold={isAtRewards}
+            onPress={onPressRewards}
+          /> */}
+          <MenuItem
+            icon={
+              isAtMissions ? (
+                <SolidRankingStarIcon />
+              ) : (
+                <RegularRankingStarIcon />
+              )
+            }
+            label="Missions"
+            accessibilityLabel="Missions"
+            accessibilityHint=""
+            bold={isAtMissions}
+            onPress={onPressMissions}
+          />
+          <MenuItem
+            icon={
+              isAtReactions ? (
+                <SolidReactionIcon />
+              ) : (
+                <RegularReactionIcon />
+              )
+            }
+            label="Reactions"
+            accessibilityLabel="Reactions"
+            accessibilityHint=""
+            bold={isAtReactions}
+            onPress={onPressReactions}
+          />
+          <MenuItem
+            icon={
+              isAtMyProfile ? (
+                <UserIconSolid
+                  style={pal.text as StyleProp<ViewStyle>}
+                  size="26"
+                  strokeWidth={1.5}
+                />
+              ) : (
+                <UserIcon
+                  style={pal.text as StyleProp<ViewStyle>}
+                  size="26"
+                  strokeWidth={1.5}
+                />
+              )
+            }
+            label="Profile"
+            accessibilityLabel="Profile"
+            accessibilityHint=""
+            onPress={onPressProfile}
+          />
+          <MenuItem
+            icon={
+              isAtWallets ? (
+                <FontAwesomeIcon
+                  size={20}
+                  icon={fa.faWallet}
+                  style={
+                    { ...pal.text, marginLeft: 4 } as FontAwesomeIconStyle
+                  }
+                />
+              ) : (
+                <FontAwesomeIcon
+                  size={20}
+                  icon={fa.faWallet}
+                  style={
+                    { ...pal.text, marginLeft: 4 } as FontAwesomeIconStyle
+                  }
+                />
+              )
+            }
+            label="Wallet"
+            accessibilityLabel="Wallet"
+            accessibilityHint="user wallets"
+            bold={isAtWallets}
+            onPress={onPressWallet}
+          /></>
+          ) : (<></>)}
           {/* <View style={styles.smallSpacer} /> */}
           {!store.session.hasSession ? (
             // <NavItem

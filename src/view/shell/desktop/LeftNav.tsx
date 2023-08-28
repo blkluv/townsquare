@@ -262,12 +262,13 @@ export const DesktopLeftNav = observer(function DesktopLeftNav() {
       {store.session.hasSession && (
         <>
           <NavItem
-            href={`/profile/${store.me.handle}`}
-            icon={<UserIcon size={24} strokeWidth={1.7} style={[pal.text]} />}
+            href="/notifications"
+            count={store.me.notifications.unreadCountLabel}
+            icon={<BellIcon strokeWidth={2} size={22} style={pal.text} />}
             iconFilled={
-              <UserIconSolid size={24} strokeWidth={1.7} style={[pal.text]} />
+              <BellIconSolid strokeWidth={1.5} size={22} style={pal.text} />
             }
-            label="Profile"
+            label="Notifications"
           />
           <NavItem
             href={`/communities`}
@@ -299,13 +300,12 @@ export const DesktopLeftNav = observer(function DesktopLeftNav() {
             label="Reactions"
           />
           <NavItem
-            href="/notifications"
-            count={store.me.notifications.unreadCountLabel}
-            icon={<BellIcon strokeWidth={2} size={22} style={pal.text} />}
+            href={`/profile/${store.me.handle}`}
+            icon={<UserIcon size={24} strokeWidth={1.7} style={[pal.text]} />}
             iconFilled={
-              <BellIconSolid strokeWidth={1.5} size={22} style={pal.text} />
+              <UserIconSolid size={24} strokeWidth={1.7} style={[pal.text]} />
             }
-            label="Notifications"
+            label="Profile"
           />
           <NavItem
             href="/wallets"

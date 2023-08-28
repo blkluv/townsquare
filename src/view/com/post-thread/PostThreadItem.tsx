@@ -55,7 +55,7 @@ export const PostThreadItem = observer(function PostThreadItem({
   const navigation = useNavigation<NavigationProp>();
   const [deleted, setDeleted] = React.useState(false)
   const record = item.postRecord
-  const hasEngagement = item.post.likeCount || item.post.repostCount
+  const hasEngagement = item.post.likeCount || item.post.repostCount || item.data.reactions?.length
 
   const itemUri = item.post.uri
   const itemCid = item.post.cid
@@ -320,8 +320,8 @@ export const PostThreadItem = observer(function PostThreadItem({
               needsTranslation={needsTranslation}
             />
             {hasEngagement ? (
-              <View style={[styles.expandedInfo, pal.border]}>
-              {item.data.reactions ? (
+              <View style={[styles.expandedInfo, pal.border, {alignItems: 'center'}]}>
+              {item.data.reactions?.length ? (
                 <Link
                   style={styles.expandedInfoItem}
                   href={likesHref}
@@ -409,14 +409,14 @@ export const PostThreadItem = observer(function PostThreadItem({
               isThreadMuted={item.isThreadMuted}
               reactions={item.data.reactions}
               viewerReaction={item.data.viewerReaction}
-                onPressReply={onPressReply}
-                onPressToggleRepost={onPressToggleRepost}
-                onPressToggleLike={onPressToggleLike}
-onPressReaction={onPressReaction}
-                onCopyPostText={onCopyPostText}
-                onOpenTranslate={onOpenTranslate}
-                onToggleThreadMute={onToggleThreadMute}
-                onDeletePost={onDeletePost}
+              onPressReply={onPressReply}
+              onPressToggleRepost={onPressToggleRepost}
+              onPressToggleLike={onPressToggleLike}
+              onPressReaction={onPressReaction}
+              onCopyPostText={onCopyPostText}
+              onOpenTranslate={onOpenTranslate}
+              onToggleThreadMute={onToggleThreadMute}
+              onDeletePost={onDeletePost}
               />
             </View>
           </View>

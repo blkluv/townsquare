@@ -8,6 +8,7 @@ import {HITSLOP_10} from 'lib/constants'
 import {MagnifyingGlassIcon} from 'lib/icons'
 import React from 'react'
 import {Text} from 'view/com/util/text/Text'
+import { UserAvatar } from '../util/UserAvatar'
 import {useAnalytics} from 'lib/analytics/analytics'
 import {usePalette} from 'lib/hooks/usePalette'
 import {useStores} from 'state/index'
@@ -60,7 +61,8 @@ export function HeaderWithInput({
           accessibilityRole="button"
           accessibilityLabel="Menu"
           accessibilityHint="Access navigation links and settings">
-          <FontAwesomeIcon icon="bars" size={18} color={pal.colors.textLight} />
+          {/* <FontAwesomeIcon icon="bars" size={18} color={pal.colors.textLight} /> */}
+          <UserAvatar avatar={store.me.avatar} size={27} />
         </TouchableOpacity>
       ) : null}
       <View
