@@ -263,7 +263,7 @@ export const ComposePost = observer(function ComposePost({
             <Text style={[pal.link, s.f18]}>Cancel</Text>
           </TouchableOpacity>
           <View style={s.flex1} />
-          <LabelsBtn labels={labels} onChange={setLabels} hasMedia={hasMedia} />
+          {/* <LabelsBtn labels={labels} onChange={setLabels} hasMedia={hasMedia} /> */}
           {isProcessing ? (
             <View style={styles.postBtn}>
               <ActivityIndicator />

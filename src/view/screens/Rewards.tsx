@@ -1,9 +1,9 @@
 import { Button, StyleSheet, View } from "react-native";
+import { CommonNavigatorParams, RewardsTabNavigatorParams } from "lib/routes/types";
 import React, { useState } from "react";
 import { colors, s } from "lib/styles";
 
 import { CenteredView } from "view/com/util/Views.web";
-import { CommonNavigatorParams } from "lib/routes/types";
 import { FeedsTabBar } from "view/com/pager/FeedsTabBarMobile";
 import { MissionsTab } from "./MissionsTab";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
@@ -33,7 +33,10 @@ const tabs = [
 ];
 
 // TODO: change the props text over here
-type Props = NativeStackScreenProps<CommonNavigatorParams, "Reactions">;
+type Props = NativeStackScreenProps<
+  RewardsTabNavigatorParams,
+  "Rewards"
+>;
 export const RewardsScreen = withAuthRequired(
   observer(({ route }: Props) => {
     const navigation = useNavigation<NavigationProp>();

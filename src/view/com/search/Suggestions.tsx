@@ -1,18 +1,20 @@
-import React, {forwardRef, ForwardedRef} from 'react'
-import {RefreshControl, StyleSheet, View} from 'react-native'
-import {observer} from 'mobx-react-lite'
-import {AppBskyActorDefs} from '@atproto/api'
 import {CenteredView, FlatList} from '../util/Views'
-import {FoafsModel} from 'state/models/discovery/foafs'
+import React, {ForwardedRef, forwardRef} from 'react'
+import {RefreshControl, StyleSheet, View} from 'react-native'
 import {
-  SuggestedActorsModel,
   SuggestedActor,
+  SuggestedActorsModel,
 } from 'state/models/discovery/suggested-actors'
-import {Text} from '../util/text/Text'
-import {ProfileCardWithFollowBtn} from '../profile/ProfileCard'
+
+import {AppBskyActorDefs} from '@atproto/api'
+import {FoafsModel} from 'state/models/discovery/foafs'
 import {ProfileCardFeedLoadingPlaceholder} from 'view/com/util/LoadingPlaceholder'
-import {sanitizeDisplayName} from 'lib/strings/display-names'
+import {ProfileCardWithFollowBtn} from '../profile/ProfileCard'
 import {RefWithInfoAndFollowers} from 'state/models/discovery/foafs'
+import {Text} from '../util/text/Text'
+import {observer} from 'mobx-react-lite'
+import {sanitizeDisplayName} from 'lib/strings/display-names'
+import {sanitizeHandle} from 'lib/strings/handles'
 import {usePalette} from 'lib/hooks/usePalette'
 
 interface Heading {
@@ -99,7 +101,7 @@ export const Suggestions = observer(
                 _reactKey: `__${item.did}_heading__`,
                 type: 'heading',
                 title: `Followed by ${sanitizeDisplayName(
-                  item.displayName || item.handle,
+                  item.displayName || sanitizeHandle(item.handle),
                 )}`,
               },
             ])

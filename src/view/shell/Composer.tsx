@@ -1,8 +1,9 @@
-import React, {useEffect} from 'react'
-import {observer} from 'mobx-react-lite'
 import {Animated, Easing, Platform, StyleSheet, View} from 'react-native'
+import React, {useEffect} from 'react'
+
 import {ComposePost} from '../com/composer/Composer'
 import {ComposerOpts} from 'state/models/ui/shell'
+import {observer} from 'mobx-react-lite'
 import {useAnimatedValue} from 'lib/hooks/useAnimatedValue'
 import {usePalette} from 'lib/hooks/usePalette'
 
@@ -14,6 +15,7 @@ export const Composer = observer(
     onPost,
     onClose,
     quote,
+    mention,
   }: {
     active: boolean
     winHeight: number
@@ -21,6 +23,7 @@ export const Composer = observer(
     onPost?: ComposerOpts['onPost']
     onClose: () => void
     quote?: ComposerOpts['quote']
+    mention?: ComposerOpts['mention']
   }) => {
     const pal = usePalette('default')
     const initInterp = useAnimatedValue(0)
@@ -65,6 +68,7 @@ export const Composer = observer(
           onPost={onPost}
           onClose={onClose}
           quote={quote}
+          mention={mention}
         />
       </Animated.View>
     )

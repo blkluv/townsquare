@@ -1,11 +1,13 @@
-import { StyleSheet, View } from "react-native";
+import {StyleSheet, View} from 'react-native'
 
-import { ComposePost } from "../com/composer/Composer";
-import { ComposerOpts } from "state/models/ui/shell";
-import React from "react";
-import { isMobileWeb } from "platform/detection";
-import { observer } from "mobx-react-lite";
-import { usePalette } from "lib/hooks/usePalette";
+import {ComposePost} from '../com/composer/Composer'
+import {ComposerOpts} from 'state/models/ui/shell'
+import React from 'react'
+import {isMobileWeb} from 'platform/detection'
+import {observer} from 'mobx-react-lite'
+import {usePalette} from 'lib/hooks/usePalette'
+
+const BOTTOM_BAR_HEIGHT = 61
 
 export const Composer = observer(
   ({
@@ -14,21 +16,23 @@ export const Composer = observer(
     quote,
     onPost,
     onClose,
+    mention,
   }: {
-    active: boolean;
-    winHeight: number;
-    replyTo?: ComposerOpts["replyTo"];
-    quote: ComposerOpts["quote"];
-    onPost?: ComposerOpts["onPost"];
-    onClose: () => void;
+    active: boolean
+    winHeight: number
+    replyTo?: ComposerOpts['replyTo']
+    quote: ComposerOpts['quote']
+    onPost?: ComposerOpts['onPost']
+    onClose: () => void
+    mention?: ComposerOpts['mention']
   }) => {
-    const pal = usePalette("default");
+    const pal = usePalette('default')
 
     // rendering
     // =
 
     if (!active) {
-      return <View />;
+      return <View />
     }
 
     return (
@@ -39,31 +43,35 @@ export const Composer = observer(
             quote={quote}
             onPost={onPost}
             onClose={onClose}
+            mention={mention}
           />
         </View>
       </View>
-    );
+    )
   },
-);
+)
 
 const styles = StyleSheet.create({
   mask: {
-    position: "absolute",
+    position: 'absolute',
     top: 0,
     left: 0,
-    width: "100%",
-    height: "100%",
-    backgroundColor: "#000c",
-    alignItems: "center",
-    justifyContent: "center",
+    width: '100%',
+    height: '100%',
+    backgroundColor: '#000c',
+    alignItems: 'center',
   },
   container: {
+    marginTop: 50,
     maxWidth: 600,
-    width: "100%",
+    width: '100%',
     paddingVertical: 0,
     paddingHorizontal: 2,
     borderRadius: isMobileWeb ? 0 : 8,
-    marginBottom: "10vh",
+    marginBottom: isMobileWeb ? BOTTOM_BAR_HEIGHT : 0,
     borderWidth: 1,
+    maxHeight: isMobileWeb
+      ? `calc(100% - ${BOTTOM_BAR_HEIGHT}px)`
+      : 'calc(100% - (40px * 2))',
   },
-});
+})

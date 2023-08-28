@@ -58,6 +58,8 @@ export type RewardsTabNavigatorParams = CommonNavigatorParams & {
   MissionsTab: undefined;
 };
 
+export type MissionsTabNavigatorParams = CommonNavigatorParams & {};
+
 export type SearchTabNavigatorParams = CommonNavigatorParams & {
   Search: { q?: string };
 };

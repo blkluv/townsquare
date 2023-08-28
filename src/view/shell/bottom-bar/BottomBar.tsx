@@ -3,7 +3,7 @@ import {
   GestureResponderEvent,
   TouchableOpacity,
   View,
-} from "react-native";
+} from 'react-native'
 import {
   BellIcon,
   BellIconSolid,
@@ -13,68 +13,68 @@ import {
   MagnifyingGlassIcon2Solid,
   SatelliteDishIcon,
   SatelliteDishIconSolid,
-} from "lib/icons";
-import React, { ComponentProps } from "react";
-import { TabState, getTabState } from "lib/routes/helpers";
+} from 'lib/icons'
+import React, {ComponentProps} from 'react'
+import {TabState, getTabState} from 'lib/routes/helpers'
 
-import { BottomTabBarProps } from "@react-navigation/bottom-tabs";
-import { StackActions } from "@react-navigation/native";
-import { Text } from "view/com/util/text/Text";
-import { UserAvatar } from "view/com/util/UserAvatar";
-import { clamp } from "lib/numbers";
-import { observer } from "mobx-react-lite";
-import { styles } from "./BottomBarStyles";
-import { useAnalytics } from "lib/analytics/analytics";
-import { useMinimalShellMode } from "lib/hooks/useMinimalShellMode";
-import { useNavigationTabState } from "lib/hooks/useNavigationTabState";
-import { usePalette } from "lib/hooks/usePalette";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { useStores } from "state/index";
+import {BottomTabBarProps} from '@react-navigation/bottom-tabs'
+import {StackActions} from '@react-navigation/native'
+import {Text} from 'view/com/util/text/Text'
+import {UserAvatar} from 'view/com/util/UserAvatar'
+import {clamp} from 'lib/numbers'
+import {observer} from 'mobx-react-lite'
+import {styles} from './BottomBarStyles'
+import {useAnalytics} from 'lib/analytics/analytics'
+import {useMinimalShellMode} from 'lib/hooks/useMinimalShellMode'
+import {useNavigationTabState} from 'lib/hooks/useNavigationTabState'
+import {usePalette} from 'lib/hooks/usePalette'
+import {useSafeAreaInsets} from 'react-native-safe-area-context'
+import {useStores} from 'state/index'
 
-type TabOptions = "Home" | "Search" | "Notifications" | "MyProfile" | "Feeds";
+type TabOptions = 'Home' | 'Search' | 'Notifications' | 'MyProfile' | 'Feeds'
 
-export const BottomBar = observer(({ navigation }: BottomTabBarProps) => {
-  const store = useStores();
-  const pal = usePalette("default");
-  const safeAreaInsets = useSafeAreaInsets();
-  const { track } = useAnalytics();
-  const { isAtHome, isAtSearch, isAtFeeds, isAtNotifications, isAtMyProfile } =
-    useNavigationTabState();
+export const BottomBar = observer(({navigation}: BottomTabBarProps) => {
+  const store = useStores()
+  const pal = usePalette('default')
+  const safeAreaInsets = useSafeAreaInsets()
+  const {track} = useAnalytics()
+  const {isAtHome, isAtSearch, isAtFeeds, isAtNotifications, isAtMyProfile} =
+    useNavigationTabState()
 
-  const { footerMinimalShellTransform } = useMinimalShellMode();
-  const { notifications } = store.me;
+  const {footerMinimalShellTransform} = useMinimalShellMode()
+  const {notifications} = store.me
 
   const onPressTab = React.useCallback(
     (tab: TabOptions) => {
-      track(`MobileShell:${tab}ButtonPressed`);
-      const state = navigation.getState();
-      const tabState = getTabState(state, tab);
+      track(`MobileShell:${tab}ButtonPressed`)
+      const state = navigation.getState()
+      const tabState = getTabState(state, tab)
       if (tabState === TabState.InsideAtRoot) {
-        store.emitScreenSoftReset();
+        store.emitScreenSoftReset()
       } else if (tabState === TabState.Inside) {
-        navigation.dispatch(StackActions.popToTop());
+        navigation.dispatch(StackActions.popToTop())
       } else {
-        navigation.navigate(`${tab}Tab`);
+        navigation.navigate(`${tab}Tab`)
       }
     },
     [store, track, navigation],
-  );
-  const onPressHome = React.useCallback(() => onPressTab("Home"), [onPressTab]);
+  )
+  const onPressHome = React.useCallback(() => onPressTab('Home'), [onPressTab])
   const onPressSearch = React.useCallback(
-    () => onPressTab("Search"),
+    () => onPressTab('Search'),
     [onPressTab],
-  );
+  )
   const onPressFeeds = React.useCallback(
-    () => onPressTab("Feeds"),
+    () => onPressTab('Feeds'),
     [onPressTab],
-  );
+  )
   const onPressNotifications = React.useCallback(
-    () => onPressTab("Notifications"),
+    () => onPressTab('Notifications'),
     [onPressTab],
-  );
+  )
   const onPressProfile = React.useCallback(() => {
-    onPressTab("MyProfile");
-  }, [onPressTab]);
+    onPressTab('MyProfile')
+  }, [onPressTab])
 
   return (
     <Animated.View
@@ -82,10 +82,9 @@ export const BottomBar = observer(({ navigation }: BottomTabBarProps) => {
         styles.bottomBar,
         pal.view,
         pal.border,
-        { paddingBottom: clamp(safeAreaInsets.bottom, 15, 30) },
+        {paddingBottom: clamp(safeAreaInsets.bottom, 15, 30)},
         footerMinimalShellTransform,
-      ]}
-    >
+      ]}>
       <Btn
         testID="bottomBarHomeBtn"
         icon={
@@ -130,7 +129,7 @@ export const BottomBar = observer(({ navigation }: BottomTabBarProps) => {
         accessibilityLabel="Search"
         accessibilityHint=""
       />
-      <Btn
+      {/* <Btn
         testID="bottomBarFeedsBtn"
         icon={
           isAtFeeds ? (
@@ -151,7 +150,7 @@ export const BottomBar = observer(({ navigation }: BottomTabBarProps) => {
         accessibilityRole="tab"
         accessibilityLabel="Feeds"
         accessibilityHint=""
-      />
+      /> */}
       <Btn
         testID="bottomBarNotificationsBtn"
         icon={
@@ -175,8 +174,8 @@ export const BottomBar = observer(({ navigation }: BottomTabBarProps) => {
         accessibilityRole="tab"
         accessibilityLabel="Notifications"
         accessibilityHint={
-          notifications.unreadCountLabel === ""
-            ? ""
+          notifications.unreadCountLabel === ''
+            ? ''
             : `${notifications.unreadCountLabel} unread`
         }
       />
@@ -191,9 +190,8 @@ export const BottomBar = observer(({ navigation }: BottomTabBarProps) => {
                   pal.text,
                   styles.profileIcon,
                   styles.onProfile,
-                  { borderColor: pal.text.color },
-                ]}
-              >
+                  {borderColor: pal.text.color},
+                ]}>
                 <UserAvatar avatar={store.me.avatar} size={27} />
               </View>
             ) : (
@@ -209,22 +207,22 @@ export const BottomBar = observer(({ navigation }: BottomTabBarProps) => {
         accessibilityHint=""
       />
     </Animated.View>
-  );
-});
+  )
+})
 
 interface BtnProps
   extends Pick<
     ComponentProps<typeof TouchableOpacity>,
-    | "accessible"
-    | "accessibilityRole"
-    | "accessibilityHint"
-    | "accessibilityLabel"
+    | 'accessible'
+    | 'accessibilityRole'
+    | 'accessibilityHint'
+    | 'accessibilityLabel'
   > {
-  testID?: string;
-  icon: JSX.Element;
-  notificationCount?: string;
-  onPress?: (event: GestureResponderEvent) => void;
-  onLongPress?: (event: GestureResponderEvent) => void;
+  testID?: string
+  icon: JSX.Element
+  notificationCount?: string
+  onPress?: (event: GestureResponderEvent) => void
+  onLongPress?: (event: GestureResponderEvent) => void
 }
 
 function Btn({
@@ -246,8 +244,7 @@ function Btn({
       onLongPress={onLongPress}
       accessible={accessible}
       accessibilityLabel={accessibilityLabel}
-      accessibilityHint={accessibilityHint}
-    >
+      accessibilityHint={accessibilityHint}>
       {notificationCount ? (
         <View style={[styles.notificationCount]}>
           <Text style={styles.notificationCountLabel}>{notificationCount}</Text>
@@ -255,5 +252,5 @@ function Btn({
       ) : undefined}
       {icon}
     </TouchableOpacity>
-  );
+  )
 }

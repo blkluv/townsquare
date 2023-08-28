@@ -34,9 +34,9 @@ const PROD_CONSTANTS = {
   SPLX_PDS_URL: "https://live.solarplex.xyz",
   SPLX_USER_HANDLE: "solarplex.live.solarplex.xyz",
   SPLX_USER_DID: "did:plc:4srpaai54v3d35bigtfbtbd5",
-  SPLX_V1_API: "https://prod.api.solarplex.xyz", // "http://localhost:3001"
+  SPLX_V1_API:  "https://prod.api.solarplex.xyz", // "http://localhost:3001"
   HELIUS_RPC_API: "https://rpc.helius.xyz",
-  SPLX_UI_URL: "https://v2.solarplex.xyz",
+  SPLX_UI_URL: "https://solarplex.xyz",
   SPLX_FEED_API: "https://feed.solarplex.xyz",
   GENESIS_COLLECTION: "7soPY36PaM8Ck1EycPq5WJ3CVHjZK47aneFniK5GNFyQ",
   GAMING_COLLECTION: "ofUvbBBKGG9X3YKQ8Xyv1s2GqQyUgwyk37XxuiNQY45",
@@ -52,7 +52,7 @@ const STAGING_CONSTANTS = {
   SPLX_USER_DID: "did:plc:aen2rosf555soqeup26zomir",
   SPLX_V1_API: "https://dev.api.solarplex.xyz",
   HELIUS_RPC_API: "https://devnet.helius-rpc.com",
-  SPLX_UI_URL: "staging.v2.solarplex.xyz",
+  SPLX_UI_URL: "https://staging.v2.solarplex.xyz",
   SPLX_FEED_API: "https://staging.feed.solarplex.xyz",
   GENESIS_COLLECTION: "7soPY36PaM8Ck1EycPq5WJ3CVHjZK47aneFniK5GNFyQ",
   GAMING_COLLECTION: "BXHRjXaTwLoGdXGuoUzbaeUuBQ21E5vWjCqyUGLsD8fM",

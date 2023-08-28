@@ -1,17 +1,17 @@
-import React from 'react'
-import {StyleSheet, TextInput, TouchableOpacity, View} from 'react-native'
 import {
   FontAwesomeIcon,
   FontAwesomeIconStyle,
 } from '@fortawesome/react-native-fontawesome'
-import {Text} from 'view/com/util/text/Text'
+import {StyleSheet, TextInput, TouchableOpacity, View} from 'react-native'
+
+import {HITSLOP_10} from 'lib/constants'
 import {MagnifyingGlassIcon} from 'lib/icons'
-import {useTheme} from 'lib/ThemeContext'
+import React from 'react'
+import {Text} from 'view/com/util/text/Text'
+import {useAnalytics} from 'lib/analytics/analytics'
 import {usePalette} from 'lib/hooks/usePalette'
 import {useStores} from 'state/index'
-import {useAnalytics} from 'lib/analytics/analytics'
-
-const MENU_HITSLOP = {left: 10, top: 10, right: 30, bottom: 10}
+import {useTheme} from 'lib/ThemeContext'
 
 interface Props {
   isInputFocused: boolean
@@ -21,6 +21,7 @@ interface Props {
   onPressClearQuery: () => void
   onPressCancelSearch: () => void
   onSubmitQuery: () => void
+  showMenu?: boolean
 }
 export function HeaderWithInput({
   isInputFocused,
@@ -30,6 +31,7 @@ export function HeaderWithInput({
   onPressClearQuery,
   onPressCancelSearch,
   onSubmitQuery,
+  showMenu = true,
 }: Props) {
   const store = useStores()
   const theme = useTheme()
@@ -49,16 +51,18 @@ export function HeaderWithInput({
 
   return (
     <View style={[pal.view, pal.border, styles.header]}>
-      <TouchableOpacity
-        testID="viewHeaderBackOrMenuBtn"
-        onPress={onPressMenu}
-        hitSlop={MENU_HITSLOP}
-        style={styles.headerMenuBtn}
-        accessibilityRole="button"
-        accessibilityLabel="Menu"
-        accessibilityHint="Access navigation links and settings">
-        <FontAwesomeIcon icon="bars" size={18} color={pal.colors.textLight} />
-      </TouchableOpacity>
+      {showMenu ? (
+        <TouchableOpacity
+          testID="viewHeaderBackOrMenuBtn"
+          onPress={onPressMenu}
+          hitSlop={HITSLOP_10}
+          style={styles.headerMenuBtn}
+          accessibilityRole="button"
+          accessibilityLabel="Menu"
+          accessibilityHint="Access navigation links and settings">
+          <FontAwesomeIcon icon="bars" size={18} color={pal.colors.textLight} />
+        </TouchableOpacity>
+      ) : null}
       <View
         style={[
           {backgroundColor: pal.colors.backgroundLight},

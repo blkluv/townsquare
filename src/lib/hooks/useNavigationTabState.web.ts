@@ -13,6 +13,8 @@ export function useNavigationTabState() {
       isAtRewards: currentRoute === "Rewards",
       isAtWallets: currentRoute === "Wallets",
       isAtSignIn: currentRoute === "SignIn",
+      isAtReactions: currentRoute === 'Reactions',
+      isAtMissions: currentRoute === 'Missions',
     };
   });
 }

@@ -1,8 +1,8 @@
+import {AppBskyEmbedRecord, ModerationUI} from '@atproto/api'
 import {StyleProp, ViewStyle} from 'react-native'
 import {hasProp, isObj} from 'lib/type-guards'
 import {makeAutoObservable, runInAction} from 'mobx'
 
-import {AppBskyEmbedRecord} from '@atproto/api'
 import {GalleryModel} from '../media/gallery'
 import {ImageModel} from '../media/image'
 import {ListModel} from '../content/list'
@@ -47,7 +47,7 @@ export interface ServerInputModal {
 export interface ModerationDetailsModal {
   name: 'moderation-details'
   context: 'account' | 'content'
-  moderation: any; // NOTE(partyman): ModerationUI (from '@atproto/api') 
+  moderation: ModerationUI
 }
 
 export type ReportModal = {
@@ -235,7 +235,7 @@ export interface ComposerOpts {
   onPost?: () => void
   quote?: ComposerOptsQuote
   mention?: string // handle of user to mention
-  isSharing?: boolean;
+isSharing?: boolean;
   uri?: string;
   sharingText?: string;
 }

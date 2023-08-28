@@ -1,10 +1,10 @@
+import { CommonNavigatorParams, MissionsTabNavigatorParams } from "lib/routes/types";
 import { FlatList, Image, StyleSheet, View } from "react-native";
 import { colors, s } from "lib/styles";
 import { isDesktopWeb, isMobileWeb } from "platform/detection";
 
 import { CenteredView } from "view/com/util/Views.web";
 import { ClaimBtn } from "view/com/rewards/ClaimBtn";
-import { CommonNavigatorParams } from "lib/routes/types";
 import { ErrorMessage } from "view/com/util/error/ErrorMessage";
 import { GENESIS_REACTIONS } from "lib/constants";
 import { HelpTip } from "view/com/auth/util/HelpTip";
@@ -249,9 +249,9 @@ const DisplayReactions = observer(function DisplayReactions() {
   );
 });
 
-type Props = NativeStackScreenProps<CommonNavigatorParams, "Missions">;
+type Props = NativeStackScreenProps<MissionsTabNavigatorParams, "Missions">;
 export const MissionsTab = withAuthRequired(
-  observer(function Missions({}: Props) {
+  observer(function Missions(props: Partial<Props>) {
     const pal = usePalette("default");
     const store = useStores();
 
