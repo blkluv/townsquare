@@ -1,10 +1,11 @@
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu'
 
+import {FontAwesomeIcon, FontAwesomeIconStyle} from '@fortawesome/react-native-fontawesome'
 import {StyleSheet, View} from 'react-native'
 
-import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome'
 import Picker from '@emoji-mart/react'
 import React from 'react'
+import { faSmile } from '@fortawesome/free-regular-svg-icons'
 import {textInputWebEmitter} from '../TextInput.web'
 import {usePalette} from '../../../../../lib/hooks/usePalette'
 
@@ -29,12 +30,11 @@ export function EmojiPickerButton() {
   return (
     <DropdownMenu.Root open={open} onOpenChange={onOpenChange}>
       <DropdownMenu.Trigger style={styles.trigger}>
-        {/* <FontAwesomeIcon
-          icon={['far', 'face-smile']}
-          color={pal.colors.link}
+        <FontAwesomeIcon
+          icon={faSmile}
+          style={pal.link as FontAwesomeIconStyle}
           size={22}
-        /> */}
-        Emoji
+        />
       </DropdownMenu.Trigger>
 
       <DropdownMenu.Portal>
