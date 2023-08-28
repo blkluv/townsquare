@@ -87,8 +87,8 @@ export class ProfileUiModel {
     const items = [
       Sections.PostsNoReplies,
       Sections.PostsWithReplies,
-      Sections.PostsWithMedia,
-      this.isAuthenticatedUser && Sections.Likes,
+      // Sections.PostsWithMedia,
+      // this.isAuthenticatedUser && Sections.Likes,
     ].filter(Boolean) as string[]
     if (this.algos.hasLoaded && !this.algos.isEmpty) {
       items.push(Sections.CustomAlgorithms)
