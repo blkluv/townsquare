@@ -14,9 +14,7 @@ export const withAuthRequired = <P extends object>(
 ): React.FC<P> =>
   observer((props: P) => {
     const store = useStores();
-    // either a user is resuming a session from earlier
-    // or there is no session, in which case we'll wait for either
-    // a default solarplex one or the logged in user's own
+
     if (store.session.isResumingSession) {
       return <Loading />;
     }

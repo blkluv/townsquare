@@ -29,13 +29,13 @@ const ShellInner = observer(() => {
     navigator.addListener("state", () => {
       store.shell.closeAnyActiveElement();
     });
-    if (!store.session.hasSession && !store.session.isResumingSession) {
-      store.session.login({
-        service: DEFAULT_SERVICE,
-        identifier: SOLARPLEX_IDENTIFIER,
-        password: SOLARPLEX_APP_PASS ?? "",
-      });
-    }
+    // if (!store.session.hasSession && !store.session.isResumingSession) {
+    //   store.session.login({
+    //     service: DEFAULT_SERVICE,
+    //     identifier: SOLARPLEX_IDENTIFIER,
+    //     password: SOLARPLEX_APP_PASS ?? "",
+    //   });
+    // }
   }, [navigator, store.shell]);
 
   return (
