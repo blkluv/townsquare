@@ -1,7 +1,5 @@
-import { DEFAULT_SERVICE, useStores } from "state/index";
 import { FlatNavigator, RoutesContainer } from "../../Navigation";
 import React, { useEffect } from "react";
-import { SOLARPLEX_APP_PASS, SOLARPLEX_IDENTIFIER } from "lib/constants";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
 import { colors, s } from "lib/styles";
 
@@ -17,6 +15,7 @@ import { NavigationProp } from "lib/routes/types";
 import { observer } from "mobx-react-lite";
 import { useColorSchemeStyle } from "lib/hooks/useColorSchemeStyle";
 import { useNavigation } from "@react-navigation/native";
+import { useStores } from "state/index";
 import { useWebMediaQueries } from "../../lib/hooks/useWebMediaQueries";
 
 const ShellInner = observer(() => {
@@ -29,13 +28,6 @@ const ShellInner = observer(() => {
     navigator.addListener("state", () => {
       store.shell.closeAnyActiveElement();
     });
-    // if (!store.session.hasSession && !store.session.isResumingSession) {
-    //   store.session.login({
-    //     service: DEFAULT_SERVICE,
-    //     identifier: SOLARPLEX_IDENTIFIER,
-    //     password: SOLARPLEX_APP_PASS ?? "",
-    //   });
-    // }
   }, [navigator, store.shell]);
 
   return (

@@ -6,7 +6,6 @@ import {
 } from "@atproto/api";
 import {
   IS_PROD,
-  SOLARPLEX_APP_PASS,
   SOLARPLEX_FEED_API,
   SOLARPLEX_IDENTIFIER,
 } from "lib/constants";
@@ -460,14 +459,6 @@ export class SessionModel {
       this.clearSessionTokens();
       this.rootStore.clearAllSessionState();
     }
-    // const agent = new BskyAgent({ service: DEFAULT_SERVICE });
-    // const session = this.switchableAccounts[0]
-    // await this.setActiveSession(agent, session.did);
-    this.login({
-      service: DEFAULT_SERVICE,
-      identifier: SOLARPLEX_IDENTIFIER,
-      password: SOLARPLEX_APP_PASS ?? "",
-    });
   }
 
   /**
