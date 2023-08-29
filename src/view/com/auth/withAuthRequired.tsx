@@ -1,13 +1,13 @@
 import { ActivityIndicator, StyleSheet } from "react-native";
-import { DEFAULT_SERVICE, useStores } from "state/index";
-import { SOLARPLEX_APP_PASS, SOLARPLEX_IDENTIFIER } from "lib/constants";
 
 import { CenteredView } from "../util/Views";
+import { LoggedOut } from "./LoggedOut";
 // import {LoggedOut} from './LoggedOut'
 import React from "react";
 import { Text } from "../util/text/Text";
 import { observer } from "mobx-react-lite";
 import { usePalette } from "lib/hooks/usePalette";
+import { useStores } from "state/index";
 
 export const withAuthRequired = <P extends object>(
   Component: React.ComponentType<P>,
@@ -17,8 +17,11 @@ export const withAuthRequired = <P extends object>(
     // either a user is resuming a session from earlier
     // or there is no session, in which case we'll wait for either
     // a default solarplex one or the logged in user's own
-    if (store.session.isResumingSession || !store.session.hasAnySession || !store.session.hasAnySession) {
+    if (store.session.isResumingSession) {
       return <Loading />;
+    }
+    if (!store.session.hasSession) {
+      return <LoggedOut />
     }
     return <Component {...props} />;
   });

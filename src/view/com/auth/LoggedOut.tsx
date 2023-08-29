@@ -22,7 +22,7 @@ export const LoggedOut = observer(() => {
   const store = useStores()
   const {screen} = useAnalytics()
   const [screenState, setScreenState] = React.useState<ScreenState>(
-    ScreenState.S_Login,
+    ScreenState.S_LoginOrCreateAccount,
   )
 
   React.useEffect(() => {
