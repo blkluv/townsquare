@@ -39,7 +39,7 @@ export const DesktopRightNav = observer(function DesktopRightNav() {
           </Text>
         )} */}
 
-        {isAtRewards || isAtSignIn ? null : <RewardsCardSidebar userId={did} />}
+        {(isAtRewards || isAtSignIn || !store.session.hasSession) ? null : <RewardsCardSidebar userId={did} />}
         <View style={[s.flexRow, { paddingHorizontal: 6 }]}>
           <TextLink
             type="md"
