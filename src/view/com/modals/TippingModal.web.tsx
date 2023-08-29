@@ -6,6 +6,7 @@ import {
   PublicKey,
   Transaction,
 } from "@solana/web3.js";
+import { HELIUS_RPC_API, RPC_API } from "../../../lib/constants";
 import React, { useState } from "react";
 import { SOL, searchTokenByName } from "../../../lib/tipTokens";
 import { StyleSheet, TextInput, View } from "react-native";
@@ -13,7 +14,6 @@ import { solTransferIx, splTransferIx } from "../../../lib/solana/spl-transfer";
 
 import { Button } from "../util/forms/Button";
 import { CenteredView } from "../util/Views";
-import { HELIUS_RPC_API } from "../../../lib/constants";
 import { Image } from "expo-image";
 import { Text } from "../util/text/Text";
 import { TippingModal } from "../../../state/models/ui/shell";
@@ -127,7 +127,8 @@ export const Component = observer(
 
       const tx = new Transaction();
       const connection = new Connection(
-        `${HELIUS_RPC_API}/?api-key=${process.env.HELIUS_API_KEY}`,
+        // `${HELIUS_RPC_API}/?api-key=${process.env.HELIUS_API_KEY}`,
+        RPC_API,
       );
       try {
         const { blockhash } = await connection.getLatestBlockhash("finalized");

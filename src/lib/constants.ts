@@ -36,6 +36,7 @@ const PROD_CONSTANTS = {
   SPLX_USER_DID: "did:plc:4srpaai54v3d35bigtfbtbd5",
   SPLX_V1_API:  "https://prod.api.solarplex.xyz", // "http://localhost:3001"
   HELIUS_RPC_API: "https://rpc.helius.xyz",
+  RPC_API: "https://try-rpc.mainnet.solana.blockdaemon.tech",
   SPLX_UI_URL: "https://solarplex.xyz",
   SPLX_FEED_API: "https://feed.solarplex.xyz",
   GENESIS_COLLECTION: "7soPY36PaM8Ck1EycPq5WJ3CVHjZK47aneFniK5GNFyQ",
@@ -52,6 +53,7 @@ const STAGING_CONSTANTS = {
   SPLX_USER_DID: "did:plc:aen2rosf555soqeup26zomir",
   SPLX_V1_API: "https://dev.api.solarplex.xyz",
   HELIUS_RPC_API: "https://devnet.helius-rpc.com",
+  RPC_API: "https://api.devnet.solana.com",
   SPLX_UI_URL: "https://staging.v2.solarplex.xyz",
   SPLX_FEED_API: "https://staging.feed.solarplex.xyz",
   GENESIS_COLLECTION: "7soPY36PaM8Ck1EycPq5WJ3CVHjZK47aneFniK5GNFyQ",
@@ -87,7 +89,7 @@ export const HELIUS_RPC_API = ACTIVE_CONSTANTS.HELIUS_RPC_API;
 export const SOLARPLEX_USER_DID = ACTIVE_CONSTANTS.SPLX_USER_DID;
 export const SOLARPLEX_UI_URL = ACTIVE_CONSTANTS.SPLX_UI_URL;
 export const SOLARPLEX_PDS_URL = ACTIVE_CONSTANTS.SPLX_PDS_URL;
-
+export const RPC_API = ACTIVE_CONSTANTS.RPC_API;
 
 
 
