@@ -2,12 +2,20 @@ import {
   GAMING_COLLECTION,
   GENESIS_COLLECTION,
   HELIUS_RPC_API,
+  SOLARPLEX_V1_API,
 } from "lib/constants";
 import { makeAutoObservable, runInAction } from "mobx";
 
 import { RootStoreModel } from "../root-store";
 import { SolarplexReaction } from "../media/reactions";
+import { actions } from "../actions";
 import cluster from "cluster";
+
+export const apiUrls = {
+  rewards: {
+    getReactions: (wallet: string) => `/rewards/reactions/${wallet}`,
+  },
+};
 
 export class NftModel {
   assets: any[] = [];
@@ -74,39 +82,19 @@ export class NftModel {
     this.rootStore.reactions.update(reactions);
   }
 
-  async _fetchNfts(wallet: string) {
-    if (!wallet) return;
-    try {
-      const items = [];
-      for (const collection of [GENESIS_COLLECTION, GAMING_COLLECTION]) {
-        const res = await fetch(
-          `${HELIUS_RPC_API}/?api-key=${process.env.HELIUS_API_KEY}`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              jsonrpc: "2.0",
-              method: "searchAssets",
-              id: "solarplex",
-              params: {
-                ownerAddress: wallet,
-                compressed: true,
-                grouping: ["collection", collection],
-                page: 1,
-              },
-            }),
-          },
-        );
-        items.push(...(await res.json()).result.items);
-      }
-      // console.log("items", items);
-      return await items;
-    } catch (e) {
-      console.log("error fetching nfts", e);
+  _fetchNfts = actions.wrapAction(async (wallet: string) => {
+    const url = `${SOLARPLEX_V1_API}${apiUrls.rewards.getReactions(wallet)}`;
+    const response = await this.rootStore.api.get(url) as {[collectionId: string]: {
+      result: { items: any[] };
+    }};
+    if (this.rootStore.api.getError(url)) {
+      return [];
     }
-  }
+    return Object.values(response).reduce<any[]>((acc, r) => {
+      acc.push(...r.result.items);
+      return acc;
+    }, []);
+  }, this, '_fetchNfts')
 
   fetchNfts(wallet: string) {
     this._fetchNfts(wallet).then((items) => this.setAssets(items));
