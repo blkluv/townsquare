@@ -81,12 +81,9 @@ export const ComposePost = observer(function ComposePost({
             initMention.length + 1,
             `${initMention}`,
           ) // insert mention if passed in
-        : '',
+        : sharingText ? sharingText : '',
     }),
   )
-  if (sharingText) {
-    richtext.insert(richtext.text.length + 1, sharingText);
-  }
   const graphemeLength = useMemo(() => {
     return shortenLinks(richtext).graphemeLength
   }, [richtext])
