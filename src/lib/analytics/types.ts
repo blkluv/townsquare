@@ -133,7 +133,7 @@ interface TrackPropertiesMap {
   "Claim:DailyReward": {};
   "Claim:WeeklyReward": {};
   "Tip:TipButton": { token: string};
-  "Tip:TipConfirmation": { token: string};
+  "Tip:TipConfirmation": { token: string,sender: string,reciever: string,amount: string};
 
 
 }

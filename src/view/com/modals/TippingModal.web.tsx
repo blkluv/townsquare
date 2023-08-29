@@ -160,6 +160,9 @@ export const Component = observer(
         const sig = await connection.sendRawTransaction(signedTx.serialize());
         track("Tip:TipConfirmation",{
           token: tokenName,
+          sender: senderAddress,
+          reciever: recipientAddress,
+          amount: amount
         });
         Toast.show("Tip Sent");
         store.shell.closeModal();
