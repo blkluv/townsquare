@@ -3,7 +3,7 @@
  * When the system lands on prod we should switch to that
  */
 
-import { SOLARPLEX_FEED_API, SOLARPLEX_FEED_URI_PATH } from "lib/constants";
+import { SOLARPLEX_DID, SOLARPLEX_FEED_API, SOLARPLEX_FEED_URI_PATH } from "lib/constants";
 import { hasProp, isObj, isStrArray } from "lib/type-guards";
 import { makeAutoObservable, runInAction } from "mobx";
 
@@ -12,6 +12,7 @@ import { PostsFeedModel } from "./feeds/posts";
 import { RootStoreModel } from "./root-store";
 import { SolarplexCommunity } from "lib/splx-types";
 import { actions } from "./actions";
+import { makeRecordUri } from "lib/strings/url-helpers";
 import merge from "lodash.merge";
 
 interface CommunitiesMap { 
@@ -135,15 +136,6 @@ export class CommunitiesModel {
     });
   }
 
-  _getAllCoummunityUris = actions.wrapAction(async () => {
-    const url = `${SOLARPLEX_FEED_API}/xrpc/app.bsky.feed.describeFeedGenerator`;
-    const response = await this.rootStore.api.get<{ did: string, feeds: Array<Partial<SolarplexCommunity>> }>(url);
-    if (!response || this.rootStore.api.getError(url)) {
-      return;
-    }
-    return response.feeds;
-  }, this, '_getAllCommunityUris');
-
   _getAllCommunities = actions.wrapAction(async () => {
     const url = `${SOLARPLEX_FEED_API}/splx/get_all_communities`;
     const response = await this.rootStore.api.get<{ data: SolarplexCommunity[] }>(url);
@@ -155,10 +147,11 @@ export class CommunitiesModel {
 
   // TODO(zfaizal2): fix db for communities to add handle
   _fetch = actions.wrapAction(async (reset: boolean = false) => {
-    const [communities, uris] = await Promise.all([this._getAllCommunities(), this._getAllCoummunityUris()]);
-    const c = merge(communities, uris) as SolarplexCommunity[];
-    console.log(c);
-    this._setCommunities(c, reset);
+    const [communities] = await Promise.all([this._getAllCommunities()]);
+    communities?.map((c) => {
+      c.uri = makeRecordUri(SOLARPLEX_DID, "app.bsky.feed.generator", c.id);
+    });
+    this._setCommunities(communities ?? [], reset);
   }, this, '_fetch');
 
   fetch = actions.wrapAction(async () => {
