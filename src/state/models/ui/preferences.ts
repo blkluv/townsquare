@@ -577,7 +577,6 @@ export class PreferencesModel {
       if (!this.joinedCommunities.includes(v)) {
         this.joinedCommunities.push(v);
       }
-      console.log("[Final] join community", v);
     } catch (e) {
       runInAction(() => {
         this.joinedCommunities = this.joinedCommunities;
@@ -590,7 +589,6 @@ export class PreferencesModel {
     const oldJoinedCommunities = this.joinedCommunities;
     try {
       this.joinedCommunities = this.joinedCommunities.filter((id) => id !== v);
-      console.log("[Final] leave community", v);
     } catch (e) {
       runInAction(() => {
         this.joinedCommunities = this.joinedCommunities;

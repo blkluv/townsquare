@@ -104,7 +104,6 @@ export const PostCtrls = (opts: PostCtrlsOpts) => {
         setpostWallet(wallet);
       }
 
-      console.log("wallet", `${wallet} --- ${opts.author.did}`);
     })();
   }, [opts]);
 

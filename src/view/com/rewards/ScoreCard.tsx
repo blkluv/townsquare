@@ -17,9 +17,6 @@ export const ScoreCard = observer(({ handleTextStyle }: ScoreCardProps) => {
   const did = store.session?.currentSession?.did ?? "";
   const score = store.rewards.getScore(did);
   const pal = usePalette("default");
-
-  console.log("score",score);
-
   return (
     <View>
       <Text type="title-lg" style={[pal.text, s.bold, handleTextStyle]}>

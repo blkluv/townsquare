@@ -204,7 +204,6 @@ export class RewardsModel {
   
   getScore(userId: string) {
     const user = this.users[userId]?.user;
-    console.log("USER",user);
     if (!user) {
       return undefined; 
     }
