@@ -70,7 +70,7 @@ const App = observer(() => {
 
   const wallets: WalletAdapter[] = [
   //   new PhantomWalletAdapter(),
-  // new SolflareWalletAdapter(),
+  new SolflareWalletAdapter(),
   // new BackpackWalletAdapter(),
   // new GlowWalletAdapter(),
   // new BraveWalletAdapter(),
