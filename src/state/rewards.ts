@@ -372,8 +372,12 @@ export class RewardsModel {
     return this.isClaimingMission(userId, this.weeklyMissionId(userId));
   }
 
+  shouldClaimMission(userId: string, missionId: string) {
+    return !!this.mission(userId, missionId)?.shouldClaim;
+  }
+
   shouldClaimDaily(userId: string): boolean | undefined {
-    return !this.dailyInFlight(userId) && !!this.dailyMissionsToClaim(userId).length;
+    return !this.dailyInFlight(userId) && this.shouldClaimMission(userId, this.dailyMissionId(userId)); //!!this.dailyMissionsToClaim(userId).length;
   }
 
   shouldClaimWeekly(userId: string): boolean | undefined {
