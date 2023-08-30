@@ -26,6 +26,7 @@ export const WalletConnect = observer(function WalletConnect() {
     connectedWallet,
     connectWalletIsBusy,
     disconnectWalletIsBusy,
+    disconnectWallet,
   ] = useSplxWallet();
   const pal = usePalette("default");
   const wallet = useWallet();
@@ -47,10 +48,7 @@ export const WalletConnect = observer(function WalletConnect() {
     }
   };
 
-  const disconnectWallet = async () => {
-    await store.wallet.unlinkWallet();
-    Toast.show("Wallet Disconnected");
-  };
+  
 
   return (
     <>

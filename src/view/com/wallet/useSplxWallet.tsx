@@ -1,3 +1,5 @@
+import * as Toast from "../util/Toast";
+
 import { useEffect } from 'react';
 import { useStores } from '../../../state';
 import { useWallet } from "@solana/wallet-adapter-react";
@@ -15,7 +17,7 @@ export const useSplxWallet = () => {
   const linkWalletIsBusy = walletAddressFromWalletConnect && store.wallet.linkWalletIsBusy(walletAddressFromWalletConnect);
   const unlinkWalletIsBusy = store.wallet.unlinkWalletIsBusy();
   const connectWalletIsBusy = waitingToConnectWallet || linkWalletIsBusy;
-  const disconnectWalletIsBusy = unlinkWalletIsBusy;
+  const disconnectWalletIsBusy = unlinkWalletIsBusy || wallet.disconnecting;
 
   const { setVisible, visible } = useWalletModal();
 
@@ -26,6 +28,11 @@ export const useSplxWallet = () => {
       setVisible(false);
     }
   }
+
+  const disconnectWallet = async () => {
+    await Promise.all([store.wallet.unlinkWallet(), wallet.disconnect()]);
+    Toast.show("Wallet Disconnected");
+  };
 
   useEffect(() => {
     if (!visible && waitForWalletConnectIsBusy && !waitingToConnectWallet && !waitingToConnectWalletCanceled) {
@@ -44,13 +51,16 @@ export const useSplxWallet = () => {
   }, [waitForWalletConnectIsBusy, waitingToConnectWallet, visible, waitingToConnectWalletCanceled, wallet.connecting]);
 
   useEffect(() => {
+    if (disconnectWalletIsBusy) {
+      return;
+    }
     if (walletAddressFromModel !== walletAddressFromWalletConnect) {
       store.wallet.setWalletAddress(walletAddressFromWalletConnect);
     }
     if (walletAddressFromWalletConnect !== walletAddressFromModel) {
       void store.wallet.linkWallet(walletAddressFromWalletConnect);
     }
-  }, [walletAddressFromWalletConnect])
+  }, [walletAddressFromModel, walletAddressFromWalletConnect])
 
-  return [visible, openWalletConnectDialog, linkedWallet, walletAddressFromWalletConnect, connectWalletIsBusy, disconnectWalletIsBusy] as [boolean, typeof openWalletConnectDialog, typeof linkedWallet, typeof walletAddressFromWalletConnect, boolean, boolean];
+  return [visible, openWalletConnectDialog, linkedWallet, walletAddressFromModel, connectWalletIsBusy, disconnectWalletIsBusy, disconnectWallet] as [boolean, typeof openWalletConnectDialog, typeof linkedWallet, typeof walletAddressFromWalletConnect, boolean, boolean, typeof disconnectWallet];
 };

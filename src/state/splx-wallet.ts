@@ -307,6 +307,7 @@ export class SplxWallet {
         const address = await this.getConnectedWallet();
         runInAction(() => {
           this.state.connectedWallets[did] = address ?? '';
+          this.state.walletId = '';
         });
         this.rootStore.me.nft.setAssets([]);
       } catch(err) {};
