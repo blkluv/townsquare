@@ -16,6 +16,7 @@ import { CustomFeedModel } from "state/models/feeds/custom-feed";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { NavigationProp } from "lib/routes/types";
 import React from "react";
+import { SOLARPLEX_USER_DID } from "lib/constants";
 import { SolarplexCommunity } from "lib/splx-types";
 import { Text } from "../util/text/Text";
 import { UserAvatar } from "../util/UserAvatar";
@@ -104,9 +105,9 @@ export const CommunityFeed = observer(
             <Text style={[pal.text, s.bold]} numberOfLines={3}>
               {item.data?.name}
             </Text>
-            <Text style={[pal.textLight]} numberOfLines={3}>
-              by @Solarplex
-            </Text>
+              <Text style={[pal.textLight]} numberOfLines={3}>
+                by @solarplex
+              </Text>
           </View>
           {showJoinBtn && (
             <View>

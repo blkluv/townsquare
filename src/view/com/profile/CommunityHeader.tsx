@@ -5,6 +5,7 @@ import {
   FontAwesomeIcon,
   FontAwesomeIconStyle,
 } from "@fortawesome/react-native-fontawesome";
+import { Link, TextLink } from "../util/Link";
 import {
   StyleSheet,
   TouchableOpacity,
@@ -23,8 +24,8 @@ import { ProfileImageLightbox } from "state/models/ui/shell";
 import { ProfileModel } from "state/models/content/profile";
 import React from "react";
 import { RichText } from "../util/text/RichText";
+import { SOLARPLEX_USER_DID } from "lib/constants";
 import { Text } from "../util/text/Text";
-import { TextLink } from "../util/Link";
 import { UserAvatar } from "../util/UserAvatar";
 import { UserBanner } from "../util/UserBanner";
 import { formatCount } from "../util/numeric/format";
@@ -311,7 +312,7 @@ const CommunityHeaderLoaded = observer(
             <UserBanner banner={view.data.banner} />
             <View style={styles.content}>
               <View style={[styles.buttonsLine]}>
-                {view.isJoined === true ? (
+                {view.data.id === 'splx-art' ? <></> : view.isJoined === true ? (
                   <TouchableOpacity
                     testID="leaveBtn"
                     onPress={onPressToggleJoin}
@@ -435,6 +436,9 @@ const CommunityHeaderLoaded = observer(
                 >
                   {sanitizeDisplayName(view.data?.name)}
                 </Text>
+                <Link href={`/profile/${SOLARPLEX_USER_DID}`} asAnchor style={[pal.textLight]} >
+                  by @solarplex
+                </Link>
               </View>
               {/* <View style={styles.handleLine}>
             {view.viewer.followedBy && !blockHide ? (

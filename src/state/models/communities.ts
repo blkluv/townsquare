@@ -153,6 +153,7 @@ export class CommunitiesModel {
     return response.data;
   }, this, '_getAllCommunities');
 
+  // TODO(zfaizal2): fix db for communities to add handle
   _fetch = actions.wrapAction(async (reset: boolean = false) => {
     const [communities, uris] = await Promise.all([this._getAllCommunities(), this._getAllCoummunityUris()]);
     const c = merge(communities, uris) as SolarplexCommunity[];

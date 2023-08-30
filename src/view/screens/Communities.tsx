@@ -102,7 +102,8 @@ export const CommunitiesScreen = withAuthRequired(
     const renderItem = React.useCallback(
       (item: any) => {
         if (item instanceof CommunityFeedModel) {
-          return <CommunityFeed item={item} showJoinBtn={true} />;
+          const showJoinBtn = item?.data?.id === 'splx-art' ? false : true;
+          return <CommunityFeed item={item} showJoinBtn={showJoinBtn} />;
         }
         return <View />;
       },
