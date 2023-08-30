@@ -41,7 +41,7 @@ export const HomeScreen = withAuthRequired(
     const store = useStores();
     const pagerRef = React.useRef<PagerRef>(null);
     const [selectedPage, setSelectedPage] = React.useState(0);
-    const [customFeeds, setCustomFeeds] = React.useState<PostsFeedModel[]>([]);
+    const customFeeds = store.communities.communityPostsFeeds;
 
     React.useEffect(
       () => {
@@ -56,14 +56,7 @@ export const HomeScreen = withAuthRequired(
         //   return;
         // }
 
-        const feeds = [];
-        for (const feed of SOLARPLEX_FEEDS) {
-          const model = new PostsFeedModel(store, "custom", { feed: feed });
-          model.setup();
-          feeds.push(model);
-        }
-        // pagerRef.current?.setPage(0);
-        setCustomFeeds(feeds);
+        store.communities.fetch();
       },
       [
         // store,

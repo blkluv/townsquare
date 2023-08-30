@@ -328,6 +328,8 @@ export class SplxActionModel {
     const name = typeof fn === 'string' ? fn : fn.name;
     const statePayload: ActionStatePayload<Args> = { store: context, actionName: name, payload: args ?? [] };
     switch (status) {
+      case ActionStatus.New:
+        return !this.getActionState(statePayload);
       case ActionStatus.Error:
         return this.getError(statePayload);
       case ActionStatus.Busy:
@@ -358,6 +360,10 @@ export class SplxActionModel {
 
   isLoading<Args extends readonly unknown[], Res>(fn: ((...args: Args) => Promise<Res>) | string, context: any, args: Args) {
     return this.actionGetter(ActionStatus.Loading, fn, context, args);
+  }
+
+  isNew<Args extends readonly unknown[], Res>(fn: ((...args: Args) => Promise<Res>) | string, context: any, args: Args) {
+    return this.actionGetter(ActionStatus.New, fn, context, args);
   }
 
   actionKey<Args extends readonly unknown[], Res>(fn: ((...args: Args) => Promise<Res>) | string, context: any, args: Args) {
