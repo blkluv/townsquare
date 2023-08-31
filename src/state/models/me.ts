@@ -121,9 +121,7 @@ export class MeModel {
       this.did = sess.currentSession?.did || ''
       await this.fetchProfile()
       await this.rootStore.wallet.getConnectedWallet();
-      if (this.rootStore.wallet.connectedWallet) {
-        await this.nft.fetchNfts(this.rootStore.wallet.connectedWallet);
-      }
+      this.updateReactions();
       this.mainFeed.clear()
       /* dont await */ this.mainFeed.setup().catch(e => {
         this.rootStore.log.error('Failed to setup main feed model', e)
@@ -137,6 +135,13 @@ export class MeModel {
     } else {
       this.clear()
     }
+  }
+
+  async updateReactions() {
+    if (!this.rootStore.wallet.connectedWallet) {
+      return;
+    }
+    this.nft.fetchNfts(this.rootStore.wallet.connectedWallet);
   }
 
   async updateIfNeeded() {

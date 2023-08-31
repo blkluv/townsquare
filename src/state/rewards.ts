@@ -218,6 +218,46 @@ export class RewardsModel {
     return this.users[userId]?.weekly?.id ?? "";
   }
 
+  _mergeResponse(userId: string, response?: MissionResponse) {
+    if (!response) {
+      return;
+    }
+    const previousStr = this.users[userId] ? JSON.stringify(this.users[userId]) : undefined;
+    runInAction(() => {
+      this.users[userId] = merge(this.users[userId], response);
+    });
+    const currStr = this.users[userId] ? JSON.stringify(this.users[userId]) : undefined;
+    if (previousStr !== currStr) {
+      this._onChange(userId, previousStr ? JSON.parse(previousStr) : undefined);
+    }
+  }
+
+  _didClaimMission(userId: string, previous?: MissionResponse) {
+    const currMissions = (this.users[userId]?.missions ?? []).reduce<{[missionId: string]: Mission}>((acc, mission) => {
+      acc[mission.id] = mission;
+      return acc;
+    }, {});
+    const prevMissions = (previous?.missions ?? []).reduce<{[missionId: string]: Mission}>((acc, mission) => {
+      acc[mission.id] = mission;
+      return acc;
+    }, {});
+    const keys = Object.keys(currMissions);
+    for (let i = 0; i < keys.length; i++) {
+      const key = keys[i];
+      if (prevMissions[key] && !prevMissions[key].claimed && currMissions[key].claimed) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  _onChange(userId: string, previous?: MissionResponse) {
+    if (this._didClaimMission(userId, previous)) {
+      userId === this.rootStore.me.did && this.rootStore.me.updateReactions();
+    }
+    // More on change stuff.
+  }
+
   _claimRewards = actions.wrapAction(async (userId: string, wallet: string, missionIds: string[]) => {
     if (!missionIds.length || !wallet || wallet !== this.rootStore.me.splxWallet) {
       throw new Error("noMissionIdOrWallet");
@@ -266,9 +306,7 @@ export class RewardsModel {
       response = await this.rootStore.api.post<MissionResponse>(url, { body });
     }
     if (!this.rootStore.api.postError(url, { body })) {
-      runInAction(() => {
-        this.users[userId] = merge(this.users[userId], response);
-      });
+      this._mergeResponse(userId, response);
     }
     runInAction(() => {
       missionIds.forEach((id) => {
@@ -469,9 +507,7 @@ export class RewardsModel {
       response = await this.rootStore.api.get<MissionResponse>(url);
     }
     if (!this.rootStore.api.getError(url)) {
-      runInAction(() => {
-        this.users[userId] = merge(this.users[userId], response);
-      });
+      this._mergeResponse(userId, response);
     }
     runInAction(() => {
       delete this.inFlight['missions'][userId];
