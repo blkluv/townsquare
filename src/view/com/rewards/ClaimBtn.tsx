@@ -1,11 +1,10 @@
 import {StyleSheet, View} from 'react-native'
 
+import React from 'react'
 import {StarsIcon} from 'lib/icons'
 import {Text} from 'view/com/util/text/Text'
 import {TouchableOpacity} from 'react-native-gesture-handler'
 import {colors} from 'lib/styles'
-
-import React = require('react')
 
 type ClaimBtnProps = {
   onClick: () => void

@@ -1,6 +1,7 @@
 import {CommonNavigatorParams, NativeStackScreenProps} from 'lib/routes/types'
 import {StyleSheet, View} from 'react-native'
 
+import React from 'react'
 import {ScrollView} from 'view/com/util/Views.web'
 import {Text} from 'view/com/util/text/Text'
 import {ViewHeader} from '../com/util/ViewHeader'
@@ -10,8 +11,6 @@ import {s} from 'lib/styles'
 import {useFocusEffect} from '@react-navigation/native'
 import {usePalette} from 'lib/hooks/usePalette'
 import {useStores} from 'state/index'
-
-import React = require('react')
 
 type Props = NativeStackScreenProps<CommonNavigatorParams, 'Wallets'>
 export const Wallets = observer((_props: Props) => {

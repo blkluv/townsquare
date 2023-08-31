@@ -1,10 +1,9 @@
 import {StyleSheet, View} from 'react-native'
 
 import {CheckIcon} from 'lib/icons'
+import React from 'react'
 import {Text} from '../util/text/Text'
 import {s} from 'lib/styles'
-
-import React = require('react')
 
 type Day = {
   day: number
