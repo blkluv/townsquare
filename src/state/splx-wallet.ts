@@ -123,6 +123,7 @@ export class SplxWallet {
             method,
             headers: {
               'Content-Type': 'application/json',
+              Authorization: `Bearer ${this.rootStore.session?.currentSession?.accessJwt}`,
             },
           }
           if (bodyStr) {

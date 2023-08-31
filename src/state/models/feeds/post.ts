@@ -149,6 +149,8 @@ export class PostsFeedItemModel {
               headers: {
                 'content-type': 'application/json',
                 'Access-Control-Allow-Origin': 'no-cors',
+                Authorization:
+                  'Bearer ' + this.rootStore.session?.currentSession?.accessJwt,
               },
               body: JSON.stringify({
                 post_id: this.uri,
@@ -179,6 +181,8 @@ export class PostsFeedItemModel {
             headers: {
               'content-type': 'application/json',
               'Access-Control-Allow-Origin': 'no-cors',
+              Authorization:
+                'Bearer ' + this.rootStore.session?.currentSession?.accessJwt,
             },
             body: JSON.stringify({
               post_id: this.uri,
