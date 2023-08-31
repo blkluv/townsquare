@@ -170,7 +170,7 @@ export function TipDropdownBtn({
 
   const tipBtnAnalytics = (func: () => void, tokenName: string) => {
     track('Tip:TipButton', {
-      token: tokenName,
+      tokenName: tokenName,
     })
     func()
   }

@@ -143,7 +143,7 @@ export const Component = observer(function ({
       const signedTx = await wallet.signTransaction(tx)
       await connection.sendRawTransaction(signedTx.serialize())
       track('Tip:TipConfirmation', {
-        token: tokenName,
+        tokenName: tokenName,
         sender: senderAddress,
         reciever: recipientAddress,
         amount: amount,

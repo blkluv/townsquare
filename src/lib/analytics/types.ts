@@ -132,9 +132,9 @@ interface TrackPropertiesMap {
   'CommunityFeed:Leave': {}
   'Claim:DailyReward': {}
   'Claim:WeeklyReward': {}
-  'Tip:TipButton': {token: string}
+  'Tip:TipButton': {tokenName: string}
   'Tip:TipConfirmation': {
-    token: string
+    tokenName: string
     sender: string
     reciever: string
     amount: string
