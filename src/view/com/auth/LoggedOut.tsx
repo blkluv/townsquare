@@ -48,17 +48,15 @@ export const LoggedOut = observer(() => {
         <ErrorBoundary>
           {screenState === ScreenState.S_Login ? (
             <Login
-              onPressBack={() =>
-                setScreenState(ScreenState.S_Login)
+              onPressBack={() => setScreenState(ScreenState.S_Login)}
+              onPressCreateAccount={() =>
+                setScreenState(ScreenState.S_CreateAccount)
               }
-              onPressCreateAccount={() => setScreenState(ScreenState.S_CreateAccount)}
             />
           ) : undefined}
           {screenState === ScreenState.S_CreateAccount ? (
             <CreateAccount
-              onPressBack={() =>
-                setScreenState(ScreenState.S_Login)
-              }
+              onPressBack={() => setScreenState(ScreenState.S_Login)}
             />
           ) : undefined}
         </ErrorBoundary>

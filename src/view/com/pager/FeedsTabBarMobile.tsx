@@ -1,38 +1,26 @@
-import {
-  Animated,
-  Button,
-  StyleSheet,
-  TouchableOpacity,
-  View,
-} from "react-native";
-import { ComposeIcon2, HeartIcon, SolarplexLogo } from "lib/icons";
-import React, { useMemo } from "react";
-import { gradients, s } from "lib/styles";
+import {Animated, StyleSheet, TouchableOpacity, View} from 'react-native'
+import React, {useMemo} from 'react'
 
-import { FAB } from "../util/fab/FAB";
-import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
-import LinearGradient from "react-native-linear-gradient";
-import { RenderTabBarFnProps } from "view/com/pager/Pager";
-import { SolarplexCommunity } from "lib/splx-types";
-import { TabBar } from "view/com/pager/TabBar";
-import { Text } from "../util/text/Text";
-import { UserAvatar } from "view/com/util/UserAvatar";
-import { observer } from "mobx-react-lite";
-import { useAnimatedValue } from "lib/hooks/useAnimatedValue";
-import { useColorSchemeStyle } from "lib/hooks/useColorSchemeStyle";
-import { usePalette } from "lib/hooks/usePalette";
-import { useStores } from "state/index";
+import {RenderTabBarFnProps} from 'view/com/pager/Pager'
+import {SolarplexLogo} from 'lib/icons'
+import {TabBar} from 'view/com/pager/TabBar'
+import {UserAvatar} from 'view/com/util/UserAvatar'
+import {gradients} from 'lib/styles'
+import {observer} from 'mobx-react-lite'
+import {useAnimatedValue} from 'lib/hooks/useAnimatedValue'
+import {usePalette} from 'lib/hooks/usePalette'
+import {useStores} from 'state/index'
 
 export const FeedsTabBar = observer(
   (
     props: RenderTabBarFnProps & {
-      testID?: string;
-      onPressSelected: () => void;
+      testID?: string
+      onPressSelected: () => void
     },
   ) => {
-    const store = useStores();
-    const pal = usePalette("default");
-    const interp = useAnimatedValue(0);
+    const store = useStores()
+    const pal = usePalette('default')
+    const interp = useAnimatedValue(0)
 
     React.useEffect(() => {
       Animated.timing(interp, {
@@ -40,17 +28,15 @@ export const FeedsTabBar = observer(
         duration: 100,
         useNativeDriver: true,
         isInteraction: false,
-      }).start();
-    }, [interp, store.shell.minimalShellMode]);
+      }).start()
+    }, [interp, store.shell.minimalShellMode])
     const transform = {
-      transform: [{ translateY: Animated.multiply(interp, -100) }],
-    };
-
-    const brandBlue = useColorSchemeStyle(s.brandBlue, s.blue3);
+      transform: [{translateY: Animated.multiply(interp, -100)}],
+    }
 
     const onPressAvi = React.useCallback(() => {
-      store.shell.openDrawer();
-    }, [store]);
+      store.shell.openDrawer()
+    }, [store])
 
     // Get the user's joined communities from joinedCommunities.communities
     // Get the names of that community from this list for display here
@@ -59,17 +45,14 @@ export const FeedsTabBar = observer(
       // .filter((community: any) =>
       //   store.me.joinedCommunities.communities.includes(community.id),
       // )
-      .map((community: any) => community.name);
+      .map((community: any) => community.name)
     const communities = useMemo(
       () => [
-        store.session.hasSession ? "Following" : "Home",
+        store.session.hasSession ? 'Following' : 'Home',
         ...joinedCommunityNames,
       ],
-      [store.me.joinedCommunities.communities, joinedCommunityNames],
-    );
-    const onPressCompose = React.useCallback(() => {
-      store.shell.openComposer({});
-    }, [store]);
+      [store.session.hasSession, joinedCommunityNames],
+    )
 
     return (
       <Animated.View style={[pal.view, pal.border, styles.tabBar, transform]}>
@@ -81,8 +64,7 @@ export const FeedsTabBar = observer(
               accessibilityRole="button"
               accessibilityLabel="Open navigation"
               accessibilityHint="Access profile and other navigation links"
-              hitSlop={10}
-            >
+              hitSlop={10}>
               <UserAvatar avatar={store.me.avatar} size={27} />
             </TouchableOpacity>
           </View>
@@ -90,13 +72,12 @@ export const FeedsTabBar = observer(
             style={{
               width: 150,
               height: 25,
-              flexDirection: "row",
-              alignItems: "center",
-            }}
-          >
+              flexDirection: 'row',
+              alignItems: 'center',
+            }}>
             <SolarplexLogo />
           </View>
-          <View></View>
+          <View />
           {/* {!store.session.isSolarplexSession && (
             <View style={[pal.view]}>
               <TouchableOpacity
@@ -123,35 +104,35 @@ export const FeedsTabBar = observer(
         {/* TODO(viksit)[F1]: Replace this with a stories layout later, for now, populate
            the list of joined communities and power that in the feed */}
         <TabBar
-          key={communities.join(",")}
+          key={communities.join(',')}
           {...props}
           items={communities}
           indicatorColor={pal.colors.link}
         />
       </Animated.View>
-    );
+    )
   },
-);
+)
 
 const styles = StyleSheet.create({
   tabBar: {
-    position: "absolute",
+    position: 'absolute',
     zIndex: 1,
     left: 0,
     right: 0,
     top: 0,
-    flexDirection: "column",
-    alignItems: "center",
+    flexDirection: 'column',
+    alignItems: 'center',
     borderBottomWidth: 1,
   },
   topBar: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     paddingHorizontal: 18,
     paddingTop: 8,
     paddingBottom: 2,
-    width: "100%",
+    width: '100%',
   },
   title: {
     fontSize: 21,
@@ -168,9 +149,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
   },
   btn: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
     paddingVertical: 7,
     borderRadius: 50,
     marginLeft: 6,
@@ -180,4 +161,4 @@ const styles = StyleSheet.create({
     paddingHorizontal: 18,
     paddingVertical: 4,
   },
-});
+})

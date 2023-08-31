@@ -1,4 +1,4 @@
-import { BLAZE, BONK, BSOL, GUAC, SOL } from "lib/tipTokens";
+import {BLAZE, BONK, BSOL, GUAC, SOL} from 'lib/tipTokens'
 import {
   CommentBottomArrow,
   HeartIcon,
@@ -7,11 +7,7 @@ import {
   RegularFaceSmileIcon,
   SolidFaceSmileIcon,
 } from 'lib/icons'
-import {
-  FontAwesomeIcon,
-  FontAwesomeIconStyle,
-} from '@fortawesome/react-native-fontawesome'
-import React, { useCallback, useEffect, useState } from 'react'
+import React, {useCallback, useEffect, useState} from 'react'
 import {
   StyleProp,
   StyleSheet,
@@ -21,26 +17,19 @@ import {
 } from 'react-native'
 import {colors, s} from 'lib/styles'
 
-import { HITSLOP_10 as HITSLOP } from 'lib/constants'
+import {HITSLOP_10 as HITSLOP} from 'lib/constants'
 import {Haptics} from 'lib/haptics'
-import { NavigationProp } from 'lib/routes/types'
+import {NavigationProp} from 'lib/routes/types'
 import {PostDropdownBtn} from '../forms/PostDropdownBtn'
-import { Reaction } from 'react-native-reactions'
-import { ReactionDropdownButton } from '../forms/ReactionDropdownButton'
-import { ReactionList } from "view/com/reactions/ReactionList";
+import {ReactionDropdownButton} from '../forms/ReactionDropdownButton'
+import {ReactionList} from 'view/com/reactions/ReactionList'
 import {RepostButton} from './RepostButton'
-import { SolarplexReaction } from 'state/models/media/reactions'
+import {SolarplexReaction} from 'state/models/media/reactions'
 import {Text} from '../text/Text'
-import { TipDropdownBtn } from "../forms/TipdropdownBtn";
-import { faSmile } from '@fortawesome/free-regular-svg-icons'
-import { faSmile as faSmileFilled } from '@fortawesome/free-solid-svg-icons'
-import { isMobileWeb } from "platform/detection";
-import { observer } from "mobx-react-lite";
+import {TipDropdownBtn} from '../forms/TipdropdownBtn'
 import {pluralize} from 'lib/strings/helpers'
-import { useNavigation } from "@react-navigation/native";
-import { useObserver } from "mobx-react-lite";
-import { usePalette } from "lib/hooks/usePalette";
-import { useSplxWallet } from "view/com/wallet/useSplxWallet";
+import {useNavigation} from '@react-navigation/native'
+import {useObserver} from 'mobx-react-lite'
 import {useStores} from 'state/index'
 import {useTheme} from 'lib/ThemeContext'
 
@@ -63,13 +52,13 @@ interface PostCtrlsOpts {
   replyCount?: number
   repostCount?: number
   likeCount?: number
-  reactions?: string[];
-  viewerReaction?: string;
+  reactions?: string[]
+  viewerReaction?: string
   isReposted: boolean
   isLiked: boolean
   isThreadMuted: boolean
   onPressReply: () => void
-  onPressReaction: (reactionId: string, remove?: boolean) => Promise<void>;
+  onPressReaction: (reactionId: string, remove?: boolean) => Promise<void>
   onPressToggleRepost: () => Promise<void>
   onPressToggleLike: () => Promise<void>
   onCopyPostText: () => void
@@ -81,37 +70,24 @@ interface PostCtrlsOpts {
 export const PostCtrls = (opts: PostCtrlsOpts) => {
   const store = useStores()
   const theme = useTheme()
-  const pal = usePalette("default");
-  const navigation = useNavigation<NavigationProp>();
+  const navigation = useNavigation<NavigationProp>()
 
-  const [postwallet, setpostWallet] = useState<string>("");
-  const [
-    visible,
-    setVisible,
-    linkedWallet,
-    walletAddressFromWalletConnect,
-    connectWalletIsBusy,
-    disconnectWalletIsBusy,
-  ] = useSplxWallet();
+  const [postwallet, setpostWallet] = useState<string>('')
 
   useEffect(() => {
-    (async () => {
-      const wallet = await store.wallet.getConnectWalletFromdid(
-        opts.author.did,
-      );
+    ;(async () => {
+      const wallet = await store.wallet.getConnectWalletFromdid(opts.author.did)
 
-      if (wallet !== null && wallet !== undefined && wallet !== "") {
-        setpostWallet(wallet);
+      if (wallet !== null && wallet !== undefined && wallet !== '') {
+        setpostWallet(wallet)
       }
+    })()
+  }, [opts, store.wallet])
 
-    })();
-  }, [opts]);
-
-
-  const defaultReactions = useObserver(() => store.reactions.curReactionsSet);
+  const defaultReactions = useObserver(() => store.reactions.curReactionsSet)
   const reactionSet = useObserver(
     () => store.reactions.earnedReactions[defaultReactions],
-  );
+  )
 
   const defaultCtrlColor = React.useMemo(
     () => ({
@@ -148,28 +124,22 @@ export const PostCtrls = (opts: PostCtrlsOpts) => {
     opts.itemUri,
     opts.text,
     store.shell,
-    store.session.isSolarplexSession,
-    navigation,
-  ]);
+  ])
 
-
-
-  function onTip({tokenName} : {tokenName: string}) {
-
-    if(store.session.isSolarplexSession){
-      navigation.navigate("SignIn")
-      return;
+  function onTip({tokenName}: {tokenName: string}) {
+    if (store.session.isSolarplexSession) {
+      navigation.navigate('SignIn')
+      return
     }
 
     store.shell.openModal({
-       name: "tip-modal",
-       recipientName: opts.author.displayName
-       ? opts.author.displayName
-       : "this user",
-       recipientAddress: postwallet,
-       tokenName: tokenName,
+      name: 'tip-modal',
+      recipientName: opts.author.displayName
+        ? opts.author.displayName
+        : 'this user',
+      recipientAddress: postwallet,
+      tokenName: tokenName,
     })
-
   }
 
   const onPressToggleLikeWrapper = async () => {
@@ -182,27 +152,27 @@ export const PostCtrls = (opts: PostCtrlsOpts) => {
   }
   const [selectedEmoji, setSelectedEmoji] = useState<
     SolarplexReaction | undefined
-  >(store.reactions.reactionTypes[opts.viewerReaction ?? " "])
-  
+  >(store.reactions.reactionTypes[opts.viewerReaction ?? ' '])
+
   const onPressReaction = async (emoji: SolarplexReaction | undefined) => {
     if (!emoji) {
-      onRemoveReaction();
-      return;
+      onRemoveReaction()
+      return
     }
     if (selectedEmoji) {
-      onRemoveReaction();
+      onRemoveReaction()
     }
     // console.log("emoji", emoji);
-    setSelectedEmoji(emoji);
-    await opts.onPressReaction(emoji.id).catch((_e) => undefined);
-  };
+    setSelectedEmoji(emoji)
+    await opts.onPressReaction(emoji.id).catch(_e => undefined)
+  }
 
   const onRemoveReaction = async () => {
     await opts
       .onPressReaction(selectedEmoji?.id ?? '', true)
-      .catch((_e) => undefined);
-    setSelectedEmoji(undefined);
-  };
+      .catch(_e => undefined)
+    setSelectedEmoji(undefined)
+  }
 
   return (
     <View style={[styles.ctrls, opts.style]}>
@@ -260,7 +230,7 @@ export const PostCtrls = (opts: PostCtrlsOpts) => {
           </Text>
         ) : undefined}
       </TouchableOpacity>
-<TouchableOpacity
+      <TouchableOpacity
         testID="reactBtn"
         style={styles.emojiCtrl}
         hitSlop={{
@@ -270,14 +240,13 @@ export const PostCtrls = (opts: PostCtrlsOpts) => {
           bottom: HITSLOP.bottom,
         }}
         accessibilityRole="button"
-        accessibilityLabel={opts.viewerReaction ? "Reacted" : "React"}
+        accessibilityLabel={opts.viewerReaction ? 'Reacted' : 'React'}
         accessibilityHint=""
         onPress={
           store.session.isSolarplexSession
-            ? () => navigation.navigate("SignIn")
+            ? () => navigation.navigate('SignIn')
             : onRemoveReaction
-        }
-      >
+        }>
         {reactionSet?.length ? (
           <ReactionDropdownButton
             testID="communityHeaderDropdownBtn"
@@ -287,28 +256,30 @@ export const PostCtrls = (opts: PostCtrlsOpts) => {
               styles.btn,
               styles.secondaryBtn,
               {
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
               },
             ]}
-            onPressReaction={onPressReaction}
-          >
-            <View style={{ flexDirection: "row", alignItems: "center" }}>
+            onPressReaction={onPressReaction}>
+            <View style={{flexDirection: 'row', alignItems: 'center'}}>
               {!opts.big && opts.reactions?.length !== undefined ? (
                 <View testID="testing" style={styles.emojiSet}>
-                  
                   <ReactionList reactions={opts.reactions} />
                 </View>
               ) : (
                 <></>
               )}
               {selectedEmoji ? (
-                <TouchableOpacity onPress={onRemoveReaction}>
+                <TouchableOpacity
+                  accessibilityRole="button"
+                  onPress={onRemoveReaction}>
                   <SolidFaceSmileIcon />
                 </TouchableOpacity>
               ) : store.session.isSolarplexSession ? (
-                <TouchableOpacity onPress={() => navigation.navigate("SignIn")}>
+                <TouchableOpacity
+                  accessibilityRole="button"
+                  onPress={() => navigation.navigate('SignIn')}>
                   <RegularFaceSmileIcon />
                 </TouchableOpacity>
               ) : (
@@ -321,13 +292,12 @@ export const PostCtrls = (opts: PostCtrlsOpts) => {
                   s.f15,
                   s.ml5,
                   {
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    marginRight: "4px",
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    marginRight: '4px',
                   },
-                ]}
-              >
+                ]}>
                 {opts.reactions?.length ? opts.reactions.length : <></>}
               </Text>
             </View>
@@ -341,52 +311,51 @@ export const PostCtrls = (opts: PostCtrlsOpts) => {
           style={styles.ctrl}
           onBonkTip={() =>
             onTip({
-              tokenName: BONK.tokenName
+              tokenName: BONK.tokenName,
             })
           }
           onGuacTip={() =>
             onTip({
-              tokenName: GUAC.tokenName
+              tokenName: GUAC.tokenName,
             })
           }
           onBSOLTip={() =>
             onTip({
-              tokenName: BSOL.tokenName
+              tokenName: BSOL.tokenName,
             })
           }
           onBLZETip={() =>
             onTip({
-              tokenName: BLAZE.tokenName
+              tokenName: BLAZE.tokenName,
             })
           }
           onSOLTip={() =>
             onTip({
-              tokenName: SOL.tokenName
+              tokenName: SOL.tokenName,
             })
-          }
-        >
+          }>
           <MoneyBill size={opts.big ? 22 : 16} />
         </TipDropdownBtn>
       ) : undefined}
 
       <View>
-      {opts.big ? undefined : (
-        <PostDropdownBtn
-          testID="postDropdownBtn"
-          itemUri={opts.itemUri}
-          itemCid={opts.itemCid}
-          itemHref={opts.itemHref}
-          itemTitle={opts.itemTitle}
-          isAuthor={opts.isAuthor}
-          isThreadMuted={opts.isThreadMuted}
-          onCopyPostText={opts.onCopyPostText}
-          onOpenTranslate={opts.onOpenTranslate}
-          onToggleThreadMute={opts.onToggleThreadMute}
-          onDeletePost={opts.onDeletePost}
-          style={styles.ctrlPad}
-        />
-      )}
-</View>
+        {opts.big ? undefined : (
+          <PostDropdownBtn
+            testID="postDropdownBtn"
+            itemUri={opts.itemUri}
+            itemCid={opts.itemCid}
+            itemHref={opts.itemHref}
+            itemTitle={opts.itemTitle}
+            isAuthor={opts.isAuthor}
+            isThreadMuted={opts.isThreadMuted}
+            onCopyPostText={opts.onCopyPostText}
+            onOpenTranslate={opts.onOpenTranslate}
+            onToggleThreadMute={opts.onToggleThreadMute}
+            onDeletePost={opts.onDeletePost}
+            style={styles.ctrlPad}
+          />
+        )}
+      </View>
       {/* used for adding pad to the right side */}
       <View />
     </View>
@@ -415,28 +384,28 @@ const styles = StyleSheet.create({
     marginTop: 1,
   },
   emojiCtrl: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
     padding: 5,
     margin: -5,
   },
   emojiSet: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
     marginRight: 10,
   },
   emojiContainerStyle: {
-    backgroundColor: "gray",
-    width: "100px",
-    height: " 100px",
+    backgroundColor: 'gray',
+    width: '100px',
+    height: ' 100px',
   },
   secondaryBtn: {
     // paddingHorizontal: 14,
   },
   btn: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
     // paddingVertical: 7,
     borderRadius: 50,
   },

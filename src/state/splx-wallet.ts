@@ -1,18 +1,18 @@
-import { makeAutoObservable, runInAction } from "mobx";
+import {makeAutoObservable, runInAction} from 'mobx'
 
-import { Json } from "lib/splx-utils/json";
-import { RootStoreModel } from "./models/root-store";
-import { SOLARPLEX_FEED_API } from "lib/constants";
-import { debouncer } from "../lib/splx-utils/functions";
-import { md5 } from "../lib/splx-utils/string";
-import merge from "lodash.merge";
-import { tryEachAnimationFrame } from '../lib/splx-utils/timers';
+import {Json} from 'lib/splx-utils/json'
+import {RootStoreModel} from './models/root-store'
+import {SOLARPLEX_FEED_API} from 'lib/constants'
+import {debouncer} from '../lib/splx-utils/functions'
+import {md5} from '../lib/splx-utils/string'
+import merge from 'lodash.merge'
+import {tryEachAnimationFrame} from '../lib/splx-utils/timers'
 
 export interface ModelWalletState {
-  walletId: string;
-  waitingToConnectWallet: boolean;
-  canceledWaitingToConnectWallet: boolean;
-  connectedWallets: { [did: string]: string }
+  walletId: string
+  waitingToConnectWallet: boolean
+  canceledWaitingToConnectWallet: boolean
+  connectedWallets: {[did: string]: string}
 }
 
 enum ActionStatus {
@@ -24,62 +24,60 @@ enum ActionStatus {
 }
 
 interface ActionState {
-  key: string;
-  status: ActionStatus;
+  key: string
+  status: ActionStatus
 }
 
 interface Actions {
-  [id: string]: ActionState;
+  [id: string]: ActionState
 }
 
 interface ActionStatePayload {
-  status: ActionStatus;
-  error?: Error;
-  key?: string;
+  status: ActionStatus
+  error?: Error
+  key?: string
 }
-
 
 function getInitialState(): ModelWalletState {
   return {
     canceledWaitingToConnectWallet: false,
     waitingToConnectWallet: false,
     walletId: '',
-    connectedWallets: {}
-  };
+    connectedWallets: {},
+  }
 }
 
 function getActionKeyFromPayload(...args: any[]): string | undefined {
   for (let i = 0; i < args.length; i++) {
     if (args[i]?.storeActionKey) {
-      return args[i]?.storeActionKey;
+      return args[i]?.storeActionKey
     }
   }
 }
 
-function getKeyPrefix<P, C, G, A>(fnName: string) {
-  return `Wallet/${fnName}`;
+function getKeyPrefix(fnName: string) {
+  return `Wallet/${fnName}`
 }
 
-function getPayloadString<P, C, G, A>(...args: any[]): string {
-  const str = getActionKeyFromPayload(...args) ?? JSON.stringify(args ?? '');
-  return str;
+function getPayloadString(...args: any[]): string {
+  const str = getActionKeyFromPayload(...args) ?? JSON.stringify(args ?? '')
+  return str
 }
 
 function payloadToKey(fnName: string, ...args: any[]) {
-  const prefix = getKeyPrefix(fnName);
-  const payloadStr = getPayloadString(...args);
-  const hash = payloadStr.length > 512 ? md5(payloadStr) : payloadStr;
+  const prefix = getKeyPrefix(fnName)
+  const payloadStr = getPayloadString(...args)
+  const hash = payloadStr.length > 512 ? md5(payloadStr) : payloadStr
   if (!hash) {
-    return prefix;
+    return prefix
   }
-  return `${prefix}#${hash}`;
+  return `${prefix}#${hash}`
 }
 
 export class SplxWallet {
-
   state: ModelWalletState = getInitialState()
 
-  actions: Actions = {};
+  actions: Actions = {}
 
   constructor(public rootStore: RootStoreModel) {
     makeAutoObservable(
@@ -87,64 +85,71 @@ export class SplxWallet {
       {
         rootStore: false,
       },
-      { autoBind: true },
-    );
+      {autoBind: true},
+    )
   }
 
   get connectedWallet(): string {
     if (!this.rootStore.me.did) {
-      return '';
+      return ''
     }
-    return this.state.connectedWallets[this.rootStore.me.did];
+    return this.state.connectedWallets[this.rootStore.me.did]
   }
 
   async getConnectWalletFromdid(did: string | undefined) {
     if (undefined) {
-      return null;
+      return null
     }
     return this._execute(
       async () => {
-        const { user } = await this._feedApiCall(`splx/get_user/${did}`);
-        
-        return user?.wallet ?? "";
+        const {user} = await this._feedApiCall(`splx/get_user/${did}`)
+
+        return user?.wallet ?? ''
       },
-      "getConnectWalletFromdid",
+      'getConnectWalletFromdid',
       did,
-    );
+    )
   }
 
-
   async _feedApiCall(subDir: string, method: string = 'GET', body?: Json) {
-    return this._execute(async () => {
-      if (!subDir.startsWith('/')) {
-        subDir = `/${subDir}`;
-      }
-      try {
-        const bodyStr = body ? JSON.stringify(body) : '';
-        const requestInit: RequestInit = {
-          method,
-          headers: {
-            "Content-Type": "application/json",
-          },
+    return this._execute(
+      async () => {
+        if (!subDir.startsWith('/')) {
+          subDir = `/${subDir}`
         }
-        if (bodyStr) {
-          requestInit.body = bodyStr;
-        }
-        const response = await fetch(`${SOLARPLEX_FEED_API}${subDir}`, requestInit);
+        try {
+          const bodyStr = body ? JSON.stringify(body) : ''
+          const requestInit: RequestInit = {
+            method,
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          }
+          if (bodyStr) {
+            requestInit.body = bodyStr
+          }
+          const response = await fetch(
+            `${SOLARPLEX_FEED_API}${subDir}`,
+            requestInit,
+          )
 
-        if (!response.ok) {
-          throw new Error(`feedApiCallFailed_${subDir}_${bodyStr}`)
+          if (!response.ok) {
+            throw new Error(`feedApiCallFailed_${subDir}_${bodyStr}`)
+          }
+          return await response.json()
+        } catch (err) {
+          console.error(`apiFeedError`, err)
+          throw err
         }
-        return await response.json();
-      } catch(err) {
-        console.error(`apiFeedError`, err);
-        throw err;
-      }
-    }, '_feedApiCall', subDir, body);
+      },
+      '_feedApiCall',
+      subDir,
+      body,
+    )
   }
 
   _maybeCreateActionStateAndReturnKey(fnName: string, ...args: any[]) {
-    const key = payloadToKey(fnName, ...args);
+    const key = payloadToKey(fnName, ...args)
     if (!this.actions[key]) {
       runInAction(() => {
         this.actions[key] = {
@@ -153,165 +158,209 @@ export class SplxWallet {
         }
       })
     }
-    return key;
+    return key
   }
 
-  _setActionState({ status, key }: ActionStatePayload, fnName: string, ...args: any[]) {
-    const stateKey = (key ?? this._maybeCreateActionStateAndReturnKey(fnName, ...args)) as string;
+  _setActionState(
+    {status, key}: ActionStatePayload,
+    fnName: string,
+    ...args: any[]
+  ) {
+    const stateKey = (key ??
+      this._maybeCreateActionStateAndReturnKey(fnName, ...args)) as string
     runInAction(() => {
-      const currentState = {...this.actions[stateKey]};
-      currentState.status = status;
-      this.actions[stateKey] = merge(this.actions[stateKey], currentState);
-    });
+      const currentState = {...this.actions[stateKey]}
+      currentState.status = status
+      this.actions[stateKey] = merge(this.actions[stateKey], currentState)
+    })
   }
 
   _setBusy(fnName: string, ...args: any[]) {
-    const key = this._maybeCreateActionStateAndReturnKey(fnName, ...args);
-    const currentStatus = this.actions[key].status;
-    this._setActionState({ 
-      key,
-      status: currentStatus === ActionStatus.New ? ActionStatus.Loading : ActionStatus.Busy,
-    }, fnName, ...args)
+    const key = this._maybeCreateActionStateAndReturnKey(fnName, ...args)
+    const currentStatus = this.actions[key].status
+    this._setActionState(
+      {
+        key,
+        status:
+          currentStatus === ActionStatus.New
+            ? ActionStatus.Loading
+            : ActionStatus.Busy,
+      },
+      fnName,
+      ...args,
+    )
   }
 
   _setIdle(fnName: string, ...args: any[]) {
-    const key = this._maybeCreateActionStateAndReturnKey(fnName, ...args);
-    const currentStatus = this.actions[key].status;
+    const key = this._maybeCreateActionStateAndReturnKey(fnName, ...args)
+    const currentStatus = this.actions[key].status
     if (currentStatus === ActionStatus.New) {
-      return;
+      return
     }
-    this._setActionState({ 
-      key,
-      status: ActionStatus.Idle,
-    }, fnName, ...args)
+    this._setActionState(
+      {
+        key,
+        status: ActionStatus.Idle,
+      },
+      fnName,
+      ...args,
+    )
   }
 
   _setError(error: Error, fnName: string, ...args: any[]) {
-    const key = this._maybeCreateActionStateAndReturnKey(fnName, ...args);
-    this._setActionState({ 
-      error,
-      key,
-      status: ActionStatus.Error,
-    }, fnName, ...args)
+    const key = this._maybeCreateActionStateAndReturnKey(fnName, ...args)
+    this._setActionState(
+      {
+        error,
+        key,
+        status: ActionStatus.Error,
+      },
+      fnName,
+      ...args,
+    )
   }
 
   _isBusy(fnName: string, ...args: any[]) {
-    const key = this._maybeCreateActionStateAndReturnKey(fnName, ...args);
-    const currentStatus = this.actions[key].status;
-    return currentStatus === ActionStatus.Busy || currentStatus === ActionStatus.Loading;
+    const key = this._maybeCreateActionStateAndReturnKey(fnName, ...args)
+    const currentStatus = this.actions[key].status
+    return (
+      currentStatus === ActionStatus.Busy ||
+      currentStatus === ActionStatus.Loading
+    )
   }
 
-  async _execute<T>(fn: (...args: any[]) => Promise<T>, fnName: string, ...args: any[]) {
+  async _execute<T>(
+    fn: (...args: any[]) => Promise<T>,
+    fnName: string,
+    ...args: any[]
+  ) {
     return await debouncer.execute(async () => {
-      this._setBusy(fnName, ...args);
+      this._setBusy(fnName, ...args)
       try {
-        const r = await fn(...args);
-        this._setIdle(fnName, ...args);
-        return r;
+        const r = await fn(...args)
+        this._setIdle(fnName, ...args)
+        return r
       } catch (err) {
-        console.error('error in', getKeyPrefix(fnName), err);
-        this._setError(err as Error, fnName, ...args);
-        throw err;
+        console.error('error in', getKeyPrefix(fnName), err)
+        this._setError(err as Error, fnName, ...args)
+        throw err
       }
-    }, payloadToKey(fnName, ...args));
+    }, payloadToKey(fnName, ...args))
   }
 
   async waitForWalletConnect() {
     return this._execute(async () => {
       await tryEachAnimationFrame(() => {
-        return !!this.state.walletId || this.state.canceledWaitingToConnectWallet;
+        return (
+          !!this.state.walletId || this.state.canceledWaitingToConnectWallet
+        )
       }, 86400 * 1000)
       runInAction(() => {
-        this.state.waitingToConnectWallet = false;
-        this.state.canceledWaitingToConnectWallet = false;
+        this.state.waitingToConnectWallet = false
+        this.state.canceledWaitingToConnectWallet = false
       })
-    }, 'waitForWalletConnect'); 
+    }, 'waitForWalletConnect')
   }
 
   waitForWalletConnectIsBusy() {
-    return this._isBusy('waitForWalletConnect');
+    return this._isBusy('waitForWalletConnect')
   }
 
   startWaitForWalletConnect() {
     runInAction(() => {
-      this.state.waitingToConnectWallet = true;
-      this.state.canceledWaitingToConnectWallet = false;
+      this.state.waitingToConnectWallet = true
+      this.state.canceledWaitingToConnectWallet = false
     })
   }
 
   cancelWaitForWalletConnect() {
     runInAction(() => {
-      this.state.waitingToConnectWallet = false;
-      this.state.canceledWaitingToConnectWallet = true;
+      this.state.waitingToConnectWallet = false
+      this.state.canceledWaitingToConnectWallet = true
     })
   }
 
   setWalletAddress(address: string) {
     runInAction(() => {
-      this.state.walletId = address ?? '';
+      this.state.walletId = address ?? ''
     })
   }
 
   unsetWalletAddress() {
     runInAction(() => {
-      this.state.walletId = '';
+      this.state.walletId = ''
     })
   }
 
   async getConnectedWallet() {
-    return this._execute(async () => {
-      const did = this.rootStore.me.did;
-      const { user } = await this._feedApiCall(`splx/get_user/${did}`);
-      runInAction(() => {
-        this.state.connectedWallets[did] = user?.wallet ?? '';
-      })
-      return user?.wallet ?? '';
-    }, 'getConnectedWallet', this.rootStore.me.did);
+    return this._execute(
+      async () => {
+        const did = this.rootStore.me.did
+        const {user} = await this._feedApiCall(`splx/get_user/${did}`)
+        runInAction(() => {
+          this.state.connectedWallets[did] = user?.wallet ?? ''
+        })
+        return user?.wallet ?? ''
+      },
+      'getConnectedWallet',
+      this.rootStore.me.did,
+    )
   }
 
   linkWalletIsBusy(wallet: string) {
-    return this._isBusy('linkWallet', this.rootStore.me.did, wallet);
+    return this._isBusy('linkWallet', this.rootStore.me.did, wallet)
   }
 
   async linkWallet(wallet: string) {
-    return this._execute(async () => {
-      if (!this.rootStore.session || wallet === this.connectedWallet) {
-        return;
-      }
-      if (this.connectedWallet) {
-        await this.unlinkWallet();
-      }
-      try {
-        await this._feedApiCall('splx/add_wallet_to_user', 'POST', { did: this.rootStore.me.did, wallet });
-        const address = await this.getConnectedWallet();
-        runInAction(() => {
-          this.state.walletId = address;
-        });
-        this.rootStore.me.nft.fetchNfts(this.rootStore.wallet.connectedWallet);
-      } catch(err) {};
-    }, 'linkWallet', this.rootStore.me.did, wallet);
+    return this._execute(
+      async () => {
+        if (!this.rootStore.session || wallet === this.connectedWallet) {
+          return
+        }
+        if (this.connectedWallet) {
+          await this.unlinkWallet()
+        }
+        try {
+          await this._feedApiCall('splx/add_wallet_to_user', 'POST', {
+            did: this.rootStore.me.did,
+            wallet,
+          })
+          const address = await this.getConnectedWallet()
+          runInAction(() => {
+            this.state.walletId = address
+          })
+          this.rootStore.me.nft.fetchNfts(this.rootStore.wallet.connectedWallet)
+        } catch (err) {}
+      },
+      'linkWallet',
+      this.rootStore.me.did,
+      wallet,
+    )
   }
 
   unlinkWalletIsBusy() {
-    return this._isBusy('unlinkWallet', this.rootStore.me.did);
+    return this._isBusy('unlinkWallet', this.rootStore.me.did)
   }
 
   async unlinkWallet() {
-    return await this._execute(async () => {
-      if (!this.connectedWallet) {
-        return;
-      }
-      try {
-        const did = this.rootStore.me.did;
-        await this._feedApiCall('splx/remove_wallet_from_user', 'POST', { did });
-        const address = await this.getConnectedWallet();
-        runInAction(() => {
-          this.state.connectedWallets[did] = address ?? '';
-          this.state.walletId = '';
-        });
-        this.rootStore.me.nft.setAssets([]);
-      } catch(err) {};
-    }, 'unlinkWallet', this.rootStore.me.did);
+    return await this._execute(
+      async () => {
+        if (!this.connectedWallet) {
+          return
+        }
+        try {
+          const did = this.rootStore.me.did
+          await this._feedApiCall('splx/remove_wallet_from_user', 'POST', {did})
+          const address = await this.getConnectedWallet()
+          runInAction(() => {
+            this.state.connectedWallets[did] = address ?? ''
+            this.state.walletId = ''
+          })
+          this.rootStore.me.nft.setAssets([])
+        } catch (err) {}
+      },
+      'unlinkWallet',
+      this.rootStore.me.did,
+    )
   }
-
 }

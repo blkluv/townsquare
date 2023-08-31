@@ -1,22 +1,24 @@
-import { StyleSheet, View } from "react-native";
-import { colors, s } from "lib/styles";
+import {StyleSheet, View} from 'react-native'
 
-import { StarsIcon } from "lib/icons";
-import { Text } from "view/com/util/text/Text";
-import { TouchableOpacity } from "react-native-gesture-handler";
+import {StarsIcon} from 'lib/icons'
+import {Text} from 'view/com/util/text/Text'
+import {TouchableOpacity} from 'react-native-gesture-handler'
+import {colors} from 'lib/styles'
+
+import React = require('react')
 
 type ClaimBtnProps = {
-  onClick: () => void;
-  text?: string;
-  loading?: boolean;
-  done?: boolean;
-  disabled?: boolean;
-  weekly?: boolean;
-};
+  onClick: () => void
+  text?: string
+  loading?: boolean
+  done?: boolean
+  disabled?: boolean
+  weekly?: boolean
+}
 
 export const ClaimBtn = ({
   onClick,
-  text = "Claim Reward",
+  text = 'Claim Reward',
   loading = false,
   disabled = false,
   done = false,
@@ -24,29 +26,29 @@ export const ClaimBtn = ({
 }: ClaimBtnProps) => {
   return (
     <TouchableOpacity
+      accessibilityRole="button"
       disabled={disabled || loading || done}
       onPress={onClick}
       style={[
         weekly ? styles.claimWeeklyBtn : styles.claimDailyBtn,
-        (disabled || loading || done) && { backgroundColor: colors.gray2 },
-      ]}
-    >
+        (disabled || loading || done) && {backgroundColor: colors.gray2},
+      ]}>
       <View style={styles.starIcon}>
-        <StarsIcon fill={weekly ? "#2E008B" : "white"} />
+        <StarsIcon fill={weekly ? '#2E008B' : 'white'} />
       </View>
       <Text style={weekly ? styles.claimWeeklyText : styles.claimDailyText}>
         {text}
       </Text>
     </TouchableOpacity>
-  );
-};
+  )
+}
 
 const styles = StyleSheet.create({
   claimDailyBtn: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    width: "100%",
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: '100%',
     borderRadius: 24,
     paddingVertical: 8,
     paddingHorizontal: 18,
@@ -55,16 +57,16 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   claimWeeklyBtn: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    width: "100%",
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: '100%',
     borderRadius: 24,
     paddingVertical: 8,
     paddingHorizontal: 18,
-    backgroundColor: "#F8D55D",
+    backgroundColor: '#F8D55D',
     borderWidth: 1,
-    borderColor: "#2E008B",
+    borderColor: '#2E008B',
 
     marginTop: 4,
     marginBottom: 4,
@@ -77,13 +79,13 @@ const styles = StyleSheet.create({
     marginRight: 8,
   },
   claimWeeklyText: {
-    color: "#2E008B",
+    color: '#2E008B',
     fontSize: 12,
-    fontWeight: "bold",
+    fontWeight: 'bold',
   },
   claimDailyText: {
     color: colors.white,
     fontSize: 12,
-    fontWeight: "bold",
+    fontWeight: 'bold',
   },
-});
+})

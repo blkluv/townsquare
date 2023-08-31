@@ -5,7 +5,6 @@ import {Button, ButtonType} from '../util/forms/Button'
 import {FollowState} from 'state/models/cache/my-follows'
 import React from 'react'
 import {View} from 'react-native'
-import {gradients} from 'lib/styles'
 import {observer} from 'mobx-react-lite'
 import {useStores} from 'state/index'
 

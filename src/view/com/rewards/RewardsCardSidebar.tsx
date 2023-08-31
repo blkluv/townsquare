@@ -1,57 +1,49 @@
-import * as Toast from "view/com/util/Toast";
+import {StyleSheet, View} from 'react-native'
+import {useFocusEffect, useNavigation} from '@react-navigation/native'
 
-import { StyleSheet, View } from "react-native";
-import { useFocusEffect, useNavigation } from "@react-navigation/native";
+import {Day} from './Day'
+import {NavigationProp} from 'lib/routes/types'
+import React from 'react'
+import {Text} from '../util/text/Text'
+import {TouchableOpacity} from 'react-native-gesture-handler'
+import {colors} from 'lib/styles'
+import {observer} from 'mobx-react-lite'
+import {useAnalytics} from 'lib/analytics/analytics'
+import {usePalette} from 'lib/hooks/usePalette'
+import {useStores} from 'state/index'
 
-import { ClaimBtn } from "./ClaimBtn";
-import { Day } from "./Day";
-import { NavigationProp } from "lib/routes/types";
-import React from "react";
-import { Text } from "../util/text/Text";
-import { TouchableOpacity } from "react-native-gesture-handler";
-import { colors } from "lib/styles";
-import { observable } from "mobx";
-import { observer } from "mobx-react-lite";
-import { useAnalytics } from "lib/analytics/analytics";
-import { usePalette } from "lib/hooks/usePalette";
-import { useState } from "react";
-import { useStores } from "state/index";
+export const RewardsCardSidebar = observer(({userId}: {userId: string}) => {
+  const store = useStores()
+  const {screen} = useAnalytics()
 
-export const RewardsCardSidebar = observer(({ userId }: { userId: string }) => {
-  const store = useStores();
-  const { screen } = useAnalytics();
+  const pal = usePalette('default')
+  const navigation = useNavigation<NavigationProp>()
+  const dailyProgress = store.rewards.dailyProgress(userId)
+  const weeklyProgress = store.rewards.weeklyProgress(userId)
 
-  const pal = usePalette("default");
-  const navigation = useNavigation<NavigationProp>();
-  const dailyProgress = store.rewards.dailyProgress(userId);
-  const weeklyProgress = store.rewards.weeklyProgress(userId);
-
-  const shouldClaimDaily = store.rewards.shouldClaimDaily(userId);
-  const isClaimingDaily = store.rewards.isClaimingDaily(userId);
-  const hasClaimedDaily = store.rewards.hasClaimedDaily(userId);
-  const dailyReward = store.rewards.dailyReward(userId);
-  const hasClaimedWeekly = store.rewards.hasClaimedWeekly(userId);
-  const shouldClaimWeekly = store.rewards.shouldClaimWeekly(userId);
+  const shouldClaimDaily = store.rewards.shouldClaimDaily(userId)
+  const hasClaimedWeekly = store.rewards.hasClaimedWeekly(userId)
+  const shouldClaimWeekly = store.rewards.shouldClaimWeekly(userId)
 
   useFocusEffect(
     React.useCallback(() => {
-      screen("Rewards");
+      screen('Rewards')
 
-      if (userId !== "") {
-        store.rewards.fetchMissions(userId);
+      if (userId !== '') {
+        store.rewards.fetchMissions(userId)
       }
-    }, [store, screen]),
-  );
+    }, [store, userId, screen]),
+  )
 
   const onClaimHandler = async () => {
     if (!store.session.hasSession) {
-      navigation.navigate("SignIn");
+      navigation.navigate('SignIn')
     } else if (shouldClaimDaily || shouldClaimWeekly) {
-      navigation.navigate("Missions");
+      navigation.navigate('Missions')
     } else {
-      navigation.navigate("Home");
+      navigation.navigate('Home')
     }
-  };
+  }
 
   return (
     <View style={styles.outer}>
@@ -68,14 +60,13 @@ export const RewardsCardSidebar = observer(({ userId }: { userId: string }) => {
           <View style={styles.streaksContainerBox}>
             <Text
               type="sm-thin"
-              style={{ color: colors.gray4, paddingBottom: 4 }}
-            >
+              style={{color: colors.gray4, paddingBottom: 4}}>
               POINTS
             </Text>
             <View>
               <Text type="lg-bold" style={styles.textPadding}>
                 {dailyProgress.count ?? 0}
-                <Text type="xs-heavy" style={{ color: colors.gray4 }}>
+                <Text type="xs-heavy" style={{color: colors.gray4}}>
                   /50
                 </Text>
               </Text>
@@ -87,10 +78,9 @@ export const RewardsCardSidebar = observer(({ userId }: { userId: string }) => {
               style={{
                 color: colors.gray4,
                 paddingBottom: 4,
-                textAlign: "center",
-                textAlignVertical: "bottom",
-              }}
-            >
+                textAlign: 'center',
+                textAlignVertical: 'bottom',
+              }}>
               DAYS
             </Text>
             <View style={styles.horizontalBox}>
@@ -101,40 +91,40 @@ export const RewardsCardSidebar = observer(({ userId }: { userId: string }) => {
                     day={day}
                     isCompleted={day <= weeklyProgress.count}
                   />
-                );
+                )
               })}
             </View>
           </View>
         </View>
         <View style={styles.claimBtn}>
           {(shouldClaimWeekly || shouldClaimDaily) && (
-              <TouchableOpacity
-                style={styles.ClaimCTA}
-                onPress={onClaimHandler}
-              >
-                <Text style={styles.claimTextCTA}>
-                  {!store.session.hasSession
-                    ? "Sign In"
-                    : shouldClaimDaily
-                    ? "Claim Daily Reward"
-                    : shouldClaimWeekly && !hasClaimedWeekly
-                    ? "Claim Weekly Reward"
-                    : "Keep Going!"}
-                </Text>
-              </TouchableOpacity>
-            )}
+            <TouchableOpacity
+              accessibilityRole="button"
+              style={styles.ClaimCTA}
+              onPress={onClaimHandler}>
+              <Text style={styles.claimTextCTA}>
+                {!store.session.hasSession
+                  ? 'Sign In'
+                  : shouldClaimDaily
+                  ? 'Claim Daily Reward'
+                  : shouldClaimWeekly && !hasClaimedWeekly
+                  ? 'Claim Weekly Reward'
+                  : 'Keep Going!'}
+              </Text>
+            </TouchableOpacity>
+          )}
         </View>
       </View>
     </View>
-  );
-});
+  )
+})
 
 const styles = StyleSheet.create({
   ClaimCTA: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    width: "100%",
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: '100%',
     borderRadius: 24,
     paddingVertical: 8,
     paddingHorizontal: 18,
@@ -145,7 +135,7 @@ const styles = StyleSheet.create({
   claimTextCTA: {
     color: colors.white,
     fontSize: 12,
-    fontWeight: "bold",
+    fontWeight: 'bold',
   },
   claimBtn: {
     paddingTop: 10,
@@ -155,7 +145,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 6,
   },
   streaks: {
-    flexDirection: "column",
+    flexDirection: 'column',
     borderRadius: 8,
 
     paddingHorizontal: 14,
@@ -164,32 +154,32 @@ const styles = StyleSheet.create({
   },
   textPadding: {
     paddingBottom: 4,
-    textAlign: "left",
+    textAlign: 'left',
   },
   para: {
     fontSize: 16,
     paddingTop: 4,
-    textTransform: "capitalize",
+    textTransform: 'capitalize',
   },
   streaksContainerBox: {
-    flexDirection: "column",
-    alignItems: "flex-start",
-    justifyContent: "flex-start",
+    flexDirection: 'column',
+    alignItems: 'flex-start',
+    justifyContent: 'flex-start',
     paddingRight: 8,
   },
 
   streaksText: {
-    fontWeight: "600",
+    fontWeight: '600',
     fontSize: 18,
   },
   horizontalBox: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   dailyPoints: {
-    fontWeight: "800",
+    fontWeight: '800',
     fontSize: 24,
     color: colors.splx.primary[50],
     // textAlign: "center",
   },
-});
+})

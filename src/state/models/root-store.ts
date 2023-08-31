@@ -7,7 +7,7 @@ import {createContext, useContext} from 'react'
 import {hasProp, isObj} from 'lib/type-guards'
 
 import {BskyAgent} from '@atproto/api'
-import { CommunitiesModel } from './communities'
+import {CommunitiesModel} from './communities'
 import {HandleResolutionsCache} from './cache/handle-resolutions'
 import {ImageSizesCache} from './cache/image-sizes'
 import {InvitedUsers} from './invited-users'
@@ -18,12 +18,12 @@ import {MutedThreads} from './muted-threads'
 import {PostsCache} from './cache/posts'
 import {PreferencesModel} from './ui/preferences'
 import {ProfilesCache} from './cache/profiles-view'
-import { RewardsModel } from 'state/rewards'
+import {RewardsModel} from 'state/rewards'
 import {SessionModel} from './session'
 import {ShellUiModel} from './ui/shell'
-import { SplxApiModel } from './api'
-import { SplxReactionModel } from './media/reactions'
-import { SplxWallet } from '../splx-wallet'
+import {SplxApiModel} from './api'
+import {SplxReactionModel} from './media/reactions'
+import {SplxWallet} from '../splx-wallet'
 // TEMPORARY (APP-700)
 // remove after backend testing finishes
 // -prf
@@ -157,7 +157,7 @@ export class RootStoreModel {
     if (!hadSession) {
       await resetNavigation()
     }
-    this.me.did && await this.rewards.fetchMissions(this.me.did)
+    this.me.did && (await this.rewards.fetchMissions(this.me.did))
     this.emitSessionReady()
   }
 

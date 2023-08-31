@@ -41,7 +41,7 @@ interface TrackPropertiesMap {
   'Post:ThreadMute': {} // CAN BE SERVER
   'Post:ThreadUnmute': {} // CAN BE SERVER
   'Post:Reply': {} // CAN BE SERVER
-  "Post:Reaction": {}; // CAN BE SERVER
+  'Post:Reaction': {} // CAN BE SERVER
   // FEED ITEM events
   'FeedItem:PostReply': {} // CAN BE SERVER
   'FeedItem:PostRepost': {} // CAN BE SERVER
@@ -69,9 +69,9 @@ interface TrackPropertiesMap {
   'ProfileHeader:FollowButtonClicked': {}
   'ProfileHeader:UnfollowButtonClicked': {}
   // Community header
-  "CommunityHeader:JoinButtonClicked": {};
-  "CommunityHeader:LeaveButtonClicked": {};
-  "CommunityHeader:ShareButtonClicked": {};
+  'CommunityHeader:JoinButtonClicked': {}
+  'CommunityHeader:LeaveButtonClicked': {}
+  'CommunityHeader:ShareButtonClicked': {}
   'ViewHeader:MenuButtonClicked': {}
   // SETTINGS events
   'Settings:SwitchAccountButtonClicked': {}
@@ -128,14 +128,17 @@ interface TrackPropertiesMap {
   'Onboarding:Begin': {}
   'Onboarding:Complete': {}
   // Communities
-  "CommunityFeed:Join": {};
-  "CommunityFeed:Leave": {};
-  "Claim:DailyReward": {};
-  "Claim:WeeklyReward": {};
-  "Tip:TipButton": { token: string};
-  "Tip:TipConfirmation": { token: string,sender: string,reciever: string,amount: string};
-
-
+  'CommunityFeed:Join': {}
+  'CommunityFeed:Leave': {}
+  'Claim:DailyReward': {}
+  'Claim:WeeklyReward': {}
+  'Tip:TipButton': {token: string}
+  'Tip:TipConfirmation': {
+    token: string
+    sender: string
+    reciever: string
+    amount: string
+  }
 }
 
 interface ScreenPropertiesMap {
@@ -147,8 +150,8 @@ interface ScreenPropertiesMap {
   'Signin:PasswordUpdatedForm': {}
   Feed: {}
   Notifications: {}
-  Communities: {};
-  Community: {};
+  Communities: {}
+  Community: {}
   Profile: {}
   'Profile:Preview': {}
   Settings: {}
@@ -157,5 +160,5 @@ interface ScreenPropertiesMap {
   BlockedAccounts: {}
   MutedAccounts: {}
   SavedFeeds: {}
-  Rewards: {};
+  Rewards: {}
 }

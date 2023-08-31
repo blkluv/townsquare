@@ -1,19 +1,14 @@
 import {
   BellIcon,
   BellIconSolid,
-  CommunitiesIcon,
-  CommunitiesIconSolid,
   HomeIcon,
   HomeIconSolid,
   MagnifyingGlassIcon2,
   MagnifyingGlassIcon2Solid,
   RegularRankingStarIcon,
   RegularReactionIcon,
-  SatelliteDishIcon,
-  SatelliteDishIconSolid,
   SolidRankingStarIcon,
   SolidReactionIcon,
-  UserIcon,
 } from 'lib/icons'
 import {getCurrentRoute, isTab} from 'lib/routes/helpers'
 
@@ -21,17 +16,14 @@ import {Animated} from 'react-native'
 import {Link} from 'view/com/util/Link'
 import React from 'react'
 import {clamp} from 'lib/numbers'
-import {makeProfileLink} from 'lib/routes/links'
 import {observer} from 'mobx-react-lite'
 import {styles} from './BottomBarStyles'
 import {useMinimalShellMode} from 'lib/hooks/useMinimalShellMode'
 import {useNavigationState} from '@react-navigation/native'
 import {usePalette} from 'lib/hooks/usePalette'
 import {useSafeAreaInsets} from 'react-native-safe-area-context'
-import {useStores} from 'state/index'
 
 export const BottomBarWeb = observer(() => {
-  const store = useStores()
   const pal = usePalette('default')
   const safeAreaInsets = useSafeAreaInsets()
   const {footerMinimalShellTransform} = useMinimalShellMode()
@@ -96,25 +88,25 @@ export const BottomBarWeb = observer(() => {
         }}
       </NavItem>
       <NavItem routeName="Missions" href="/rewards/missions">
-        {({ isActive }) => {
-          const Icon = isActive ? SolidRankingStarIcon : RegularRankingStarIcon;
+        {({isActive}) => {
+          const Icon = isActive ? SolidRankingStarIcon : RegularRankingStarIcon
           return (
             <Icon
               size={24}
               style={[styles.ctrlIcon, pal.text, styles.bellIcon]}
             />
-          );
+          )
         }}
       </NavItem>
       <NavItem routeName="Reactions" href="/rewards/reactions">
-        {({ isActive }) => {
-          const Icon = isActive ? SolidReactionIcon : RegularReactionIcon;
+        {({isActive}) => {
+          const Icon = isActive ? SolidReactionIcon : RegularReactionIcon
           return (
             <Icon
               size={24}
               style={[styles.ctrlIcon, pal.text, styles.bellIcon]}
             />
-          );
+          )
         }}
       </NavItem>
       {/* <NavItem routeName="Profile" href={makeProfileLink(store.me)}>

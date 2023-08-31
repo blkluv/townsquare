@@ -3,6 +3,7 @@
   "compilerOptions": {
     "jsx": "react-jsx",
     "types": ["node"],
+    "rootDir": "./",
     "lib": [
       "es2019",
       "dom"
@@ -13,5 +14,14 @@
       "state/*": ["./src/state/*"],
       "view/*": ["./src/view/*"],
     }
-  }
+  },
+  "include": [
+    "src",
+    ".eslintrc.js",
+    "index.js",
+    "index.web.js",
+    "webpack.config.js",
+    "babel.config.js",
+    "metro.config.js"
+  ],
 }

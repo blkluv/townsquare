@@ -113,11 +113,11 @@ const ProfileHeaderLoaded = observer(
 
     const onPressBack = React.useCallback(() => {
       if (navigation.canGoBack()) {
-        navigation.goBack();
+        navigation.goBack()
       } else {
-        navigation.navigate("Home");
+        navigation.navigate('Home')
       }
-    }, [navigation]);
+    }, [navigation])
 
     const onPressAvi = React.useCallback(() => {
       if (
@@ -277,15 +277,15 @@ const ProfileHeaderLoaded = observer(
       ]
       if (!store.session.isSolarplexSession) {
         items.push({
-          testID: "profileHeaderDropdownListAddRemoveBtn",
-          label: "Add to Lists",
+          testID: 'profileHeaderDropdownListAddRemoveBtn',
+          label: 'Add to Lists',
           onPress: onPressAddRemoveLists,
-        });
+        })
       }
       if (!isMe && !store.session.isSolarplexSession) {
         items.push({label: 'separator'})
         // Only add "Add to Lists" on other user's profiles, doesn't make sense to mute my own self!
-  
+
         if (!view.viewer.blocking) {
           items.push({
             testID: 'profileHeaderDropdownMuteBtn',
@@ -341,6 +341,7 @@ const ProfileHeaderLoaded = observer(
       onPressBlockAccount,
       onPressReportAccount,
       onPressAddRemoveLists,
+      store.session.isSolarplexSession,
     ])
 
     const blockHide = !isMe && (view.viewer.blocking || view.viewer.blockedBy)
@@ -355,67 +356,67 @@ const ProfileHeaderLoaded = observer(
           <View style={[styles.buttonsLine]}>
             {!store.session.isSolarplexSession ? (
               isMe ? (
-              <TouchableOpacity
-                testID="profileHeaderEditProfileButton"
-                onPress={onPressEditProfile}
-                style={[styles.btn, styles.mainBtn, pal.btn]}
-                accessibilityRole="button"
-                accessibilityLabel="Edit profile"
-                accessibilityHint="Opens editor for profile display name, avatar, background image, and description">
-                <Text type="button" style={pal.text}>
-                  Edit Profile
-                </Text>
-              </TouchableOpacity>
-            ) : view.viewer.blocking ? (
-              <TouchableOpacity
-                testID="unblockBtn"
-                onPress={onPressUnblockAccount}
-                style={[styles.btn, styles.mainBtn, pal.btn]}
-                accessibilityRole="button"
-                accessibilityLabel="Unblock"
-                accessibilityHint="">
-                <Text type="button" style={[pal.text, s.bold]}>
-                  Unblock
-                </Text>
-              </TouchableOpacity>
-            ) : !view.viewer.blockedBy ? (
-              <>
-                {store.me.follows.getFollowState(view.did) ===
-                FollowState.Following ? (
-                  <TouchableOpacity
-                    testID="unfollowBtn"
-                    onPress={onPressToggleFollow}
-                    style={[styles.btn, styles.mainBtn, pal.btn]}
-                    accessibilityRole="button"
-                    accessibilityLabel={`Unfollow ${view.handle}`}
-                    accessibilityHint={`Hides posts from ${view.handle} in your feed`}>
-                    <FontAwesomeIcon
-                      icon="check"
-                      style={[pal.text, s.mr5]}
-                      size={14}
-                    />
-                    <Text type="button" style={pal.text}>
-                      Following
-                    </Text>
-                  </TouchableOpacity>
-                ) : (
-                  <TouchableOpacity
-                    testID="followBtn"
-                    onPress={onPressToggleFollow}
-                    style={[styles.btn, styles.mainBtn, palInverted.view]}
-                    accessibilityRole="button"
-                    accessibilityLabel={`Follow ${view.handle}`}
-                    accessibilityHint={`Shows posts from ${view.handle} in your feed`}>
-                    <FontAwesomeIcon
-                      icon="plus"
-                      style={[palInverted.text, s.mr5]}
-                    />
-                    <Text type="button" style={[palInverted.text, s.bold]}>
-                      Follow
-                    </Text>
-                  </TouchableOpacity>
-                )}
-              </>
+                <TouchableOpacity
+                  testID="profileHeaderEditProfileButton"
+                  onPress={onPressEditProfile}
+                  style={[styles.btn, styles.mainBtn, pal.btn]}
+                  accessibilityRole="button"
+                  accessibilityLabel="Edit profile"
+                  accessibilityHint="Opens editor for profile display name, avatar, background image, and description">
+                  <Text type="button" style={pal.text}>
+                    Edit Profile
+                  </Text>
+                </TouchableOpacity>
+              ) : view.viewer.blocking ? (
+                <TouchableOpacity
+                  testID="unblockBtn"
+                  onPress={onPressUnblockAccount}
+                  style={[styles.btn, styles.mainBtn, pal.btn]}
+                  accessibilityRole="button"
+                  accessibilityLabel="Unblock"
+                  accessibilityHint="">
+                  <Text type="button" style={[pal.text, s.bold]}>
+                    Unblock
+                  </Text>
+                </TouchableOpacity>
+              ) : !view.viewer.blockedBy ? (
+                <>
+                  {store.me.follows.getFollowState(view.did) ===
+                  FollowState.Following ? (
+                    <TouchableOpacity
+                      testID="unfollowBtn"
+                      onPress={onPressToggleFollow}
+                      style={[styles.btn, styles.mainBtn, pal.btn]}
+                      accessibilityRole="button"
+                      accessibilityLabel={`Unfollow ${view.handle}`}
+                      accessibilityHint={`Hides posts from ${view.handle} in your feed`}>
+                      <FontAwesomeIcon
+                        icon="check"
+                        style={[pal.text, s.mr5]}
+                        size={14}
+                      />
+                      <Text type="button" style={pal.text}>
+                        Following
+                      </Text>
+                    </TouchableOpacity>
+                  ) : (
+                    <TouchableOpacity
+                      testID="followBtn"
+                      onPress={onPressToggleFollow}
+                      style={[styles.btn, styles.mainBtn, palInverted.view]}
+                      accessibilityRole="button"
+                      accessibilityLabel={`Follow ${view.handle}`}
+                      accessibilityHint={`Shows posts from ${view.handle} in your feed`}>
+                      <FontAwesomeIcon
+                        icon="plus"
+                        style={[palInverted.text, s.mr5]}
+                      />
+                      <Text type="button" style={[palInverted.text, s.bold]}>
+                        Follow
+                      </Text>
+                    </TouchableOpacity>
+                  )}
+                </>
               ) : null
             ) : null}
             {dropdownItems?.length ? (

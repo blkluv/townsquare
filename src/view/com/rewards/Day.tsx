@@ -1,36 +1,39 @@
-import { StyleSheet, View } from "react-native";
+import {StyleSheet, View} from 'react-native'
 
-import { CheckIcon } from "lib/icons";
-import { Text } from "../util/text/Text";
-import { s } from "lib/styles";
+import {CheckIcon} from 'lib/icons'
+import {Text} from '../util/text/Text'
+import {s} from 'lib/styles'
+
+import React = require('react')
 
 type Day = {
-  day: number;
-  isCompleted: boolean;
-};
+  day: number
+  isCompleted: boolean
+}
 
-export const Day = ({ day, isCompleted }: Day) => (
-  <View
-    style={[
-      styles.daybox,
-      isCompleted ? styles.dayContentChecked : styles.dayContentText,
-    ]}
-  >
-    {isCompleted ? (
-      <View>
-        <CheckIcon />
-      </View>
-    ) : (
-      <Text style={styles.text}>{day}</Text>
-    )}
-  </View>
-);
+export function Day({day, isCompleted}: Day) {
+  return (
+    <View
+      style={[
+        styles.daybox,
+        isCompleted ? styles.dayContentChecked : styles.dayContentText,
+      ]}>
+      {isCompleted ? (
+        <View>
+          <CheckIcon />
+        </View>
+      ) : (
+        <Text style={styles.text}>{day}</Text>
+      )}
+    </View>
+  )
+}
 
 const styles = StyleSheet.create({
   daybox: {
-    flexDirection: "column",
-    alignItems: "center",
-    justifyContent: "center",
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
     borderRadius: 100,
     width: 8,
     height: 8,
@@ -41,9 +44,9 @@ const styles = StyleSheet.create({
     backgroundColor: s.gray3.color,
   },
   dayContentChecked: {
-    backgroundColor: "transparent",
+    backgroundColor: 'transparent',
   },
   text: {
-    color: "white",
+    color: 'white',
   },
-});
+})

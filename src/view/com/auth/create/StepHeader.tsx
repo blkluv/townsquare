@@ -4,7 +4,7 @@ import React from 'react'
 import {Text} from 'view/com/util/text/Text'
 import {usePalette} from 'lib/hooks/usePalette'
 
-export function StepHeader({step, title}: {step: string; title: string}) {
+export function StepHeader({title}: {step: string; title: string}) {
   const pal = usePalette('default')
   return (
     <View style={styles.container}>

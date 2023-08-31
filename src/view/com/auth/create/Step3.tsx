@@ -1,19 +1,16 @@
-import { StyleSheet, View } from "react-native";
+import {CreateAccountModel} from 'state/models/ui/create-account'
+import {Policies} from './Policies'
+import React from 'react'
+import {Text} from 'view/com/util/text/Text'
+import {TextInput} from '../util/TextInput'
+import {View} from 'react-native'
+import {createFullHandle} from 'lib/strings/handles'
+import {observer} from 'mobx-react-lite'
+import {s} from 'lib/styles'
+import {usePalette} from 'lib/hooks/usePalette'
 
-import { CreateAccountModel } from "state/models/ui/create-account";
-import { ErrorMessage } from "view/com/util/error/ErrorMessage";
-import { Policies } from "./Policies";
-import React from "react";
-import { StepHeader } from "./StepHeader";
-import { Text } from "view/com/util/text/Text";
-import { TextInput } from "../util/TextInput";
-import { createFullHandle } from "lib/strings/handles";
-import { observer } from "mobx-react-lite";
-import { s } from "lib/styles";
-import { usePalette } from "lib/hooks/usePalette";
-
-export const Step3 = observer(({ model }: { model: CreateAccountModel }) => {
-  const pal = usePalette("default");
+export const Step3 = observer(({model}: {model: CreateAccountModel}) => {
+  const pal = usePalette('default')
   return (
     <View>
       {/* <StepHeader step="3" title="Your user handle" /> */}
@@ -36,7 +33,7 @@ export const Step3 = observer(({ model }: { model: CreateAccountModel }) => {
         <Text type="lg-bold" style={[pal.text, s.pl5, s.pt10]}>
           <Text type="lg" style={[pal.text]}>
             Your Handle will be
-          </Text>{" "}
+          </Text>{' '}
           @{createFullHandle(model.handle, model.userDomain)}
         </Text>
       </View>
@@ -50,11 +47,5 @@ export const Step3 = observer(({ model }: { model: CreateAccountModel }) => {
         />
       )}
     </View>
-  );
-});
-
-const styles = StyleSheet.create({
-  error: {
-    borderRadius: 6,
-  },
-});
+  )
+})

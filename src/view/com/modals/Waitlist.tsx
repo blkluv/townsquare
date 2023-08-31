@@ -3,68 +3,64 @@ import {
   StyleSheet,
   TouchableOpacity,
   View,
-} from "react-native";
+} from 'react-native'
 import {
   FontAwesomeIcon,
   FontAwesomeIconStyle,
-} from "@fortawesome/react-native-fontawesome";
-import { gradients, s } from "lib/styles";
+} from '@fortawesome/react-native-fontawesome'
+import {gradients, s} from 'lib/styles'
 
-import { ErrorMessage } from "../util/error/ErrorMessage";
-import LinearGradient from "react-native-linear-gradient";
-import React from "react";
-import { Text } from "../util/text/Text";
-import { TextInput } from "./util";
-import { cleanError } from "lib/strings/errors";
-import { usePalette } from "lib/hooks/usePalette";
-import { useStores } from "state/index";
-import { useTheme } from "lib/ThemeContext";
+import {ErrorMessage} from '../util/error/ErrorMessage'
+import LinearGradient from 'react-native-linear-gradient'
+import React from 'react'
+import {Text} from '../util/text/Text'
+import {TextInput} from './util'
+import {cleanError} from 'lib/strings/errors'
+import {usePalette} from 'lib/hooks/usePalette'
+import {useStores} from 'state/index'
+import {useTheme} from 'lib/ThemeContext'
 
-export const snapPoints = ["80%"];
+export const snapPoints = ['80%']
 
 export function Component({}: {}) {
-  const pal = usePalette("default");
-  const theme = useTheme();
-  const store = useStores();
-  const [email, setEmail] = React.useState<string>("");
-  const [isEmailSent, setIsEmailSent] = React.useState<boolean>(false);
-  const [isProcessing, setIsProcessing] = React.useState<boolean>(false);
-  const [error, setError] = React.useState<string>("");
+  const pal = usePalette('default')
+  const theme = useTheme()
+  const store = useStores()
+  const [email, setEmail] = React.useState<string>('')
+  const [isEmailSent, setIsEmailSent] = React.useState<boolean>(false)
+  const [isProcessing, setIsProcessing] = React.useState<boolean>(false)
+  const [error, setError] = React.useState<string>('')
 
   const onPressSignup = async () => {
-    setError("");
-    setIsProcessing(true);
+    setError('')
+    setIsProcessing(true)
     try {
-      const res = await fetch("https://bsky.app/api/waitlist", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email }),
-      });
-      const resBody = await res.json();
+      const res = await fetch('https://bsky.app/api/waitlist', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({email}),
+      })
+      const resBody = await res.json()
       if (resBody.success) {
-        setIsEmailSent(true);
+        setIsEmailSent(true)
       } else {
         setError(
           resBody.error ||
-            "Something went wrong. Check your email and try again.",
-        );
+            'Something went wrong. Check your email and try again.',
+        )
       }
     } catch (e: any) {
-      setError(cleanError(e));
+      setError(cleanError(e))
     }
-    setIsProcessing(false);
-  };
+    setIsProcessing(false)
+  }
   const onCancel = () => {
-    store.shell.closeModal();
-  };
+    store.shell.closeModal()
+  }
 
   return (
     <View
-      style={[
-        styles.container,
-        { backgroundColor: pal.colors.backgroundLight },
-      ]}
-    >
+      style={[styles.container, {backgroundColor: pal.colors.backgroundLight}]}>
       <View style={[styles.innerContainer, pal.view]}>
         <Text type="title-xl" style={[styles.title, pal.text]}>
           Join the waitlist
@@ -110,14 +106,12 @@ export function Component({}: {}) {
             <TouchableOpacity
               onPress={onPressSignup}
               accessibilityRole="button"
-              accessibilityHint={`Confirms signing up ${email} to the waitlist`}
-            >
+              accessibilityHint={`Confirms signing up ${email} to the waitlist`}>
               <LinearGradient
                 colors={[gradients.blueLight.start, gradients.blueLight.end]}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 1 }}
-                style={[styles.btn]}
-              >
+                start={{x: 0, y: 0}}
+                end={{x: 1, y: 1}}
+                style={[styles.btn]}>
                 <Text type="button-lg" style={[s.white, s.bold]}>
                   Join Waitlist
                 </Text>
@@ -129,8 +123,7 @@ export function Component({}: {}) {
               accessibilityRole="button"
               accessibilityLabel="Cancel waitlist signup"
               accessibilityHint={`Exits signing up for waitlist with ${email}`}
-              onAccessibilityEscape={onCancel}
-            >
+              onAccessibilityEscape={onCancel}>
               <Text type="button-lg" style={pal.textLight}>
                 Cancel
               </Text>
@@ -139,7 +132,7 @@ export function Component({}: {}) {
         )}
       </View>
     </View>
-  );
+  )
 }
 
 const styles = StyleSheet.create({
@@ -150,12 +143,12 @@ const styles = StyleSheet.create({
     paddingBottom: 20,
   },
   title: {
-    textAlign: "center",
+    textAlign: 'center',
     marginTop: 12,
     marginBottom: 12,
   },
   description: {
-    textAlign: "center",
+    textAlign: 'center',
     paddingHorizontal: 22,
     marginBottom: 10,
   },
@@ -168,9 +161,9 @@ const styles = StyleSheet.create({
     marginHorizontal: 20,
   },
   btn: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
     borderRadius: 32,
     padding: 14,
     marginHorizontal: 20,
@@ -180,4 +173,4 @@ const styles = StyleSheet.create({
     marginHorizontal: 20,
     marginBottom: 20,
   },
-});
+})

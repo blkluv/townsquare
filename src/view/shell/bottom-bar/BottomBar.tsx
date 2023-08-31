@@ -11,8 +11,6 @@ import {
   HomeIconSolid,
   MagnifyingGlassIcon2,
   MagnifyingGlassIcon2Solid,
-  SatelliteDishIcon,
-  SatelliteDishIconSolid,
 } from 'lib/icons'
 import React, {ComponentProps} from 'react'
 import {TabState, getTabState} from 'lib/routes/helpers'
@@ -38,7 +36,7 @@ export const BottomBar = observer(({navigation}: BottomTabBarProps) => {
   const pal = usePalette('default')
   const safeAreaInsets = useSafeAreaInsets()
   const {track} = useAnalytics()
-  const {isAtHome, isAtSearch, isAtFeeds, isAtNotifications, isAtMyProfile} =
+  const {isAtHome, isAtSearch, isAtNotifications, isAtMyProfile} =
     useNavigationTabState()
 
   const {footerMinimalShellTransform} = useMinimalShellMode()
@@ -64,10 +62,7 @@ export const BottomBar = observer(({navigation}: BottomTabBarProps) => {
     () => onPressTab('Search'),
     [onPressTab],
   )
-  const onPressFeeds = React.useCallback(
-    () => onPressTab('Feeds'),
-    [onPressTab],
-  )
+
   const onPressNotifications = React.useCallback(
     () => onPressTab('Notifications'),
     [onPressTab],

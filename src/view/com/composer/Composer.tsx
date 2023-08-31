@@ -25,7 +25,6 @@ import {ExternalEmbed} from './ExternalEmbed'
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome'
 import {Gallery} from './photos/Gallery'
 import {GalleryModel} from 'state/models/media/gallery'
-import {LabelsBtn} from './labels/LabelsBtn'
 import LinearGradient from 'react-native-linear-gradient'
 import {MAX_GRAPHEME_LENGTH} from 'lib/constants'
 import {OpenCameraBtn} from './photos/OpenCameraBtn'
@@ -65,9 +64,9 @@ export const ComposePost = observer(function ComposePost({
   const {track} = useAnalytics()
   const pal = usePalette('default')
   const store = useStores()
-  const isThisSharing = store.shell.isSharing;
-  const sharingText = store.shell.sharingText;
-  const uri = store.shell.sharedUri;
+  const isThisSharing = store.shell.isSharing
+  const sharingText = store.shell.sharingText
+  const uri = store.shell.sharedUri
   const textInput = useRef<TextInputRef>(null)
   const [isKeyboardVisible] = useIsKeyboardVisible({iosUseWillEvents: true})
   const [isProcessing, setIsProcessing] = useState(false)
@@ -81,7 +80,9 @@ export const ComposePost = observer(function ComposePost({
             initMention.length + 1,
             `${initMention}`,
           ) // insert mention if passed in
-        : sharingText ? sharingText : '',
+        : sharingText
+        ? sharingText
+        : '',
     }),
   )
   const graphemeLength = useMemo(() => {
@@ -91,7 +92,7 @@ export const ComposePost = observer(function ComposePost({
     initQuote,
   )
   const {extLink, setExtLink} = useExternalLinkFetch({setQuote})
-  const [labels, setLabels] = useState<string[]>([])
+  const [labels, _setLabels] = useState<string[]>([])
   const [suggestedLinks, setSuggestedLinks] = useState<Set<string>>(new Set())
   const gallery = useMemo(() => new GalleryModel(store), [store])
 
@@ -138,9 +139,9 @@ export const ComposePost = observer(function ComposePost({
   useEffect(() => {
     autocompleteView.setup()
     if (isThisSharing && uri) {
-      gallery.paste(uri);
+      gallery.paste(uri)
     }
-  }, [autocompleteView, uri])
+  }, [autocompleteView, gallery, isThisSharing, uri])
 
   // listen to escape key on desktop web
   const onEscape = useCallback(
@@ -241,7 +242,6 @@ export const ComposePost = observer(function ComposePost({
   const selectTextInputPlaceholder = replyTo ? 'Write your reply' : `What's up?`
 
   const canSelectImages = useMemo(() => gallery.size < 4, [gallery.size])
-  const hasMedia = gallery.size > 0 || Boolean(extLink)
 
   return (
     <KeyboardAvoidingView

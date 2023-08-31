@@ -18,7 +18,7 @@ import {ContentHider} from '../util/moderation/ContentHider'
 import {AppBskyFeedPost as FeedPost} from '@atproto/api'
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome'
 import {Link} from '../util/Link'
-import { NavigationProp } from "lib/routes/types";
+import {NavigationProp} from 'lib/routes/types'
 import {PostAlerts} from '../util/moderation/PostAlerts'
 import {PostCtrls} from '../util/post-ctrls/PostCtrls'
 import {PostEmbeds} from '../util/post-embeds'
@@ -31,8 +31,8 @@ import {Text} from '../util/text/Text'
 import {UserInfoText} from '../util/UserInfoText'
 import {makeProfileLink} from 'lib/routes/links'
 import {observer} from 'mobx-react-lite'
-import { track } from "lib/analytics/analytics";
-import { useNavigation } from "@react-navigation/native";
+import {track} from 'lib/analytics/analytics'
+import {useNavigation} from '@react-navigation/native'
 import {usePalette} from 'lib/hooks/usePalette'
 import {useStores} from 'state/index'
 
@@ -129,7 +129,7 @@ const PostLoaded = observer(
   }) => {
     const pal = usePalette('default')
     const store = useStores()
-    const navigation = useNavigation<NavigationProp>();
+    const navigation = useNavigation<NavigationProp>()
 
     const itemUri = item.post.uri
     const itemCid = item.post.cid
@@ -152,49 +152,49 @@ const PostLoaded = observer(
 
     const onPressReply = React.useCallback(async () => {
       store.session.isSolarplexSession
-        ? navigation.navigate("SignIn")
+        ? navigation.navigate('SignIn')
         : store.shell.openComposer({
-        replyTo: {
-          uri: item.post.uri,
-          cid: item.post.cid,
-          text: record.text as string,
-          author: {
-            handle: item.post.author.handle,
-            displayName: item.post.author.displayName,
-            avatar: item.post.author.avatar,
-          },
-        },
-      })
+            replyTo: {
+              uri: item.post.uri,
+              cid: item.post.cid,
+              text: record.text as string,
+              author: {
+                handle: item.post.author.handle,
+                displayName: item.post.author.displayName,
+                avatar: item.post.author.avatar,
+              },
+            },
+          })
     }, [store, item, record, navigation])
 
     const onPressToggleRepost = React.useCallback(async () => {
       return store.session.isSolarplexSession
-      ? navigation.navigate("SignIn")
-      : item
-        .toggleRepost()
-        .catch(e => store.log.error('Failed to toggle repost', e))
+        ? navigation.navigate('SignIn')
+        : item
+            .toggleRepost()
+            .catch(e => store.log.error('Failed to toggle repost', e))
     }, [item, store, navigation])
 
     const onPressToggleLike = React.useCallback(async () => {
       return store.session.isSolarplexSession
-        ? navigation.navigate("SignIn")
+        ? navigation.navigate('SignIn')
         : item
-        .toggleLike()
-        .catch(e => store.log.error('Failed to toggle like', e))
+            .toggleLike()
+            .catch(e => store.log.error('Failed to toggle like', e))
     }, [item, store, navigation])
 
     const onPressReaction = React.useCallback(
       async (reactionId: string, remove?: boolean) => {
-        track("FeedItem:PostLike");
+        track('FeedItem:PostLike')
         // console.log("reactionId", reactionId);
         return store.session.isSolarplexSession
-          ? await navigation.navigate("SignIn")
+          ? await navigation.navigate('SignIn')
           : item
               .react(reactionId, remove)
-              .catch((e) => store.log.error("Failed to add reaction", e));
+              .catch(e => store.log.error('Failed to add reaction', e))
       },
-      [track, item, store, navigation],
-    );
+      [item, store, navigation],
+    )
 
     const onCopyPostText = React.useCallback(() => {
       Clipboard.setString(record.text)

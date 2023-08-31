@@ -13,7 +13,7 @@ import Clipboard from '@react-native-clipboard/clipboard'
 import {ContentHider} from '../util/moderation/ContentHider'
 import {ErrorMessage} from '../util/error/ErrorMessage'
 import {Link} from '../util/Link'
-import { NavigationProp } from "lib/routes/types";
+import {NavigationProp} from 'lib/routes/types'
 import {PostAlerts} from '../util/moderation/PostAlerts'
 import {PostCtrls} from '../util/post-ctrls/PostCtrls'
 import {PostDropdownBtn} from '../util/forms/PostDropdownBtn'
@@ -23,7 +23,7 @@ import {PostMeta} from '../util/PostMeta'
 import {PostSandboxWarning} from '../util/PostSandboxWarning'
 import {PostThreadItemModel} from 'state/models/content/post-thread-item'
 import {PreviewableUserAvatar} from '../util/UserAvatar'
-import { ReactionList } from "../reactions/ReactionList";
+import {ReactionList} from '../reactions/ReactionList'
 import {RichText} from '../util/text/RichText'
 import {Text} from '../util/text/Text'
 import {TimeElapsed} from 'view/com/util/TimeElapsed'
@@ -36,8 +36,8 @@ import {pluralize} from 'lib/strings/helpers'
 import {s} from 'lib/styles'
 import {sanitizeDisplayName} from 'lib/strings/display-names'
 import {sanitizeHandle} from 'lib/strings/handles'
-import { track } from "lib/analytics/analytics";
-import { useNavigation } from "@react-navigation/native";
+import {track} from 'lib/analytics/analytics'
+import {useNavigation} from '@react-navigation/native'
 import {usePalette} from 'lib/hooks/usePalette'
 import {useStores} from 'state/index'
 
@@ -52,10 +52,11 @@ export const PostThreadItem = observer(function PostThreadItem({
 }) {
   const pal = usePalette('default')
   const store = useStores()
-  const navigation = useNavigation<NavigationProp>();
+  const navigation = useNavigation<NavigationProp>()
   const [deleted, setDeleted] = React.useState(false)
   const record = item.postRecord
-  const hasEngagement = item.post.likeCount || item.post.repostCount || item.data.reactions?.length
+  const hasEngagement =
+    item.post.likeCount || item.post.repostCount || item.data.reactions?.length
 
   const itemUri = item.post.uri
   const itemCid = item.post.cid
@@ -87,50 +88,50 @@ export const PostThreadItem = observer(function PostThreadItem({
 
   const onPressReply = React.useCallback(async () => {
     store.session.isSolarplexSession
-      ? navigation.navigate("SignIn")
+      ? navigation.navigate('SignIn')
       : store.shell.openComposer({
-      replyTo: {
-        uri: item.post.uri,
-        cid: item.post.cid,
-        text: record?.text as string,
-        author: {
-          handle: item.post.author.handle,
-          displayName: item.post.author.displayName,
-          avatar: item.post.author.avatar,
-        },
-      },
-      onPost: onPostReply,
-    })
+          replyTo: {
+            uri: item.post.uri,
+            cid: item.post.cid,
+            text: record?.text as string,
+            author: {
+              handle: item.post.author.handle,
+              displayName: item.post.author.displayName,
+              avatar: item.post.author.avatar,
+            },
+          },
+          onPost: onPostReply,
+        })
   }, [store, item, record, onPostReply, navigation])
 
   const onPressToggleRepost = React.useCallback(async () => {
     return store.session.isSolarplexSession
-    ? navigation.navigate("SignIn")
-    : item
-      .toggleRepost()
-      .catch(e => store.log.error('Failed to toggle repost', e))
+      ? navigation.navigate('SignIn')
+      : item
+          .toggleRepost()
+          .catch(e => store.log.error('Failed to toggle repost', e))
   }, [item, store, navigation])
 
   const onPressToggleLike = React.useCallback(async () => {
     return store.session.isSolarplexSession
-    ? navigation.navigate("SignIn")
-    : item
-      .toggleLike()
-      .catch(e => store.log.error('Failed to toggle like', e))
+      ? navigation.navigate('SignIn')
+      : item
+          .toggleLike()
+          .catch(e => store.log.error('Failed to toggle like', e))
   }, [item, store, navigation])
 
   const onPressReaction = React.useCallback(
     async (reactionId: string, remove?: boolean) => {
-      track("FeedItem:PostLike");
+      track('FeedItem:PostLike')
       // console.log("reactionId", reactionId);
       return store.session.isSolarplexSession
-        ? await navigation.navigate("SignIn")
+        ? await navigation.navigate('SignIn')
         : item
             .react(reactionId, remove)
-            .catch((e) => store.log.error("Failed to add reaction", e));
+            .catch(e => store.log.error('Failed to add reaction', e))
     },
-    [track, item, store, navigation],
-  );
+    [item, store, navigation],
+  )
 
   const onCopyPostText = React.useCallback(() => {
     Clipboard.setString(record?.text || '')
@@ -320,103 +321,103 @@ export const PostThreadItem = observer(function PostThreadItem({
               needsTranslation={needsTranslation}
             />
             {hasEngagement ? (
-              <View style={[styles.expandedInfo, pal.border, {alignItems: 'center'}]}>
-              {item.data.reactions?.length ? (
-                <Link
-                  style={styles.expandedInfoItem}
-                  href={likesHref}
-                  title={likesTitle}
-                >
-                  <Text
-                    testID="likeCount"
-                    type="lg"
-                    style={[
-                      pal.textLight,
-                      {
-                        display: "flex",
-                        flexDirection: "row",
-                        alignItems: "center",
-                      },
-                    ]}
-                  >
-                    <ReactionList reactions={item.data.reactions}/>
+              <View
+                style={[
+                  styles.expandedInfo,
+                  pal.border,
+                  {alignItems: 'center'},
+                ]}>
+                {item.data.reactions?.length ? (
+                  <Link
+                    style={styles.expandedInfoItem}
+                    href={likesHref}
+                    title={likesTitle}>
                     <Text
-                      type="xl-bold"
-                      style={{ marginLeft: 4, marginRight: 4, ...pal.text }}
-                    >
-                      {formatCount(item.data.reactions.length)}
-                    </Text>{" "}
-                    {pluralize(item.data.reactions.length, "react")}
-                  </Text>
-                </Link>
-              ) : (
-                <></>
-              )}
-              {item.post.repostCount ? (
-                <Link
-                  style={styles.expandedInfoItem}
-                  href={repostsHref}
-                  title={repostsTitle}
-                >
-                  <Text testID="repostCount" type="lg" style={pal.textLight}>
-                    <Text type="xl-bold" style={pal.text}>
-                      {formatCount(item.post.repostCount)}
-                    </Text>{" "}
-                    {pluralize(item.post.repostCount, "repost")}
-                  </Text>
-                </Link>
-              ) : (
-                <></>
-              )}
-              {item.post.likeCount ? (
-                <Link
-                  style={styles.expandedInfoItem}
-                  href={likesHref}
-                  title={likesTitle}
-                >
-                  <Text testID="likeCount" type="lg" style={pal.textLight}>
-                    <Text type="xl-bold" style={pal.text}>
-                      {formatCount(item.post.likeCount)}
-                    </Text>{" "}
-                    {pluralize(item.post.likeCount, "like")}
-                  </Text>
-                </Link>
-              ) : (
-                <></>
-              )}
-            </View>
-          ) : (
-            <></>
-          )}
-          <View style={[s.pl10, s.pb5]}>
-            <PostCtrls
-              big
-              itemUri={itemUri}
-              itemCid={itemCid}
-              itemHref={itemHref}
-              itemTitle={itemTitle}
-              author={{
-                avatar: item.post.author.avatar!,
-                handle: item.post.author.handle,
-                displayName: item.post.author.displayName!,
-                did: item.post.author.did,
-              }}
-              text={item.richText?.text || record.text}
-              indexedAt={item.post.indexedAt}
-              isAuthor={item.post.author.did === store.me.did}
-              isReposted={!!item.post.viewer?.repost}
-              isLiked={!!item.post.viewer?.like}
-              isThreadMuted={item.isThreadMuted}
-              reactions={item.data.reactions}
-              viewerReaction={item.data.viewerReaction}
-              onPressReply={onPressReply}
-              onPressToggleRepost={onPressToggleRepost}
-              onPressToggleLike={onPressToggleLike}
-              onPressReaction={onPressReaction}
-              onCopyPostText={onCopyPostText}
-              onOpenTranslate={onOpenTranslate}
-              onToggleThreadMute={onToggleThreadMute}
-              onDeletePost={onDeletePost}
+                      testID="likeCount"
+                      type="lg"
+                      style={[
+                        pal.textLight,
+                        {
+                          display: 'flex',
+                          flexDirection: 'row',
+                          alignItems: 'center',
+                        },
+                      ]}>
+                      <ReactionList reactions={item.data.reactions} />
+                      <Text
+                        type="xl-bold"
+                        style={{marginLeft: 4, marginRight: 4, ...pal.text}}>
+                        {formatCount(item.data.reactions.length)}
+                      </Text>{' '}
+                      {pluralize(item.data.reactions.length, 'react')}
+                    </Text>
+                  </Link>
+                ) : (
+                  <></>
+                )}
+                {item.post.repostCount ? (
+                  <Link
+                    style={styles.expandedInfoItem}
+                    href={repostsHref}
+                    title={repostsTitle}>
+                    <Text testID="repostCount" type="lg" style={pal.textLight}>
+                      <Text type="xl-bold" style={pal.text}>
+                        {formatCount(item.post.repostCount)}
+                      </Text>{' '}
+                      {pluralize(item.post.repostCount, 'repost')}
+                    </Text>
+                  </Link>
+                ) : (
+                  <></>
+                )}
+                {item.post.likeCount ? (
+                  <Link
+                    style={styles.expandedInfoItem}
+                    href={likesHref}
+                    title={likesTitle}>
+                    <Text testID="likeCount" type="lg" style={pal.textLight}>
+                      <Text type="xl-bold" style={pal.text}>
+                        {formatCount(item.post.likeCount)}
+                      </Text>{' '}
+                      {pluralize(item.post.likeCount, 'like')}
+                    </Text>
+                  </Link>
+                ) : (
+                  <></>
+                )}
+              </View>
+            ) : (
+              <></>
+            )}
+            <View style={[s.pl10, s.pb5]}>
+              <PostCtrls
+                big
+                itemUri={itemUri}
+                itemCid={itemCid}
+                itemHref={itemHref}
+                itemTitle={itemTitle}
+                author={{
+                  avatar: item.post.author.avatar!,
+                  handle: item.post.author.handle,
+                  displayName: item.post.author.displayName!,
+                  did: item.post.author.did,
+                }}
+                text={item.richText?.text || record.text}
+                indexedAt={item.post.indexedAt}
+                isAuthor={item.post.author.did === store.me.did}
+                isReposted={!!item.post.viewer?.repost}
+                isLiked={!!item.post.viewer?.like}
+                isThreadMuted={item.isThreadMuted}
+                reactions={item.data.reactions}
+                viewerReaction={item.data.viewerReaction}
+                onPressReply={onPressReply}
+                onPressToggleRepost={onPressToggleRepost}
+                onPressToggleLike={onPressToggleLike}
+                onPressReaction={onPressReaction}
+                onCopyPostText={onCopyPostText}
+                onOpenTranslate={onOpenTranslate}
+                onToggleThreadMute={onToggleThreadMute}
+                onDeletePost={onDeletePost}
               />
             </View>
           </View>
@@ -546,10 +547,10 @@ export const PostThreadItem = observer(function PostThreadItem({
                 isReposted={!!item.post.viewer?.repost}
                 isLiked={!!item.post.viewer?.like}
                 isThreadMuted={item.isThreadMuted}
-reactions={item.data.reactions}
+                reactions={item.data.reactions}
                 viewerReaction={item.data.viewerReaction}
                 onPressReply={onPressReply}
-onPressReaction={onPressReaction}
+                onPressReaction={onPressReaction}
                 onPressToggleRepost={onPressToggleRepost}
                 onPressToggleLike={onPressToggleLike}
                 onCopyPostText={onCopyPostText}
@@ -689,7 +690,7 @@ const styles = StyleSheet.create({
   image: {
     // width: '100%',
     // height: '100%',
-    resizeMode: "contain",
+    resizeMode: 'contain',
     width: 25,
     height: 25,
     marginLeft: -15,

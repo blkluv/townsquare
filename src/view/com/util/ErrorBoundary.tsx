@@ -28,7 +28,7 @@ export class ErrorBoundary extends Component<Props, State> {
 
   public render() {
     if (this.state.hasError) {
-      console.trace(this.state.error);
+      console.trace(this.state.error)
       return (
         <CenteredView>
           <ErrorScreen

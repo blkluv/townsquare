@@ -1,26 +1,24 @@
-import { StyleSheet, TouchableOpacity, View } from "react-native";
+import {StyleSheet, TouchableOpacity, View} from 'react-native'
 
-import { DesktopSearch } from "./Search";
-import { FEEDBACK_FORM_URL } from "../../../lib/constants";
-import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
-import React from "react";
-import { RewardsCardSidebar } from "../../../view/com/rewards/RewardsCardSidebar";
-import { Text } from "../../../view/com/util/text/Text";
-import { TextLink } from "../../../view/com/util/Link";
-import { formatCount } from "../../../view/com/util/numeric/format";
-import { observer } from "mobx-react-lite";
-import { pluralize } from "../../../lib/strings/helpers";
-import { s } from "../../../lib/styles";
-import { useNavigationTabState } from "../../../lib/hooks/useNavigationTabState.web";
-import { usePalette } from "../../../lib/hooks/usePalette";
-import { useStores } from "../../../state/index";
+import {DesktopSearch} from './Search'
+import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome'
+import React from 'react'
+import {RewardsCardSidebar} from '../../../view/com/rewards/RewardsCardSidebar'
+import {Text} from '../../../view/com/util/text/Text'
+import {TextLink} from '../../../view/com/util/Link'
+import {formatCount} from '../../../view/com/util/numeric/format'
+import {observer} from 'mobx-react-lite'
+import {pluralize} from '../../../lib/strings/helpers'
+import {s} from '../../../lib/styles'
+import {useNavigationTabState} from '../../../lib/hooks/useNavigationTabState.web'
+import {usePalette} from '../../../lib/hooks/usePalette'
+import {useStores} from '../../../state/index'
 
 export const DesktopRightNav = observer(function DesktopRightNav() {
-  const store = useStores();
-  const pal = usePalette("default");
-  const palError = usePalette("error");
-  const { isAtRewards, isAtSignIn } = useNavigationTabState();
-  const did = store.session?.currentSession?.did ?? "";
+  const store = useStores()
+  const pal = usePalette('default')
+  const {isAtRewards, isAtSignIn} = useNavigationTabState()
+  const did = store.session?.currentSession?.did ?? ''
 
   return (
     <View style={[styles.rightNav, pal.view]}>
@@ -39,12 +37,14 @@ export const DesktopRightNav = observer(function DesktopRightNav() {
           </Text>
         )} */}
 
-        {(isAtRewards || isAtSignIn || !store.session.hasSession) ? null : <RewardsCardSidebar userId={did} />}
-        <View style={[s.flexRow, { paddingHorizontal: 6 }]}>
+        {isAtRewards || isAtSignIn || !store.session.hasSession ? null : (
+          <RewardsCardSidebar userId={did} />
+        )}
+        <View style={[s.flexRow, {paddingHorizontal: 6}]}>
           <TextLink
             type="md"
             style={pal.link}
-            href={"https://tally.so/r/nrD8l2"}
+            href={'https://tally.so/r/nrD8l2'}
             text="Feedback"
           />
           <Text type="md" style={pal.textLight}>
@@ -78,18 +78,18 @@ export const DesktopRightNav = observer(function DesktopRightNav() {
       </View>
       <InviteCodes />
     </View>
-  );
-});
+  )
+})
 
 const InviteCodes = observer(() => {
-  const store = useStores();
-  const pal = usePalette("default");
+  const store = useStores()
+  const pal = usePalette('default')
 
-  const { invitesAvailable } = store.me;
+  const {invitesAvailable} = store.me
 
   const onPress = React.useCallback(() => {
-    store.shell.openModal({ name: "invite-codes" });
-  }, [store]);
+    store.shell.openModal({name: 'invite-codes'})
+  }, [store])
   return (
     store.session.hasSession &&
     !store.session.isSolarplexSession && (
@@ -99,11 +99,10 @@ const InviteCodes = observer(() => {
         accessibilityRole="button"
         accessibilityLabel={
           invitesAvailable === 1
-            ? "Invite codes: 1 available"
+            ? 'Invite codes: 1 available'
             : `Invite codes: ${invitesAvailable} available`
         }
-        accessibilityHint="Opens list of invite codes"
-      >
+        accessibilityHint="Opens list of invite codes">
         <FontAwesomeIcon
           icon="ticket"
           style={[
@@ -114,27 +113,26 @@ const InviteCodes = observer(() => {
         />
         <Text
           type="md-medium"
-          style={store.me.invitesAvailable > 0 ? pal.link : pal.textLight}
-        >
-          {formatCount(store.me.invitesAvailable)} invite{" "}
-          {pluralize(store.me.invitesAvailable, "code")} available
+          style={store.me.invitesAvailable > 0 ? pal.link : pal.textLight}>
+          {formatCount(store.me.invitesAvailable)} invite{' '}
+          {pluralize(store.me.invitesAvailable, 'code')} available
         </Text>
       </TouchableOpacity>
     )
-  );
-});
+  )
+})
 
 const styles = StyleSheet.create({
   rightNav: {
-    position: "absolute",
+    position: 'absolute',
     top: 20,
-    left: "calc(50vw + 310px)",
+    left: 'calc(50vw + 310px)',
     width: 304,
   },
 
   message: {
-    flexDirection: "column",
-    alignItems: "center",
+    flexDirection: 'column',
+    alignItems: 'center',
     marginTop: 20,
     paddingHorizontal: 10,
   },
@@ -147,10 +145,10 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     paddingHorizontal: 16,
     paddingVertical: 12,
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   inviteCodesIcon: {
     marginRight: 6,
   },
-});
+})

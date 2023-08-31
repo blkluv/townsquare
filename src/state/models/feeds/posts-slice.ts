@@ -13,13 +13,19 @@ export class PostsFeedSliceModel {
   constructor(public rootStore: RootStoreModel, slice: FeedViewPostsSlice) {
     this._reactKey = slice._reactKey
     for (let i = 0; i < slice.items.length; i++) {
-      const reactions = this.rootStore.reactions.reactionMap[slice.items[i].post.uri] ? Object.values(this.rootStore.reactions.reactionMap[slice.items[i].post.uri]) : []
+      const reactions = this.rootStore.reactions.reactionMap[
+        slice.items[i].post.uri
+      ]
+        ? Object.values(
+            this.rootStore.reactions.reactionMap[slice.items[i].post.uri],
+          )
+        : []
       this.items.push(
         new PostsFeedItemModel(
           rootStore,
           `${this._reactKey} - ${i}`,
           slice.items[i],
-          reactions.length ? reactions : undefined
+          reactions.length ? reactions : undefined,
         ),
       )
     }

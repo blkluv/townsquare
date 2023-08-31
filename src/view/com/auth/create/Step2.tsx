@@ -1,36 +1,23 @@
-import {
-  Linking,
-  StyleSheet,
-  TouchableWithoutFeedback,
-  View,
-} from "react-native";
+import {Linking, StyleSheet, TouchableWithoutFeedback, View} from 'react-native'
 
-import { BLUESKY_INTENT_LINK } from "lib/constants";
-import { CreateAccountModel } from "state/models/ui/create-account";
-import { DateInput } from "view/com/util/forms/DateInput";
-import { ErrorMessage } from "view/com/util/error/ErrorMessage";
-import { Policies } from "./Policies";
-import React from "react";
-import { StepHeader } from "./StepHeader";
-import { Text } from "view/com/util/text/Text";
-import { TextInput } from "../util/TextInput";
-import { TextLink } from "view/com/util/Link";
-import { observer } from "mobx-react-lite";
-import { s } from "lib/styles";
-import { usePalette } from "lib/hooks/usePalette";
-import { useStores } from "state/index";
+import {BLUESKY_INTENT_LINK} from 'lib/constants'
+import {CreateAccountModel} from 'state/models/ui/create-account'
+import {DateInput} from 'view/com/util/forms/DateInput'
+import {ErrorMessage} from 'view/com/util/error/ErrorMessage'
+import React from 'react'
+import {StepHeader} from './StepHeader'
+import {Text} from 'view/com/util/text/Text'
+import {TextInput} from '../util/TextInput'
+import {observer} from 'mobx-react-lite'
+import {s} from 'lib/styles'
+import {usePalette} from 'lib/hooks/usePalette'
 
-export const Step2 = observer(({ model }: { model: CreateAccountModel }) => {
-  const pal = usePalette("default");
-  const store = useStores();
-
-  const onPressWaitlist = React.useCallback(() => {
-    store.shell.openModal({ name: "waitlist" });
-  }, [store]);
+export const Step2 = observer(({model}: {model: CreateAccountModel}) => {
+  const pal = usePalette('default')
 
   const onPressRequestInvite = React.useCallback(() => {
-    Linking.openURL(BLUESKY_INTENT_LINK);
-  }, []);
+    Linking.openURL(BLUESKY_INTENT_LINK)
+  }, [])
 
   return (
     <View>
@@ -54,15 +41,14 @@ export const Step2 = observer(({ model }: { model: CreateAccountModel }) => {
       </View>
 
       <Text style={[s.alignBaseline, s.pb20, pal.text]}>
-        Don't have an invite code?{" "}
+        Don't have an invite code?{' '}
         <TouchableWithoutFeedback
           onPress={onPressRequestInvite}
           accessibilityRole="button"
           accessibilityLabel="Waitlist"
-          accessibilityHint="Opens Solarplex Live waitlist form"
-        >
+          accessibilityHint="Opens Solarplex Live waitlist form">
           <Text style={pal.link}>Request an invite</Text>
-        </TouchableWithoutFeedback>{" "}
+        </TouchableWithoutFeedback>{' '}
         to try the beta before it's publicly available.
       </Text>
       <View style={s.pb20}>
@@ -120,8 +106,8 @@ export const Step2 = observer(({ model }: { model: CreateAccountModel }) => {
         <ErrorMessage message={model.error} style={styles.error} />
       ) : undefined}
     </View>
-  );
-});
+  )
+})
 
 const styles = StyleSheet.create({
   error: {
@@ -134,4 +120,4 @@ const styles = StyleSheet.create({
     borderRadius: 6,
     paddingVertical: 14,
   },
-});
+})

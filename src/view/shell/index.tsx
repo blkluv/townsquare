@@ -54,10 +54,7 @@ const ShellInner = observer(() => {
             onOpen={onOpenDrawer}
             onClose={onCloseDrawer}
             swipeEdgeWidth={winDim.width / 2}
-            swipeEnabled={
-              !canGoBack &&
-              !store.shell.isDrawerSwipeDisabled
-            }>
+            swipeEnabled={!canGoBack && !store.shell.isDrawerSwipeDisabled}>
             <TabsNavigator />
           </Drawer>
         </ErrorBoundary>

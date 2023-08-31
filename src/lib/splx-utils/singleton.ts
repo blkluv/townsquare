@@ -1,22 +1,22 @@
-import { Json } from './json';
-import { getGlobal } from './global';
+import {Json} from './json'
+import {getGlobal} from './global'
 
-const registryKey = `@dispatch-services/singletonRegistry`;
+const registryKey = `@dispatch-services/singletonRegistry`
 
 function getRegistry(): Json {
   if (!getGlobal()[registryKey]) {
     Object.defineProperty(getGlobal(), registryKey, {
       configurable: true,
       value: {},
-    });
+    })
   }
-  return getGlobal()[registryKey];
+  return getGlobal()[registryKey]
 }
 
 export function register<T>(fn: () => T, key: string): ReturnType<typeof fn> {
-  const registry = getRegistry();
+  const registry = getRegistry()
   if (!registry[key]) {
-    registry[key] = fn();
+    registry[key] = fn()
   }
-  return registry[key];
+  return registry[key]
 }

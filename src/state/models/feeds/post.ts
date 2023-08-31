@@ -7,7 +7,7 @@ import {
 } from '@atproto/api'
 
 import {RootStoreModel} from '../root-store'
-import { SOLARPLEX_FEED_API } from "lib/constants";
+import {SOLARPLEX_FEED_API} from 'lib/constants'
 import {hackAddDeletedEmbed} from 'lib/api/hack-add-deleted-embed'
 import {makeAutoObservable} from 'mobx'
 import {track} from 'lib/analytics/analytics'
@@ -112,31 +112,31 @@ export class PostsFeedItemModel {
       ? !!this.rootStore.reactions.reactionMap[this.post.uri][
           this.rootStore.me.did
         ]
-      : false;
+      : false
   }
 
   get viewerReaction(): string | undefined {
     return (
       this.rootStore.reactions.reactionMap[this.post.uri] &&
       this.rootStore.reactions.reactionMap[this.post.uri][this.rootStore.me.did]
-    );
+    )
   }
 
   async react(reactionId: string, remove: boolean = false) {
-    this.post.viewer = this.post.viewer || {};
+    this.post.viewer = this.post.viewer || {}
     try {
       await updateDataOptimistically(
         this.post,
         () => {
           if (remove) {
-            this.reactions?.splice(this.reactions?.indexOf(reactionId), 1);
+            this.reactions?.splice(this.reactions?.indexOf(reactionId), 1)
             delete this.rootStore.reactions.reactionMap[this.post.uri][
               this.rootStore.me.did
-            ];
+            ]
           } else {
             this.reactions
               ? this.reactions.push(reactionId)
-              : (this.reactions = [reactionId]);
+              : (this.reactions = [reactionId])
           }
         },
         async () =>
@@ -145,10 +145,10 @@ export class PostsFeedItemModel {
               ? `${SOLARPLEX_FEED_API}/splx/delete_reaction_from_post`
               : `${SOLARPLEX_FEED_API}/splx/add_reaction_to_post`,
             {
-              method: "POST",
+              method: 'POST',
               headers: {
-                "content-type": "application/json",
-                "Access-Control-Allow-Origin": "no-cors",
+                'content-type': 'application/json',
+                'Access-Control-Allow-Origin': 'no-cors',
               },
               body: JSON.stringify({
                 post_id: this.uri,
@@ -157,32 +157,28 @@ export class PostsFeedItemModel {
               }),
             },
           ),
-        (res) => {
-          this.post.viewer = this.post.viewer || {};
-          // this.data.viewer.react = res.uri
-        },
-      );
+      )
     } catch (error) {
-      this.rootStore.log.error("Failed to toggle reaction", error);
+      this.rootStore.log.error('Failed to toggle reaction', error)
     } finally {
-      track("Post:Reaction");
+      track('Post:Reaction')
     }
   }
 
   async removeReaction(reactionId: string) {
-    this.post.viewer = this.post.viewer || {};
+    this.post.viewer = this.post.viewer || {}
     try {
       await updateDataOptimistically(
         this.post,
         () => {
-          this.reactions?.push(reactionId);
+          this.reactions?.push(reactionId)
         },
         async () =>
           await fetch(`${SOLARPLEX_FEED_API}/splx/add_reaction_to_post`, {
-            method: "POST",
+            method: 'POST',
             headers: {
-              "content-type": "application/json",
-              "Access-Control-Allow-Origin": "no-cors",
+              'content-type': 'application/json',
+              'Access-Control-Allow-Origin': 'no-cors',
             },
             body: JSON.stringify({
               post_id: this.uri,
@@ -190,15 +186,11 @@ export class PostsFeedItemModel {
               user_id: this.rootStore.me.did,
             }),
           }),
-        (res) => {
-          this.post.viewer = this.post.viewer || {};
-          // this.data.viewer.react = res.uri
-        },
-      );
+      )
     } catch (error) {
-      this.rootStore.log.error("Failed to toggle reaction", error);
+      this.rootStore.log.error('Failed to toggle reaction', error)
     } finally {
-      track("Post:Reaction");
+      track('Post:Reaction')
     }
   }
 

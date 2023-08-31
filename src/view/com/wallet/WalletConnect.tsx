@@ -1,54 +1,51 @@
-import * as Toast from "../util/Toast";
-import * as fa from "@fortawesome/free-solid-svg-icons";
+import * as Toast from '../util/Toast'
+import * as fa from '@fortawesome/free-solid-svg-icons'
 
 import {
   FontAwesomeIcon,
   FontAwesomeIconStyle,
-} from "@fortawesome/react-native-fontawesome";
-import { StyleSheet, TouchableOpacity, View } from "react-native";
-import { colors, s } from "lib/styles";
+} from '@fortawesome/react-native-fontawesome'
+import {StyleSheet, TouchableOpacity, View} from 'react-native'
+import {colors, s} from 'lib/styles'
 
-import { Link } from "../util/Link";
-import { Loading } from "../auth/withAuthRequired";
-import { Text } from "../util/text/Text";
-import { observer } from "mobx-react-lite";
-import { usePalette } from "lib/hooks/usePalette";
-import { useSplxWallet } from "./useSplxWallet";
-import { useStores } from "state/index";
-import { useWallet } from "@solana/wallet-adapter-react";
+import {Link} from '../util/Link'
+import {Loading} from '../auth/withAuthRequired'
+import React from 'react'
+import {Text} from '../util/text/Text'
+import {observer} from 'mobx-react-lite'
+import {usePalette} from 'lib/hooks/usePalette'
+import {useSplxWallet} from './useSplxWallet'
+import {useStores} from 'state/index'
 
 export const WalletConnect = observer(function WalletConnect() {
-  const store = useStores();
+  const store = useStores()
   const [
-    visible,
+    _visible,
     setVisible,
     linkedWallet,
     connectedWallet,
     connectWalletIsBusy,
     disconnectWalletIsBusy,
     disconnectWallet,
-  ] = useSplxWallet();
-  const pal = usePalette("default");
-  const wallet = useWallet();
+  ] = useSplxWallet()
+  const pal = usePalette('default')
 
   async function handleConnectWallet() {
     if (connectedWallet) {
-      await store.wallet.linkWallet(connectedWallet);
+      await store.wallet.linkWallet(connectedWallet)
     } else {
-      setVisible(true);
+      setVisible(true)
     }
   }
 
   const handleLinkWallet = async () => {
     if (connectedWallet) {
-      await store.wallet.linkWallet(connectedWallet);
-      Toast.show("Wallet Connected");
+      await store.wallet.linkWallet(connectedWallet)
+      Toast.show('Wallet Connected')
     } else {
-      Toast.show("No Wallet Connection Found");
+      Toast.show('No Wallet Connection Found')
     }
-  };
-
-  
+  }
 
   return (
     <>
@@ -61,8 +58,7 @@ export const WalletConnect = observer(function WalletConnect() {
                   <Link
                     href={`/profile/${store.me.handle}`}
                     title="Your profile"
-                    noFeedback
-                  >
+                    noFeedback>
                     <View style={[pal.view, styles.linkCard]}>
                       <View style={styles.avi}>
                         <View style={[styles.iconContainer, pal.btn]}>
@@ -90,10 +86,9 @@ export const WalletConnect = observer(function WalletConnect() {
                         accessibilityRole="button"
                         accessibilityLabel="Link Wallet"
                         disabled={connectWalletIsBusy}
-                        accessibilityHint={`Signs ${store.me.displayName} out of Solarplex`}
-                      >
+                        accessibilityHint={`Signs ${store.me.displayName} out of Solarplex`}>
                         <Text type="lg" style={pal.link}>
-                          {connectWalletIsBusy ? "Linking..." : "Link Wallet"}
+                          {connectWalletIsBusy ? 'Linking...' : 'Link Wallet'}
                         </Text>
                       </TouchableOpacity>
                     </View>
@@ -109,19 +104,16 @@ export const WalletConnect = observer(function WalletConnect() {
                 accessibilityRole="button"
                 accessibilityLabel="Connect  Wallet"
                 accessibilityHint="Wallet Connect Button"
-                disabled={connectWalletIsBusy}
-              >
+                disabled={connectWalletIsBusy}>
                 <View style={[styles.iconContainer, pal.btn]}>
                   <FontAwesomeIcon
                     size={20}
                     icon={fa.faWallet}
-                    style={
-                      { ...pal.text, marginLeft: 4 } as FontAwesomeIconStyle
-                    }
+                    style={{...pal.text, marginLeft: 4} as FontAwesomeIconStyle}
                   />
                 </View>
                 <Text type="lg" style={pal.text}>
-                  {connectWalletIsBusy ? "Connecting..." : "Connect Wallet"}
+                  {connectWalletIsBusy ? 'Connecting...' : 'Connect Wallet'}
                 </Text>
               </TouchableOpacity>
             )
@@ -131,8 +123,7 @@ export const WalletConnect = observer(function WalletConnect() {
                 <Link
                   href={`/profile/${store.me.handle}`}
                   title="Your profile"
-                  noFeedback
-                >
+                  noFeedback>
                   <View style={[pal.view, styles.linkCard]}>
                     <View style={styles.avi}>
                       <View style={[styles.iconContainer, pal.btn]}>
@@ -160,12 +151,11 @@ export const WalletConnect = observer(function WalletConnect() {
                       accessibilityRole="button"
                       accessibilityLabel="Disconnect Wallet"
                       accessibilityHint={`Disconnects ${store.me.displayName} out of Solarplex`}
-                      disabled={disconnectWalletIsBusy}
-                    >
+                      disabled={disconnectWalletIsBusy}>
                       <Text type="lg" style={pal.link}>
                         {disconnectWalletIsBusy
-                          ? "Disconnecting..."
-                          : "Disconnect Wallet"}
+                          ? 'Disconnecting...'
+                          : 'Disconnect Wallet'}
                       </Text>
                     </TouchableOpacity>
                   </View>
@@ -179,23 +169,23 @@ export const WalletConnect = observer(function WalletConnect() {
         <Loading />
       )}
     </>
-  );
-});
+  )
+})
 
 const styles = StyleSheet.create({
   avi: {
     marginRight: 12,
   },
   linkCard: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
     paddingVertical: 12,
     paddingHorizontal: 18,
     marginBottom: 1,
   },
   iconContainer: {
-    alignItems: "center",
-    justifyContent: "center",
+    alignItems: 'center',
+    justifyContent: 'center',
     width: 40,
     height: 40,
     borderRadius: 30,
@@ -212,10 +202,10 @@ const styles = StyleSheet.create({
     height: 20,
   },
   connectBtn: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    width: "100%",
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: '100%',
     borderRadius: 24,
     paddingVertical: 8,
     paddingHorizontal: 18,
@@ -224,4 +214,4 @@ const styles = StyleSheet.create({
     marginTop: 4,
     marginBottom: 4,
   },
-});
+})

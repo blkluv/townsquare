@@ -1,81 +1,53 @@
-import { CommonNavigatorParams, MissionsTabNavigatorParams } from "lib/routes/types";
-import { FlatList, Image, StyleSheet, View } from "react-native";
-import { colors, s } from "lib/styles";
-import { isDesktopWeb, isMobileWeb } from "platform/detection";
+import {FlatList, Image, StyleSheet, View} from 'react-native'
+import {colors, s} from 'lib/styles'
+import {isDesktopWeb, isMobileWeb} from 'platform/detection'
 
-import { CenteredView } from "view/com/util/Views.web";
-import { ClaimBtn } from "view/com/rewards/ClaimBtn";
-import { ErrorMessage } from "view/com/util/error/ErrorMessage";
-import { GENESIS_REACTIONS } from "lib/constants";
-import { HelpTip } from "view/com/auth/util/HelpTip";
-import { Link } from "view/com/util/Link";
-import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { RadioButton } from "view/com/util/forms/RadioButton";
-import React from "react";
-import { ScrollView } from "../com/util/Views";
-import { Text } from "view/com/util/text/Text";
-import { ToggleButton } from "view/com/util/forms/ToggleButton";
-import { TouchableOpacity } from "react-native-gesture-handler";
-import { UserAvatar } from "view/com/util/UserAvatar";
-import { ViewHeader } from "view/com/util/ViewHeader";
-import { observer } from "mobx-react-lite";
-import { useColorSchemeStyle } from "lib/hooks/useColorSchemeStyle";
-import { usePalette } from "lib/hooks/usePalette";
-import { useStores } from "state/index";
-import { withAuthRequired } from "view/com/auth/withAuthRequired";
-
-const InfoText = ({ text }: { text: string }) => {
-  const pal = usePalette("error");
-  return (
-    <View style={[pal.view, styles.outer]}>
-      <View>
-        <Image
-          style={{ width: 24, height: 24, marginRight: 8 }}
-          source={require("../../../assets/trophy.png")}
-        />
-      </View>
-      <Text
-        type="sm-medium"
-        style={[{ flex: 1, paddingRight: 10 }, pal.text, { color: "black" }]}
-        numberOfLines={2}
-      >
-        {text}
-      </Text>
-    </View>
-  );
-};
+import {CenteredView} from 'view/com/util/Views.web'
+import {Link} from 'view/com/util/Link'
+import {MissionsTabNavigatorParams} from 'lib/routes/types'
+import {NativeStackScreenProps} from '@react-navigation/native-stack'
+import React from 'react'
+import {ScrollView} from '../com/util/Views'
+import {Text} from 'view/com/util/text/Text'
+import {ToggleButton} from 'view/com/util/forms/ToggleButton'
+import {UserAvatar} from 'view/com/util/UserAvatar'
+import {ViewHeader} from 'view/com/util/ViewHeader'
+import {observer} from 'mobx-react-lite'
+import {usePalette} from 'lib/hooks/usePalette'
+import {useStores} from 'state/index'
+import {withAuthRequired} from 'view/com/auth/withAuthRequired'
 
 function getReactionPackTitle(reactionPack: string): string {
-  if (reactionPack == "gaming") {
-    return `Rubian Reactions by Zen Republic`;
+  if (reactionPack == 'gaming') {
+    return `Rubian Reactions by Zen Republic`
   } else {
     return `Solarplex ${
       reactionPack.charAt(0).toUpperCase() + reactionPack.slice(1)
-    } Reactions`;
+    } Reactions`
   }
 }
 
 function getReactionPackStyle(reactionPack: string) {
-  if (reactionPack == "default") {
+  if (reactionPack == 'default') {
     return {
       width: isMobileWeb ? 40 : 50,
       height: isMobileWeb ? 40 : 50,
-    };
-  } else if (reactionPack == "gaming") {
+    }
+  } else if (reactionPack == 'gaming') {
     return {
       width: isMobileWeb ? 60 : 60,
       height: isMobileWeb ? 60 : 60,
-    };
-  } else if (reactionPack == "squid") {
+    }
+  } else if (reactionPack == 'squid') {
     return {
       width: isMobileWeb ? 100 : 100,
       height: isMobileWeb ? 100 : 100,
-    };
+    }
   } else {
     return {
       width: isMobileWeb ? 75 : 70,
       height: isMobileWeb ? 75 : 70,
-    };
+    }
   }
 }
 
@@ -83,47 +55,49 @@ export const GrayedImage = ({
   image,
   reactionpack,
 }: {
-  image: any;
-  reactionpack: string;
+  image: any
+  reactionpack: string
 }) => {
   return (
     <View>
       <Image
+        accessibilityIgnoresInvertColors={true}
         source={{
           uri: image,
         }}
         style={{
-          tintColor: "gray",
+          tintColor: 'gray',
           ...getReactionPackStyle(reactionpack),
         }}
       />
       <Image
+        accessibilityIgnoresInvertColors={true}
         source={{
           uri: image,
         }}
         style={{
-          position: "absolute",
+          position: 'absolute',
           opacity: 0.17,
           ...getReactionPackStyle(reactionpack),
         }}
       />
     </View>
-  );
-};
+  )
+}
 
 const DisplayReactions = observer(function DisplayReactions() {
-  const pal = usePalette("default");
-  const store = useStores();
+  const pal = usePalette('default')
+  const store = useStores()
 
   const onPressReactionPack = (reactionPack: string) => {
     if (reactionPack === store.reactions.curReactionsSet) {
-      store.reactions.selectReactionSet("default");
-      return;
+      store.reactions.selectReactionSet('default')
+      return
     }
     store.reactions.earnedReactions[reactionPack]?.length
       ? store.reactions.selectReactionSet(reactionPack)
-      : {};
-  };
+      : {}
+  }
 
   return (
     <View>
@@ -131,8 +105,8 @@ const DisplayReactions = observer(function DisplayReactions() {
         <InfoText text="Reaction packs are on chain collectibles that allow you to uniquely express yourself on Solarplex posts. Engage with/create posts to win points and unlock packs!" />
       </View> */}
       {Object.keys(store.reactions.reactionSets)
-        .sort((a, b) => (a === "gaming" ? -1 : b === "gaming" ? 1 : 0))
-        .map((reactionPack) => (
+        .sort((a, b) => (a === 'gaming' ? -1 : b === 'gaming' ? 1 : 0))
+        .map(reactionPack => (
           <View
             key={reactionPack}
             style={[
@@ -140,28 +114,26 @@ const DisplayReactions = observer(function DisplayReactions() {
               !store.reactions.earnedReactions[reactionPack]?.length && {
                 opacity: 0.2,
               },
-            ]}
-          >
+            ]}>
             <View style={styles.HeaderRow}>
               <View style={styles.horizontalContainer}>
                 <UserAvatar
                   size={25}
                   avatar={
-                    reactionPack === "gaming"
-                      ? "https://live.solarplex.xyz/image/agIRkUaOAo7UKR83WhTqnSYMBUGILjWmXEKhlw0lhrc/rs:fill:1000:1000:1:0/plain/bafkreihko7w6unxciovmrzsou2naohht5zb7jst2op4hqaoi573m6bzh3m@jpeg"
-                      : "https://i.ibb.co/NLkvySY/blob.png"
+                    reactionPack === 'gaming'
+                      ? 'https://live.solarplex.xyz/image/agIRkUaOAo7UKR83WhTqnSYMBUGILjWmXEKhlw0lhrc/rs:fill:1000:1000:1:0/plain/bafkreihko7w6unxciovmrzsou2naohht5zb7jst2op4hqaoi573m6bzh3m@jpeg'
+                      : 'https://i.ibb.co/NLkvySY/blob.png'
                   }
                 />
 
                 <View
                   style={
                     isMobileWeb ? styles.verticalView : styles.horizontalView
-                  }
-                >
+                  }>
                   <Text type="lg-heavy" style={[pal.text, styles.textPadding]}>
-                    {reactionPack === "gaming" ? (
+                    {reactionPack === 'gaming' ? (
                       <Link href="/profile/zenrepublic.live.solarplex.xyz">
-                        {" "}
+                        {' '}
                         {getReactionPackTitle(reactionPack)}
                       </Link>
                     ) : (
@@ -170,14 +142,13 @@ const DisplayReactions = observer(function DisplayReactions() {
                   </Text>
                   <Text
                     type="sm-heavy"
-                    style={[pal.text, styles.textPadding, styles.reaction]}
-                  >
+                    style={[pal.text, styles.textPadding, styles.reaction]}>
                     {Math.min(
                       store.reactions.earnedReactions[reactionPack]?.length ??
                         0,
                       11,
                     )}
-                    /{store.reactions.reactionSets[reactionPack]?.length}{" "}
+                    /{store.reactions.reactionSets[reactionPack]?.length}{' '}
                     Reactions
                   </Text>
                 </View>
@@ -195,10 +166,10 @@ const DisplayReactions = observer(function DisplayReactions() {
                 data={store.reactions.reactionSets[reactionPack]}
                 numColumns={isMobileWeb ? 4 : 4}
                 key={4}
-                renderItem={({ item }) => {
+                renderItem={({item}) => {
                   if (
                     store.reactions.earnedReactions[reactionPack]?.find(
-                      (reaction) => reaction.reaction_id === item.reaction_id,
+                      reaction => reaction.reaction_id === item.reaction_id,
                     )
                   ) {
                     return (
@@ -206,38 +177,37 @@ const DisplayReactions = observer(function DisplayReactions() {
                         style={{
                           width: 100,
                           height: 100,
-                          flexDirection: "row",
-                          alignItems: "center",
-                          justifyContent: "center",
+                          flexDirection: 'row',
+                          alignItems: 'center',
+                          justifyContent: 'center',
                           paddingHorizontal: isMobileWeb ? 8 : 12,
-                        }}
-                      >
+                        }}>
                         <Image
+                          accessibilityIgnoresInvertColors={true}
                           source={{
                             uri: item.nft_metadata.image,
                           }}
                           style={getReactionPackStyle(reactionPack)}
                         />
                       </View>
-                    );
+                    )
                   } else {
                     return (
                       <View
                         style={{
                           width: 100,
                           height: 100,
-                          flexDirection: "row",
-                          alignItems: "center",
-                          justifyContent: "center",
+                          flexDirection: 'row',
+                          alignItems: 'center',
+                          justifyContent: 'center',
                           paddingHorizontal: isMobileWeb ? 8 : 12,
-                        }}
-                      >
+                        }}>
                         <GrayedImage
                           reactionpack={reactionPack}
                           image={item.nft_metadata.image}
                         />
                       </View>
-                    );
+                    )
                   }
                 }}
               />
@@ -246,37 +216,35 @@ const DisplayReactions = observer(function DisplayReactions() {
         ))}
       <View style={styles.spacer20} />
     </View>
-  );
-});
+  )
+})
 
-type Props = NativeStackScreenProps<MissionsTabNavigatorParams, "Missions">;
+type Props = NativeStackScreenProps<MissionsTabNavigatorParams, 'Missions'>
 export const MissionsTab = withAuthRequired(
-  observer(function Missions(props: Partial<Props>) {
-    const pal = usePalette("default");
-    const store = useStores();
+  observer(function Missions(_props: Partial<Props>) {
+    const pal = usePalette('default')
 
     return (
       <View testID="communitiesScreen" style={s.hContentRegion}>
         <ScrollView
           style={[s.hContentRegion]}
           contentContainerStyle={!isDesktopWeb && pal.viewLight}
-          scrollIndicatorInsets={{ right: 1 }}
-        >
+          scrollIndicatorInsets={{right: 1}}>
           <ViewHeader title="Reactions" canGoBack={false} />
           <CenteredView style={styles.container}>
             <DisplayReactions />
           </CenteredView>
         </ScrollView>
       </View>
-    );
+    )
   }),
-);
+)
 
 const styles = StyleSheet.create({
   outer: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "#FEDC9B",
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FEDC9B',
     paddingVertical: 8,
     paddingHorizontal: 8,
   },
@@ -284,16 +252,16 @@ const styles = StyleSheet.create({
     backgroundColor: colors.gray1,
   },
   horizontalView: {
-    flexDirection: "row",
-    alignItems: "flex-start",
-    justifyContent: "center",
-    flexWrap: "wrap",
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    justifyContent: 'center',
+    flexWrap: 'wrap',
   },
   verticalView: {
-    flexDirection: "column",
-    alignItems: "flex-start",
-    justifyContent: "center",
-    flexWrap: "wrap",
+    flexDirection: 'column',
+    alignItems: 'flex-start',
+    justifyContent: 'center',
+    flexWrap: 'wrap',
   },
   container: {
     // backgroundColor: colors.gray1,
@@ -309,9 +277,9 @@ const styles = StyleSheet.create({
     borderRadius: 12,
   },
   DiceRowCol: {
-    flexDirection: "column",
-    alignItems: "center",
-    justifyContent: "center",
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
     borderColor: colors.gray1,
     borderWidth: 1,
     borderRadius: 6,
@@ -324,31 +292,31 @@ const styles = StyleSheet.create({
   ImgView: {
     width: 150,
     height: 150,
-    flexDirection: "column",
-    alignItems: "center",
-    justifyContent: "center",
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   HeaderRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
     paddingHorizontal: 12,
     paddingVertical: 8,
-    flexWrap: "wrap",
+    flexWrap: 'wrap',
   },
   horizontalContainer: {
-    flexDirection: "row",
+    flexDirection: 'row',
     // alignItems: "center",
-    justifyContent: "space-between",
+    justifyContent: 'space-between',
   },
   HeaderItemVStack: {
-    flexDirection: "column",
-    alignItems: "center",
+    flexDirection: 'column',
+    alignItems: 'center',
   },
   textPadding: {
     paddingHorizontal: 4,
     paddingVertical: 2,
-    flexWrap: "wrap",
+    flexWrap: 'wrap',
   },
   reactionImage: {
     width: 100,
@@ -362,10 +330,10 @@ const styles = StyleSheet.create({
     height: 100,
   },
   reactionList: {
-    width: "full",
-    flexDirection: "column",
-    alignItems: "center",
-    justifyContent: "center",
+    width: 'full',
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
     paddingBottom: 10,
     paddingHorizontal: 12,
   },
@@ -378,4 +346,4 @@ const styles = StyleSheet.create({
   spacer20: {
     height: 20,
   },
-});
+})

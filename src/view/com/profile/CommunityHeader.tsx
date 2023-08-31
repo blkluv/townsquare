@@ -1,56 +1,49 @@
-import * as Toast from "../util/Toast";
+import * as Toast from '../util/Toast'
 
-import { DropdownButton, DropdownItem } from "../util/forms/DropdownButton";
+import {DropdownButton, DropdownItem} from '../util/forms/DropdownButton'
 import {
   FontAwesomeIcon,
   FontAwesomeIconStyle,
-} from "@fortawesome/react-native-fontawesome";
-import { Link, TextLink } from "../util/Link";
+} from '@fortawesome/react-native-fontawesome'
 import {
   StyleSheet,
   TouchableOpacity,
   TouchableWithoutFeedback,
   View,
-} from "react-native";
-import { colors, gradients, s } from "lib/styles";
-import { isDesktopWeb, isNative } from "platform/detection";
+} from 'react-native'
+import {gradients, s} from 'lib/styles'
+import {isDesktopWeb, isNative} from 'platform/detection'
 
-import { BlurView } from "../util/BlurView";
-import { CommunityFeedModel } from "state/models/feeds/community-feed";
-import { FollowState } from "state/models/cache/my-follows";
-import { LoadingPlaceholder } from "../util/LoadingPlaceholder";
-import { NavigationProp } from "lib/routes/types";
-import { ProfileImageLightbox } from "state/models/ui/shell";
-import { ProfileModel } from "state/models/content/profile";
-import React from "react";
-import { RichText } from "../util/text/RichText";
-import { SOLARPLEX_USER_DID } from "lib/constants";
-import { Text } from "../util/text/Text";
-import { UserAvatar } from "../util/UserAvatar";
-import { UserBanner } from "../util/UserBanner";
-import { formatCount } from "../util/numeric/format";
-import { listUriToHref } from "lib/strings/url-helpers";
-import { observer } from "mobx-react-lite";
-import { pluralize } from "lib/strings/helpers";
-import { sanitizeDisplayName } from "lib/strings/display-names";
-import { shareUrl } from "lib/sharing";
-import { toShareUrl } from "lib/strings/url-helpers";
-import { useAnalytics } from "lib/analytics/analytics";
-import { useNavigation } from "@react-navigation/native";
-import { usePalette } from "lib/hooks/usePalette";
-import { useStores } from "state/index";
+import {BlurView} from '../util/BlurView'
+import {CommunityFeedModel} from 'state/models/feeds/community-feed'
+import {Link} from '../util/Link'
+import {LoadingPlaceholder} from '../util/LoadingPlaceholder'
+import {NavigationProp} from 'lib/routes/types'
+import React from 'react'
+import {SOLARPLEX_USER_DID} from 'lib/constants'
+import {Text} from '../util/text/Text'
+import {UserAvatar} from '../util/UserAvatar'
+import {UserBanner} from '../util/UserBanner'
+import {observer} from 'mobx-react-lite'
+import {sanitizeDisplayName} from 'lib/strings/display-names'
+import {shareUrl} from 'lib/sharing'
+import {toShareUrl} from 'lib/strings/url-helpers'
+import {useAnalytics} from 'lib/analytics/analytics'
+import {useNavigation} from '@react-navigation/native'
+import {usePalette} from 'lib/hooks/usePalette'
+import {useStores} from 'state/index'
 
-const BACK_HITSLOP = { left: 30, top: 30, right: 30, bottom: 30 };
+const BACK_HITSLOP = {left: 30, top: 30, right: 30, bottom: 30}
 
 interface Props {
-  view: CommunityFeedModel;
-  onRefreshAll: () => void;
-  hideBackButton?: boolean;
+  view: CommunityFeedModel
+  onRefreshAll: () => void
+  hideBackButton?: boolean
 }
 
 export const CommunityHeader = observer(
-  ({ view, onRefreshAll, hideBackButton = false }: Props) => {
-    const pal = usePalette("default");
+  ({view, onRefreshAll, hideBackButton = false}: Props) => {
+    const pal = usePalette('default')
     // loading
     // =
     if (!view || !view.hasLoaded) {
@@ -60,10 +53,9 @@ export const CommunityHeader = observer(
           <View
             style={[
               pal.view,
-              { borderColor: pal.colors.background },
+              {borderColor: pal.colors.background},
               styles.avi,
-            ]}
-          >
+            ]}>
             <LoadingPlaceholder width={80} height={80} style={styles.br40} />
           </View>
           <View style={styles.content}>
@@ -77,7 +69,7 @@ export const CommunityHeader = observer(
             </View>
           </View>
         </View>
-      );
+      )
     }
 
     // error
@@ -87,7 +79,7 @@ export const CommunityHeader = observer(
         <View testID="communityHeaderHasError">
           <Text>{view.error}</Text>
         </View>
-      );
+      )
     }
 
     // loaded
@@ -98,30 +90,30 @@ export const CommunityHeader = observer(
         onRefreshAll={onRefreshAll}
         hideBackButton={hideBackButton}
       />
-    );
+    )
   },
-);
+)
 
 const CommunityHeaderLoaded = observer(
-  ({ view, onRefreshAll, hideBackButton = false }: Props) => {
-    const pal = usePalette("default");
-    const store = useStores();
-    const navigation = useNavigation<NavigationProp>();
-    const { track } = useAnalytics();
+  ({view, hideBackButton = false}: Props) => {
+    const pal = usePalette('default')
+    const store = useStores()
+    const navigation = useNavigation<NavigationProp>()
+    const {track} = useAnalytics()
 
     const onPressBack = React.useCallback(() => {
       if (navigation.canGoBack()) {
-        navigation.goBack();
+        navigation.goBack()
       } else {
-        navigation.navigate("Home");
+        navigation.navigate('Home')
       }
-    }, [navigation]);
+    }, [navigation])
 
     const onPressAvi = React.useCallback(() => {
       // if (view.data) {
       //   store.shell.openLightbox(new ProfileImageLightbox(view));
       // }
-    }, [store, view]);
+    }, [])
 
     const onPressToggleJoin = React.useCallback(async () => {
       // track(
@@ -131,130 +123,32 @@ const CommunityHeaderLoaded = observer(
       // );
       if (view.isJoined) {
         // leave
-        track("CommunityHeader:LeaveButtonClicked");
-        await store.me.joinedCommunities.leave(view);
-        Toast.show("Removed from my communities");
+        track('CommunityHeader:LeaveButtonClicked')
+        await store.me.joinedCommunities.leave(view)
+        Toast.show('Removed from my communities')
       } else {
         // join
-        track("CommunityHeader:JoinButtonClicked");
-        await store.me.joinedCommunities.join(view);
-        Toast.show("Added to my communities");
+        track('CommunityHeader:JoinButtonClicked')
+        await store.me.joinedCommunities.join(view)
+        Toast.show('Added to my communities')
       }
-    }, [track, view, store.log]);
-
-    const onPressEditProfile = React.useCallback(() => {
-      // track("CommunityHeader:EditProfileButtonClicked");
-      // store.shell.openModal({
-      //   name: "edit-profile",
-      //   profileView: view,
-      //   onUpdate: onRefreshAll,
-      // });
-    }, [track, store, view, onRefreshAll]);
-
-    const onPressFollowers = React.useCallback(() => {
-      // track("CommunityHeader:FollowersButtonClicked");
-      // navigation.push("ProfileFollowers", { name: view.handle });
-    }, [track, navigation, view]);
-
-    const onPressFollows = React.useCallback(() => {
-      // track("CommunityHeader:FollowsButtonClicked");
-      // navigation.push("ProfileFollows", { name: view.handle });
-    }, [track, navigation, view]);
+    }, [track, view, store.me.joinedCommunities])
 
     const onPressShare = React.useCallback(() => {
-      track("CommunityHeader:ShareButtonClicked");
-      const url = toShareUrl(`/community/${view.data?.id}`);
-      shareUrl(url);
-    }, [track, view]);
+      track('CommunityHeader:ShareButtonClicked')
+      const url = toShareUrl(`/community/${view.data?.id}`)
+      shareUrl(url)
+    }, [track, view])
 
-    const onPressAddRemoveLists = React.useCallback(() => {
-      // track("CommunityHeader:AddToListsButtonClicked");
-      // store.shell.openModal({
-      //   name: "list-add-remove-user",
-      //   subject: view.did,
-      //   displayName: view.displayName || view.handle,
-      // });
-    }, [track, view, store]);
-
-    const onPressMuteAccount = React.useCallback(async () => {
-      // track("CommunityHeader:MuteAccountButtonClicked");
-      // try {
-      //   await view.muteAccount();
-      //   Toast.show("Account muted");
-      // } catch (e: any) {
-      //   store.log.error("Failed to mute account", e);
-      //   Toast.show(`There was an issue! ${e.toString()}`);
-      // }
-    }, [track, view, store]);
-
-    const onPressUnmuteAccount = React.useCallback(async () => {
-      // track("CommunityHeader:UnmuteAccountButtonClicked");
-      // try {
-      //   await view.unmuteAccount();
-      //   Toast.show("Account unmuted");
-      // } catch (e: any) {
-      //   store.log.error("Failed to unmute account", e);
-      //   Toast.show(`There was an issue! ${e.toString()}`);
-      // }
-    }, [track, view, store]);
-
-    const onPressBlockAccount = React.useCallback(async () => {
-      // track("CommunityHeader:BlockAccountButtonClicked");
-      // store.shell.openModal({
-      //   name: "confirm",
-      //   title: "Block Account",
-      //   message:
-      //     "Blocked accounts cannot reply in your threads, mention you, or otherwise interact with you.",
-      //   onPressConfirm: async () => {
-      //     try {
-      //       await view.blockAccount();
-      //       onRefreshAll();
-      //       Toast.show("Account blocked");
-      //     } catch (e: any) {
-      //       store.log.error("Failed to block account", e);
-      //       Toast.show(`There was an issue! ${e.toString()}`);
-      //     }
-      //   },
-      // });
-    }, [track, view, store, onRefreshAll]);
-
-    const onPressUnblockAccount = React.useCallback(async () => {
-      // track("CommunityHeader:UnblockAccountButtonClicked");
-      // store.shell.openModal({
-      //   name: "confirm",
-      //   title: "Unblock Account",
-      //   message:
-      //     "The account will be able to interact with you after unblocking.",
-      //   onPressConfirm: async () => {
-      //     try {
-      //       await view.unblockAccount();
-      //       onRefreshAll();
-      //       Toast.show("Account unblocked");
-      //     } catch (e: any) {
-      //       store.log.error("Failed to unblock account", e);
-      //       Toast.show(`There was an issue! ${e.toString()}`);
-      //     }
-      //   },
-      // });
-    }, [track, view, store, onRefreshAll]);
-
-    const onPressReportAccount = React.useCallback(() => {
-      // track("CommunityHeader:ReportAccountButtonClicked");
-      // store.shell.openModal({
-      //   name: "report-account",
-      //   did: view.did,
-      // });
-    }, [track, store, view]);
-
-    const isMe = React.useMemo(() => true, [store.me.did]);
+    const isMe = React.useMemo(() => true, [])
     const dropdownItems: DropdownItem[] = React.useMemo(() => {
       let items: DropdownItem[] = [
         {
-          testID: "communityHeaderDropdownShareBtn",
-          label: "Share",
+          testID: 'communityHeaderDropdownShareBtn',
+          label: 'Share',
           onPress: onPressShare,
         },
-      ];
+      ]
       if (!store.session.isSolarplexSession) {
         // items.push({
         //   testID: "communityHeaderDropdownListAddRemoveBtn",
@@ -263,7 +157,7 @@ const CommunityHeaderLoaded = observer(
         // });
       }
       if (!isMe && !store.session.isSolarplexSession) {
-        items.push({ sep: true });
+        items.push({sep: true})
         // if (!view.viewer.blocking) {
         //   items.push({
         //     testID: "communityHeaderDropdownMuteBtn",
@@ -286,20 +180,8 @@ const CommunityHeaderLoaded = observer(
         //   onPress: onPressReportAccount,
         // });
       }
-      return items;
-    }, [
-      isMe,
-      //view.viewer.muted,
-      //view.viewer.blocking,
-      onPressShare,
-      onPressUnmuteAccount,
-      onPressMuteAccount,
-      onPressUnblockAccount,
-      onPressBlockAccount,
-      onPressReportAccount,
-      onPressAddRemoveLists,
-      store.session.isSolarplexSession,
-    ]);
+      return items
+    }, [isMe, onPressShare, store.session.isSolarplexSession])
 
     // const blockHide = !isMe && (view.viewer.blocking || view.viewer.blockedBy);
     // const following = formatCount(view.followsCount);
@@ -312,15 +194,16 @@ const CommunityHeaderLoaded = observer(
             <UserBanner banner={view.data.banner} />
             <View style={styles.content}>
               <View style={[styles.buttonsLine]}>
-                {view.data.id === 'splx-art' ? <></> : view.isJoined === true ? (
+                {view.data.id === 'splx-art' ? (
+                  <></>
+                ) : view.isJoined === true ? (
                   <TouchableOpacity
                     testID="leaveBtn"
                     onPress={onPressToggleJoin}
                     style={[styles.btn, styles.mainBtn, pal.btn]}
                     accessibilityRole="button"
                     accessibilityLabel={`Leave ${view.data.name}`}
-                    accessibilityHint={`Leave ${view.data.name}`}
-                  >
+                    accessibilityHint={`Leave ${view.data.name}`}>
                     <FontAwesomeIcon
                       icon="check"
                       style={[pal.text, s.mr5]}
@@ -337,8 +220,7 @@ const CommunityHeaderLoaded = observer(
                     style={[styles.btn, styles.primaryBtn]}
                     accessibilityRole="button"
                     accessibilityLabel={`Join ${view.data.name}`}
-                    accessibilityHint={`Joins ${view.data.name}`}
-                  >
+                    accessibilityHint={`Joins ${view.data.name}`}>
                     <FontAwesomeIcon
                       icon="plus"
                       style={[s.white as FontAwesomeIconStyle, s.mr5]}
@@ -422,8 +304,7 @@ const CommunityHeaderLoaded = observer(
                     testID="communityHeaderDropdownBtn"
                     type="bare"
                     items={dropdownItems}
-                    style={[styles.btn, styles.secondaryBtn, pal.btn]}
-                  >
+                    style={[styles.btn, styles.secondaryBtn, pal.btn]}>
                     <FontAwesomeIcon icon="ellipsis" style={[pal.text]} />
                   </DropdownButton>
                 ) : undefined}
@@ -432,11 +313,13 @@ const CommunityHeaderLoaded = observer(
                 <Text
                   testID="communityHeaderDisplayName"
                   type="title-2xl"
-                  style={[pal.text, styles.title]}
-                >
+                  style={[pal.text, styles.title]}>
                   {sanitizeDisplayName(view.data?.name)}
                 </Text>
-                <Link href={`/profile/${SOLARPLEX_USER_DID}`} asAnchor style={[pal.textLight]} >
+                <Link
+                  href={`/profile/${SOLARPLEX_USER_DID}`}
+                  asAnchor
+                  style={[pal.textLight]}>
                   by @solarplex
                 </Link>
               </View>
@@ -498,8 +381,7 @@ const CommunityHeaderLoaded = observer(
                 hitSlop={BACK_HITSLOP}
                 accessibilityRole="button"
                 accessibilityLabel="Back"
-                accessibilityHint=""
-              >
+                accessibilityHint="">
                 <View style={styles.backBtnWrapper}>
                   <BlurView style={styles.backBtn} blurType="dark">
                     <FontAwesomeIcon
@@ -516,15 +398,13 @@ const CommunityHeaderLoaded = observer(
               onPress={onPressAvi}
               accessibilityRole="image"
               accessibilityLabel={`View ${view.data.name} Community`}
-              accessibilityHint=""
-            >
+              accessibilityHint="">
               <View
                 style={[
                   pal.view,
-                  { borderColor: pal.colors.background },
+                  {borderColor: pal.colors.background},
                   styles.avi,
-                ]}
-              >
+                ]}>
                 {/**add image url to type */}
                 <UserAvatar size={80} avatar={view.data.image} />
               </View>
@@ -532,33 +412,33 @@ const CommunityHeaderLoaded = observer(
           </View>
         )}
       </>
-    );
+    )
   },
-);
+)
 
 const styles = StyleSheet.create({
   banner: {
-    width: "100%",
+    width: '100%',
     height: 120,
   },
   backBtnWrapper: {
-    position: "absolute",
+    position: 'absolute',
     top: 10,
     left: 10,
     width: 30,
     height: 30,
-    overflow: "hidden",
+    overflow: 'hidden',
     borderRadius: 15,
   },
   backBtn: {
     width: 30,
     height: 30,
     borderRadius: 15,
-    alignItems: "center",
-    justifyContent: "center",
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   avi: {
-    position: "absolute",
+    position: 'absolute',
     top: 110,
     left: 10,
     width: 84,
@@ -573,8 +453,8 @@ const styles = StyleSheet.create({
   },
 
   buttonsLine: {
-    flexDirection: "row",
-    marginLeft: "auto",
+    flexDirection: 'row',
+    marginLeft: 'auto',
     marginBottom: 12,
   },
   primaryBtn: {
@@ -589,14 +469,14 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
   },
   btn: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
     paddingVertical: 7,
     borderRadius: 50,
     marginLeft: 6,
   },
-  title: { lineHeight: 38 },
+  title: {lineHeight: 38},
 
   // Word wrapping appears fine on
   // mobile but overflows on desktop
@@ -604,16 +484,16 @@ const styles = StyleSheet.create({
     ? {}
     : {
         // @ts-ignore web only -prf
-        wordBreak: "break-all",
+        wordBreak: 'break-all',
       },
 
   handleLine: {
-    flexDirection: "row",
+    flexDirection: 'row',
     marginBottom: 8,
   },
 
   metricsLine: {
-    flexDirection: "row",
+    flexDirection: 'row',
     marginBottom: 8,
   },
 
@@ -623,8 +503,8 @@ const styles = StyleSheet.create({
   },
 
   detailLine: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
     marginBottom: 5,
   },
 
@@ -639,14 +519,14 @@ const styles = StyleSheet.create({
   },
 
   moderationNotice: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
     borderRadius: 8,
     paddingHorizontal: 16,
     paddingVertical: 14,
     gap: 8,
   },
 
-  br40: { borderRadius: 40 },
-  br50: { borderRadius: 50 },
-});
+  br40: {borderRadius: 40},
+  br50: {borderRadius: 50},
+})

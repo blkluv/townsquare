@@ -1,10 +1,10 @@
-import { shim } from 'globalthis';
+import {shim} from 'globalthis'
 
-let _global: ReturnType<typeof shim>;
+let _global: ReturnType<typeof shim>
 
 export function getGlobal() {
   if (!_global) {
-    _global = shim();
+    _global = shim()
   }
-  return _global;
+  return _global
 }

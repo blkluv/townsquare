@@ -1,4 +1,4 @@
-import { Button, ButtonType } from "./Button";
+import {Button, ButtonType} from './Button'
 import {
   Dimensions,
   StyleProp,
@@ -7,61 +7,53 @@ import {
   TouchableWithoutFeedback,
   View,
   ViewStyle,
-} from "react-native";
-import React, { PropsWithChildren, useMemo, useRef } from "react";
-import { colors, s } from "lib/styles";
+} from 'react-native'
+import React, {PropsWithChildren, useMemo, useRef} from 'react'
+import {colors, s} from 'lib/styles'
 
-import { EmojiItemProp } from "react-native-reactions/lib/components/ReactionView/types";
-import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
-import { IconProp } from "@fortawesome/fontawesome-svg-core";
-import { Image } from "expo-image";
-import { NavigationProp } from "lib/routes/types";
-import RootSiblings from "react-native-root-siblings";
-import { SolarplexReaction } from "state/models/media/reactions";
-import { Text } from "../text/Text";
-import { isWeb } from "platform/detection";
-import { shareUrl } from "lib/sharing";
-import { toShareUrl } from "lib/strings/url-helpers";
-import { useNavigation } from "@react-navigation/native";
-import { usePalette } from "lib/hooks/usePalette";
-import { useStores } from "state/index";
-import { useTheme } from "lib/ThemeContext";
+import {IconProp} from '@fortawesome/fontawesome-svg-core'
+import {Image} from 'expo-image'
+import {NavigationProp} from 'lib/routes/types'
+import RootSiblings from 'react-native-root-siblings'
+import {SolarplexReaction} from 'state/models/media/reactions'
+import {Text} from '../text/Text'
+import {useNavigation} from '@react-navigation/native'
+import {usePalette} from 'lib/hooks/usePalette'
+import {useStores} from 'state/index'
+import {useTheme} from 'lib/ThemeContext'
 
-const HITSLOP = { left: 20, top: 20, right: 20, bottom: 20 };
-const ESTIMATED_BTN_HEIGHT = 50;
-const ESTIMATED_SEP_HEIGHT = 16;
+const HITSLOP = {left: 20, top: 20, right: 20, bottom: 20}
 
 export interface ReactionDropdownItemButton {
-  testID?: string;
-  icon?: IconProp;
-  label: string;
-  onPress: () => void;
+  testID?: string
+  icon?: IconProp
+  label: string
+  onPress: () => void
 }
 export interface DropdownItemSeparator {
-  sep: true;
+  sep: true
 }
-export type DropdownItem = SolarplexReaction;
-type MaybeDropdownItem = DropdownItem | false | undefined;
+export type DropdownItem = SolarplexReaction
 
-export type DropdownButtonType = ButtonType | "bare";
+export type DropdownButtonType = ButtonType | 'bare'
 
 interface DropdownButtonProps {
-  testID?: string;
-  type?: DropdownButtonType;
-  style?: StyleProp<ViewStyle>;
-  items: SolarplexReaction[];
-  label?: string;
-  menuWidth?: number;
-  children?: React.ReactNode;
-  openToRight?: boolean;
-  rightOffset?: number;
-  bottomOffset?: number;
-  onPressReaction: (emoji: SolarplexReaction) => void;
+  testID?: string
+  type?: DropdownButtonType
+  style?: StyleProp<ViewStyle>
+  items: SolarplexReaction[]
+  label?: string
+  menuWidth?: number
+  children?: React.ReactNode
+  openToRight?: boolean
+  rightOffset?: number
+  bottomOffset?: number
+  onPressReaction: (emoji: SolarplexReaction) => void
 }
 
 export function ReactionDropdownButton({
   testID,
-  type = "bare",
+  type = 'bare',
   style,
   items,
   label,
@@ -72,17 +64,17 @@ export function ReactionDropdownButton({
   rightOffset = 0,
   bottomOffset = 0,
 }: PropsWithChildren<DropdownButtonProps>) {
-  const ref1 = useRef<TouchableOpacity>(null);
-  const ref2 = useRef<View>(null);
-  const store = useStores();
-  const navigation = useNavigation<NavigationProp>();
+  const ref1 = useRef<TouchableOpacity>(null)
+  const ref2 = useRef<View>(null)
+  const store = useStores()
+  const navigation = useNavigation<NavigationProp>()
 
   const onPress = () => {
     if (store.session.isSolarplexSession) {
-      navigation.navigate("SignIn");
-      return;
+      navigation.navigate('SignIn')
+      return
     }
-    const ref = ref1.current || ref2.current;
+    const ref = ref1.current || ref2.current
     ref?.measure(
       (
         _x: number,
@@ -93,10 +85,10 @@ export function ReactionDropdownButton({
         pageY: number,
       ) => {
         if (!menuWidth) {
-          menuWidth = 200;
+          menuWidth = 200
         }
-        const winHeight = Dimensions.get("window").height;
-        let estimatedMenuHeight = 102;
+        const winHeight = Dimensions.get('window').height
+        let estimatedMenuHeight = 102
         // for (const item of items) {
         //   if (item && isSep(item)) {
         //     estimatedMenuHeight += ESTIMATED_SEP_HEIGHT;
@@ -106,35 +98,35 @@ export function ReactionDropdownButton({
         // }
         const newX = openToRight
           ? pageX + width + rightOffset
-          : pageX + width - menuWidth;
-        let newY = pageY + height + bottomOffset;
+          : pageX + width - menuWidth
+        let newY = pageY + height + bottomOffset
         if (newY + estimatedMenuHeight > winHeight) {
-          newY -= estimatedMenuHeight;
+          newY -= estimatedMenuHeight
         }
         createDropdownMenu(
           newX,
           newY,
           250,
-          items.filter((v) => !!v) as DropdownItem[],
+          items.filter(v => !!v) as DropdownItem[],
           onPressReaction,
-        );
+        )
       },
-    );
-  };
+    )
+  }
 
   const numItems = useMemo(
     () =>
-      items.filter((item) => {
+      items.filter(item => {
         if (item === undefined) {
-          return false;
+          return false
         }
 
-        return isBtn(item);
+        return isBtn(item)
       }).length,
     [items],
-  );
+  )
 
-  if (type === "bare") {
+  if (type === 'bare') {
     return (
       <TouchableOpacity
         testID={testID}
@@ -144,11 +136,10 @@ export function ReactionDropdownButton({
         ref={ref1}
         accessibilityRole="button"
         accessibilityLabel={`Opens ${numItems} options`}
-        accessibilityHint={`Opens ${numItems} options`}
-      >
+        accessibilityHint={`Opens ${numItems} options`}>
         {children}
       </TouchableOpacity>
-    );
+    )
   }
   return (
     <View ref={ref2}>
@@ -157,12 +148,11 @@ export function ReactionDropdownButton({
         testID={testID}
         onPress={onPress}
         style={style}
-        label={label}
-      >
+        label={label}>
         {children}
       </Button>
     </View>
-  );
+  )
 }
 
 // export function ReactionPostDropdownBtn({
@@ -280,13 +270,13 @@ function createDropdownMenu(
   onPressReaction: (emoji: SolarplexReaction) => void,
 ): RootSiblings {
   const onPressItem = (index: number) => {
-    sibling.destroy();
-    const item = items[index];
+    sibling.destroy()
+    const item = items[index]
     if (isBtn(item)) {
-      onPressReaction(item);
+      onPressReaction(item)
     }
-  };
-  const onOuterPress = () => sibling.destroy();
+  }
+  const onOuterPress = () => sibling.destroy()
   const sibling = new RootSiblings(
     (
       <DropdownItems
@@ -298,18 +288,18 @@ function createDropdownMenu(
         onPressItem={onPressItem}
       />
     ),
-  );
-  return sibling;
+  )
+  return sibling
 }
 
 type DropDownItemProps = {
-  onOuterPress: () => void;
-  x: number;
-  y: number;
-  width: number;
-  items: DropdownItem[];
-  onPressItem: (index: number) => void;
-};
+  onOuterPress: () => void
+  x: number
+  y: number
+  width: number
+  items: DropdownItem[]
+  onPressItem: (index: number) => void
+}
 
 const DropdownItems = ({
   onOuterPress,
@@ -319,15 +309,14 @@ const DropdownItems = ({
   items,
   onPressItem,
 }: DropDownItemProps) => {
-  const pal = usePalette("default");
-  const theme = useTheme();
+  const pal = usePalette('default')
+  const theme = useTheme()
   const dropDownBackgroundColor =
-    theme.colorScheme === "dark" ? pal.btn : pal.view;
+    theme.colorScheme === 'dark' ? pal.btn : pal.view
   const separatorColor =
-    theme.colorScheme === "dark" ? pal.borderDark : pal.border;
+    theme.colorScheme === 'dark' ? pal.borderDark : pal.border
 
-  const numItems = items.filter(isBtn).length;
-
+  const numItems = items.filter(isBtn).length
 
   return (
     <>
@@ -340,17 +329,15 @@ const DropdownItems = ({
         // props, and always have an explicit label
         accessibilityRole="button"
         accessibilityLabel="Toggle dropdown"
-        accessibilityHint=""
-      >
+        accessibilityHint="">
         <View style={[styles.bg]} />
       </TouchableWithoutFeedback>
       <View
         style={[
           styles.menu,
-          { left: x, top: y, width },
+          {left: x, top: y, width},
           dropDownBackgroundColor,
-        ]}
-      >
+        ]}>
         {items.map((item, index) => {
           if (isBtn(item)) {
             return (
@@ -360,8 +347,7 @@ const DropdownItems = ({
                 style={[styles.menuItem]}
                 onPress={() => onPressItem(index)}
                 accessibilityLabel={item.nft_metadata?.name as string}
-                accessibilityHint={`Option ${index + 1} of ${numItems}`}
-              >
+                accessibilityHint={`Option ${index + 1} of ${numItems}`}>
                 {/* {item.icon && (
                   <FontAwesomeIcon
                     style={styles.icon}
@@ -371,10 +357,9 @@ const DropdownItems = ({
                 )}
                 <Text style={[styles.label, pal.text]}>{item.label}</Text> */}
                 {/* <Image style={styles.image} source={{uri: (item.emoji as string)}}/> */}
-                {(item?.nft_metadata?.image as string)?.includes(
-                  "http",
-                ) ? (
+                {(item?.nft_metadata?.image as string)?.includes('http') ? (
                   <Image
+                    accessibilityIgnoresInvertColors={true}
                     style={styles.image}
                     source={{
                       uri: item?.nft_metadata?.image as string,
@@ -382,59 +367,57 @@ const DropdownItems = ({
                   />
                 ) : (
                   <Text
-                    style={[s.f20, 
-                      { marginLeft: index ? -8 : 0, zIndex: -1 * index },
-                    ]}
-                  >
+                    style={[
+                      s.f20,
+                      {marginLeft: index ? -8 : 0, zIndex: -1 * index},
+                    ]}>
                     {item?.nft_metadata?.image as string}
                   </Text>
                 )}
-            
-
               </TouchableOpacity>
-            );
+            )
           } else if (isSep(item)) {
             return (
               <View key={index} style={[styles.separator, separatorColor]} />
-            );
+            )
           }
-          return null;
+          return null
         })}
       </View>
     </>
-  );
-};
+  )
+}
 
 function isSep(item: DropdownItem): item is DropdownItem {
-  return "sep" in item && item.sep as boolean;
+  return 'sep' in item && (item.sep as boolean)
 }
 function isBtn(item: DropdownItem): item is DropdownItem {
-  return !isSep(item);
+  return !isSep(item)
 }
 
 const styles = StyleSheet.create({
   bg: {
-    position: "absolute",
+    position: 'absolute',
     top: 0,
     right: 0,
     bottom: 0,
     left: 0,
-    backgroundColor: "#000",
+    backgroundColor: '#000',
     opacity: 0.1,
   },
   menu: {
-    position: "absolute",
-    backgroundColor: "#fff",
+    position: 'absolute',
+    backgroundColor: '#fff',
     borderRadius: 14,
     opacity: 1,
     paddingVertical: 6,
-    flexDirection: "row",
-    flexWrap: "wrap",
-    justifyContent: "center",
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'center',
   },
   menuItem: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
     paddingVertical: 10,
     paddingLeft: 15,
     paddingRight: 15,
@@ -463,4 +446,4 @@ const styles = StyleSheet.create({
     width: 20,
     height: 20,
   },
-});
+})

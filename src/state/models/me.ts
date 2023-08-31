@@ -5,9 +5,9 @@ import {
 import {hasProp, isObj} from 'lib/type-guards'
 import {makeAutoObservable, runInAction} from 'mobx'
 
-import { JoinedCommunitiesModel } from './ui/joined-communities';
+import {JoinedCommunitiesModel} from './ui/joined-communities'
 import {MyFollowsCache} from './cache/my-follows'
-import { NftModel } from "./content/nft";
+import {NftModel} from './content/nft'
 import {NotificationsFeedModel} from './feeds/notifications'
 import {PostsFeedModel} from './feeds/posts'
 import {RootStoreModel} from './root-store'
@@ -40,7 +40,7 @@ export class MeModel {
   }
 
   get splxWallet() {
-    return this.rootStore.wallet.connectedWallet;
+    return this.rootStore.wallet.connectedWallet
   }
 
   constructor(public rootStore: RootStoreModel) {
@@ -116,12 +116,12 @@ export class MeModel {
   async load() {
     const sess = this.rootStore.session
     this.rootStore.log.debug('MeModel:load', {hasSession: sess.hasSession})
-    await Promise.all([this.fetchAllReactions(), this.fetchCommunities()]);
+    await Promise.all([this.fetchAllReactions(), this.fetchCommunities()])
     if (sess.hasSession) {
       this.did = sess.currentSession?.did || ''
       await this.fetchProfile()
-      await this.rootStore.wallet.getConnectedWallet();
-      this.updateReactions();
+      await this.rootStore.wallet.getConnectedWallet()
+      this.updateReactions()
       this.mainFeed.clear()
       /* dont await */ this.mainFeed.setup().catch(e => {
         this.rootStore.log.error('Failed to setup main feed model', e)
@@ -139,9 +139,9 @@ export class MeModel {
 
   async updateReactions() {
     if (!this.rootStore.wallet.connectedWallet) {
-      return;
+      return
     }
-    this.nft.fetchNfts(this.rootStore.wallet.connectedWallet);
+    this.nft.fetchNfts(this.rootStore.wallet.connectedWallet)
   }
 
   async updateIfNeeded() {
@@ -160,11 +160,11 @@ export class MeModel {
   }
 
   async fetchCommunities() {
-    await this.rootStore.communities.fetch();
+    await this.rootStore.communities.fetch()
   }
 
   async fetchAllReactions() {
-    await this.rootStore.reactions.fetch();
+    await this.rootStore.reactions.fetch()
   }
 
   async fetchProfile() {

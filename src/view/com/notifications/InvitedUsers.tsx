@@ -1,45 +1,45 @@
 import {
   FontAwesomeIcon,
   FontAwesomeIconStyle,
-} from "@fortawesome/react-native-fontawesome";
-import { Link, TextLink } from "../util/Link";
-import { StyleSheet, View } from "react-native";
+} from '@fortawesome/react-native-fontawesome'
+import {Link, TextLink} from '../util/Link'
+import {StyleSheet, View} from 'react-native'
 
-import { AppBskyActorDefs } from "@atproto/api";
-import { Button } from "../util/forms/Button";
-import { CenteredView } from "../util/Views.web";
-import { FollowButton } from "../profile/FollowButton";
-import React from "react";
-import { Text } from "../util/text/Text";
-import { UserAvatar } from "../util/UserAvatar";
-import { observer } from "mobx-react-lite";
-import { s } from "lib/styles";
-import { sanitizeDisplayName } from "lib/strings/display-names";
-import { usePalette } from "lib/hooks/usePalette";
-import { useStores } from "state/index";
+import {AppBskyActorDefs} from '@atproto/api'
+import {Button} from '../util/forms/Button'
+import {CenteredView} from '../util/Views.web'
+import {FollowButton} from '../profile/FollowButton'
+import React from 'react'
+import {Text} from '../util/text/Text'
+import {UserAvatar} from '../util/UserAvatar'
+import {observer} from 'mobx-react-lite'
+import {s} from 'lib/styles'
+import {sanitizeDisplayName} from 'lib/strings/display-names'
+import {usePalette} from 'lib/hooks/usePalette'
+import {useStores} from 'state/index'
 
 export const InvitedUsers = observer(() => {
-  const store = useStores();
+  const store = useStores()
   return (
     <CenteredView>
-      {store.invitedUsers.profiles.map((profile) => (
+      {store.invitedUsers.profiles.map(profile => (
         <InvitedUser key={profile.did} profile={profile} />
       ))}
     </CenteredView>
-  );
-});
+  )
+})
 
 function InvitedUser({
   profile,
 }: {
-  profile: AppBskyActorDefs.ProfileViewDetailed;
+  profile: AppBskyActorDefs.ProfileViewDetailed
 }) {
-  const pal = usePalette("default");
-  const store = useStores();
+  const pal = usePalette('default')
+  const store = useStores()
 
   const onPressDismiss = React.useCallback(() => {
-    store.invitedUsers.markSeen(profile.did);
-  }, [store, profile]);
+    store.invitedUsers.markSeen(profile.did)
+  }, [store, profile])
 
   return (
     <View
@@ -50,8 +50,7 @@ function InvitedUser({
           backgroundColor: pal.colors.unreadNotifBg,
           borderColor: pal.colors.unreadNotifBorder,
         },
-      ]}
-    >
+      ]}>
       <View style={styles.layoutIcon}>
         <FontAwesomeIcon
           icon="user-plus"
@@ -69,7 +68,7 @@ function InvitedUser({
             style={pal.text}
             href={`/profile/${profile.handle}`}
             text={sanitizeDisplayName(profile.displayName || profile.handle)}
-          />{" "}
+          />{' '}
           joined using your invite code!
         </Text>
         <View style={styles.btns}>
@@ -89,18 +88,18 @@ function InvitedUser({
         </View>
       </View>
     </View>
-  );
+  )
 }
 
 const styles = StyleSheet.create({
   layout: {
-    flexDirection: "row",
+    flexDirection: 'row',
     borderTopWidth: 1,
     padding: 10,
   },
   layoutIcon: {
     width: 70,
-    alignItems: "flex-end",
+    alignItems: 'flex-end',
     paddingTop: 2,
   },
   icon: {
@@ -111,7 +110,7 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
   },
   btns: {
-    flexDirection: "row",
+    flexDirection: 'row',
     gap: 10,
   },
-});
+})

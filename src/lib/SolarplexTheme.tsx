@@ -1,9 +1,9 @@
-import { Platform } from "react-native";
-import type { Theme } from "./ThemeContext";
-import { colors } from "./styles";
+import {Platform} from 'react-native'
+import type {Theme} from './ThemeContext'
+import {colors} from './styles'
 
 export const solarplexTheme: Theme = {
-  colorScheme: "light",
+  colorScheme: 'light',
   palette: {
     default: {
       background: colors.white,
@@ -13,17 +13,17 @@ export const solarplexTheme: Theme = {
       textInverted: colors.white,
       link: colors.splx.primary[50],
       border: colors.splx.neutral[10],
-      borderDark: "#e0d9d9",
+      borderDark: '#e0d9d9',
       icon: colors.gray4,
       // non-standard
       textVeryLight: colors.gray4,
       replyLine: colors.gray2,
       replyLineDot: colors.gray3,
-      unreadNotifBg: "#ebf6ff",
+      unreadNotifBg: '#ebf6ff',
       unreadNotifBorder: colors.blue1,
-      postCtrl: "#71768A",
-      brandText: "#0066FF",
-      emptyStateIcon: "#B6B6C9",
+      postCtrl: '#71768A',
+      brandText: '#0066FF',
+      emptyStateIcon: '#B6B6C9',
     },
     primary: {
       background: colors.splx.primary[50],
@@ -82,243 +82,243 @@ export const solarplexTheme: Theme = {
     },
   },
   typography: {
-    "2xl-thin": {
-      fontFamily: "Chirp",
+    '2xl-thin': {
+      fontFamily: 'Chirp',
       fontSize: 16,
       letterSpacing: 0.25,
-      fontWeight: "300",
+      fontWeight: '300',
     },
-    "2xl": {
-      fontFamily: "Chirp",
+    '2xl': {
+      fontFamily: 'Chirp',
       fontSize: 16,
       letterSpacing: 0.25,
-      fontWeight: "400",
+      fontWeight: '400',
     },
-    "2xl-medium": {
-      fontFamily: "Chirp",
+    '2xl-medium': {
+      fontFamily: 'Chirp',
       fontSize: 16,
       letterSpacing: 0.25,
-      fontWeight: "500",
+      fontWeight: '500',
     },
-    "2xl-bold": {
-      fontFamily: "Chirp",
+    '2xl-bold': {
+      fontFamily: 'Chirp',
       fontSize: 16,
       letterSpacing: 0.25,
-      fontWeight: "700",
+      fontWeight: '700',
     },
-    "2xl-heavy": {
-      fontFamily: "Chirp",
+    '2xl-heavy': {
+      fontFamily: 'Chirp',
       fontSize: 16,
       letterSpacing: 0.25,
-      fontWeight: "800",
+      fontWeight: '800',
     },
-    "xl-thin": {
-      fontFamily: "Chirp",
+    'xl-thin': {
+      fontFamily: 'Chirp',
       fontSize: 15,
       letterSpacing: 0.25,
-      fontWeight: "300",
+      fontWeight: '300',
     },
     xl: {
-      fontFamily: "Chirp",
+      fontFamily: 'Chirp',
       fontSize: 15,
       letterSpacing: 0.25,
-      fontWeight: "400",
+      fontWeight: '400',
     },
-    "xl-medium": {
-      fontFamily: "Chirp",
+    'xl-medium': {
+      fontFamily: 'Chirp',
       fontSize: 15,
       letterSpacing: 0.25,
-      fontWeight: "500",
+      fontWeight: '500',
     },
-    "xl-bold": {
-      fontFamily: "Chirp",
+    'xl-bold': {
+      fontFamily: 'Chirp',
       fontSize: 15,
       letterSpacing: 0.25,
-      fontWeight: "700",
+      fontWeight: '700',
     },
-    "xl-heavy": {
-      fontFamily: "Chirp",
+    'xl-heavy': {
+      fontFamily: 'Chirp',
       fontSize: 15,
       letterSpacing: 0.25,
-      fontWeight: "800",
+      fontWeight: '800',
     },
-    "lg-thin": {
-      fontFamily: "Chirp",
+    'lg-thin': {
+      fontFamily: 'Chirp',
       fontSize: 14,
       letterSpacing: 0.25,
-      fontWeight: "300",
+      fontWeight: '300',
     },
     lg: {
-      fontFamily: "Chirp",
+      fontFamily: 'Chirp',
       fontSize: 14,
       letterSpacing: 0.25,
-      fontWeight: "400",
+      fontWeight: '400',
     },
-    "lg-medium": {
-      fontFamily: "Chirp",
+    'lg-medium': {
+      fontFamily: 'Chirp',
       fontSize: 14,
       letterSpacing: 0.25,
-      fontWeight: "500",
+      fontWeight: '500',
     },
-    "lg-bold": {
-      fontFamily: "Chirp",
+    'lg-bold': {
+      fontFamily: 'Chirp',
       fontSize: 14,
       letterSpacing: 0.25,
-      fontWeight: "700",
+      fontWeight: '700',
     },
-    "lg-heavy": {
-      fontFamily: "Chirp",
+    'lg-heavy': {
+      fontFamily: 'Chirp',
       fontSize: 14,
       letterSpacing: 0.25,
-      fontWeight: "800",
+      fontWeight: '800',
     },
-    "md-thin": {
-      fontFamily: "Chirp",
+    'md-thin': {
+      fontFamily: 'Chirp',
       fontSize: 13,
       letterSpacing: 0.25,
-      fontWeight: "300",
+      fontWeight: '300',
     },
     md: {
-      fontFamily: "Chirp",
+      fontFamily: 'Chirp',
       fontSize: 13,
       letterSpacing: 0.25,
-      fontWeight: "400",
+      fontWeight: '400',
     },
-    "md-medium": {
-      fontFamily: "Chirp",
+    'md-medium': {
+      fontFamily: 'Chirp',
       fontSize: 13,
       letterSpacing: 0.25,
-      fontWeight: "500",
+      fontWeight: '500',
     },
-    "md-bold": {
-      fontFamily: "Chirp",
+    'md-bold': {
+      fontFamily: 'Chirp',
       fontSize: 13,
       letterSpacing: 0.25,
-      fontWeight: "700",
+      fontWeight: '700',
     },
-    "md-heavy": {
-      fontFamily: "Chirp",
+    'md-heavy': {
+      fontFamily: 'Chirp',
       fontSize: 13,
       letterSpacing: 0.25,
-      fontWeight: "800",
+      fontWeight: '800',
     },
-    "sm-thin": {
-      fontFamily: "Chirp",
+    'sm-thin': {
+      fontFamily: 'Chirp',
       fontSize: 12,
       letterSpacing: 0.25,
-      fontWeight: "300",
+      fontWeight: '300',
     },
     sm: {
-      fontFamily: "Chirp",
+      fontFamily: 'Chirp',
       fontSize: 12,
       letterSpacing: 0.25,
-      fontWeight: "400",
+      fontWeight: '400',
     },
-    "sm-medium": {
-      fontFamily: "Chirp",
+    'sm-medium': {
+      fontFamily: 'Chirp',
       fontSize: 12,
       letterSpacing: 0.25,
-      fontWeight: "500",
+      fontWeight: '500',
     },
-    "sm-bold": {
-      fontFamily: "Chirp",
+    'sm-bold': {
+      fontFamily: 'Chirp',
       fontSize: 12,
       letterSpacing: 0.25,
-      fontWeight: "700",
+      fontWeight: '700',
     },
-    "sm-heavy": {
-      fontFamily: "Chirp",
+    'sm-heavy': {
+      fontFamily: 'Chirp',
       fontSize: 12,
       letterSpacing: 0.25,
-      fontWeight: "800",
+      fontWeight: '800',
     },
-    "xs-thin": {
-      fontFamily: "Chirp",
+    'xs-thin': {
+      fontFamily: 'Chirp',
       fontSize: 11,
       letterSpacing: 0.25,
-      fontWeight: "300",
+      fontWeight: '300',
     },
     xs: {
       fontSize: 11,
-      fontFamily: "Chirp",
+      fontFamily: 'Chirp',
       letterSpacing: 0.25,
-      fontWeight: "400",
+      fontWeight: '400',
     },
-    "xs-medium": {
-      fontFamily: "Chirp",
+    'xs-medium': {
+      fontFamily: 'Chirp',
       fontSize: 11,
       letterSpacing: 0.25,
-      fontWeight: "500",
+      fontWeight: '500',
     },
-    "xs-bold": {
-      fontFamily: "Chirp",
+    'xs-bold': {
+      fontFamily: 'Chirp',
       fontSize: 11,
       letterSpacing: 0.25,
-      fontWeight: "700",
+      fontWeight: '700',
     },
-    "xs-heavy": {
-      fontFamily: "Chirp",
+    'xs-heavy': {
+      fontFamily: 'Chirp',
       fontSize: 11,
       letterSpacing: 0.25,
-      fontWeight: "800",
+      fontWeight: '800',
     },
 
-    "title-2xl": {
-      fontFamily: "Chirp",
+    'title-2xl': {
+      fontFamily: 'Chirp',
       fontSize: 32,
       letterSpacing: 0.25,
-      fontWeight: "500",
+      fontWeight: '500',
     },
-    "title-xl": {
-      fontFamily: "Chirp",
+    'title-xl': {
+      fontFamily: 'Chirp',
       fontSize: 26,
       letterSpacing: 0.25,
-      fontWeight: "500",
+      fontWeight: '500',
     },
-    "title-lg": {
-      fontFamily: "Chirp",
+    'title-lg': {
+      fontFamily: 'Chirp',
       fontSize: 20,
-      fontWeight: "500",
+      fontWeight: '500',
     },
     title: {
-      fontFamily: "Chirp",
-      fontWeight: "500",
+      fontFamily: 'Chirp',
+      fontWeight: '500',
       fontSize: 18,
       letterSpacing: 0.15,
     },
-    "title-sm": {
-      fontFamily: "Chirp",
-      fontWeight: "bold",
+    'title-sm': {
+      fontFamily: 'Chirp',
+      fontWeight: 'bold',
       fontSize: 15,
       letterSpacing: 0.15,
     },
-    "post-text": {
-      fontFamily: "Chirp",
+    'post-text': {
+      fontFamily: 'Chirp',
       fontSize: 14,
       letterSpacing: 0.2,
-      fontWeight: "400",
+      fontWeight: '400',
     },
-    "post-text-lg": {
-      fontFamily: "Chirp",
+    'post-text-lg': {
+      fontFamily: 'Chirp',
       fontSize: 20,
       letterSpacing: 0.4,
-      fontWeight: "400",
+      fontWeight: '400',
     },
-    "button-lg": {
-      fontFamily: "Chirp",
-      fontWeight: "500",
+    'button-lg': {
+      fontFamily: 'Chirp',
+      fontWeight: '500',
       fontSize: 16,
       letterSpacing: 0.5,
     },
     button: {
-      fontFamily: "Chirp",
-      fontWeight: "500",
+      fontFamily: 'Chirp',
+      fontWeight: '500',
       fontSize: 12,
       letterSpacing: 0.5,
     },
     mono: {
       fontSize: 12,
-      fontFamily: Platform.OS === "android" ? "Chirp" : "Chirp",
+      fontFamily: Platform.OS === 'android' ? 'Chirp' : 'Chirp',
     },
   },
-};
+}

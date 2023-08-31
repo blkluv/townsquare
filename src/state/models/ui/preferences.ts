@@ -150,9 +150,9 @@ export class PreferencesModel {
       if (
         hasProp(v, 'joinedCommunities') &&
         Array.isArray(v.joinedCommunities) &&
-        typeof v.joinedCommunities.every((item) => typeof item === 'string')
+        typeof v.joinedCommunities.every(item => typeof item === 'string')
       ) {
-        this.joinedCommunities = v.joinedCommunities;
+        this.joinedCommunities = v.joinedCommunities
       }
       // check if home feed replies are enabled in preferences, then hydrate
       if (
@@ -201,9 +201,9 @@ export class PreferencesModel {
       // fetch preferences
       let hasSavedFeedsPref = false
       const res = await this.rootStore.agent.app.bsky.actor.getPreferences({})
-      await this.rootStore.reactions.fetch();
-      await this.rootStore.me.savedFeeds.updateCache(clearCache);
-      await this.rootStore.me.joinedCommunities.updateCache(clearCache);
+      await this.rootStore.reactions.fetch()
+      await this.rootStore.me.savedFeeds.updateCache(clearCache)
+      await this.rootStore.me.joinedCommunities.updateCache(clearCache)
       runInAction(() => {
         for (const pref of res.data.preferences) {
           if (
@@ -572,28 +572,26 @@ export class PreferencesModel {
   }
 
   async joinCommunity(v: string) {
-    const oldJoinedCommunities = this.joinedCommunities;
     try {
       if (!this.joinedCommunities.includes(v)) {
-        this.joinedCommunities.push(v);
+        this.joinedCommunities.push(v)
       }
     } catch (e) {
       runInAction(() => {
-        this.joinedCommunities = this.joinedCommunities;
-      });
-      throw e;
+        this.joinedCommunities = this.joinedCommunities
+      })
+      throw e
     }
   }
 
   async leaveCommunity(v: string) {
-    const oldJoinedCommunities = this.joinedCommunities;
     try {
-      this.joinedCommunities = this.joinedCommunities.filter((id) => id !== v);
+      this.joinedCommunities = this.joinedCommunities.filter(id => id !== v)
     } catch (e) {
       runInAction(() => {
-        this.joinedCommunities = this.joinedCommunities;
-      });
-      throw e;
+        this.joinedCommunities = this.joinedCommunities
+      })
+      throw e
     }
   }
 

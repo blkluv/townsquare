@@ -1,11 +1,11 @@
-import { RouteParams, State } from "./types";
+import {RouteParams, State} from './types'
 
 export function getCurrentRoute(state: State) {
-  let node = state.routes[state.index || 0];
-  while (node.state?.routes && typeof node.state?.index === "number") {
-    node = node.state?.routes[node.state?.index];
+  let node = state.routes[state.index || 0]
+  while (node.state?.routes && typeof node.state?.index === 'number') {
+    node = node.state?.routes[node.state?.index]
   }
-  return node;
+  return node
 }
 
 export function isStateAtTabRoot(state: State | undefined) {
@@ -14,11 +14,11 @@ export function isStateAtTabRoot(state: State | undefined) {
     // if state is not defined it's because init is occurring
     // and therefore we can safely assume we're at root
     // -prf
-    return true;
+    return true
   }
-  const currentRoute = getCurrentRoute(state);
+  const currentRoute = getCurrentRoute(state)
 
-  return isTab(currentRoute.name, "PostThread");
+  return isTab(currentRoute.name, 'PostThread')
 }
 
 export function isTab(current: string, route: string) {
@@ -30,7 +30,7 @@ export function isTab(current: string, route: string) {
     current === route ||
     current === `${route}Tab` ||
     current === `${route}Inner`
-  );
+  )
 }
 
 export enum TabState {
@@ -40,40 +40,40 @@ export enum TabState {
 }
 export function getTabState(state: State | undefined, tab: string): TabState {
   if (!state) {
-    return TabState.Outside;
+    return TabState.Outside
   }
-  const currentRoute = getCurrentRoute(state);
+  const currentRoute = getCurrentRoute(state)
   if (isTab(currentRoute.name, tab)) {
-    return TabState.InsideAtRoot;
+    return TabState.InsideAtRoot
   } else if (isTab(state.routes[state.index || 0].name, tab)) {
-    return TabState.Inside;
+    return TabState.Inside
   }
-  return TabState.Outside;
+  return TabState.Outside
 }
 
 type ExistingState = {
-  name: string;
-  params?: RouteParams;
-};
+  name: string
+  params?: RouteParams
+}
 export function buildStateObject(
   stack: string,
   route: string,
   params: RouteParams,
   state: ExistingState[] = [],
 ) {
-  if (stack === "Flat") {
+  if (stack === 'Flat') {
     return {
-      routes: [{ name: route, params }],
-    };
+      routes: [{name: route, params}],
+    }
   }
   return {
     routes: [
       {
         name: stack,
         state: {
-          routes: [...state, { name: route, params }],
+          routes: [...state, {name: route, params}],
         },
       },
     ],
-  };
+  }
 }

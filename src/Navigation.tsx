@@ -28,8 +28,8 @@ import {RouteParams, State} from 'lib/routes/types'
 
 import {AppPasswords} from 'view/screens/AppPasswords'
 import {BottomBar} from './view/shell/bottom-bar/BottomBar'
-import { CommunitiesScreen } from "view/screens/Communities";
-import { CommunityFeedScreen } from "view/screens/CommunityFeedScreen";
+import {CommunitiesScreen} from 'view/screens/Communities'
+import {CommunityFeedScreen} from 'view/screens/CommunityFeedScreen'
 import {CommunityGuidelinesScreen} from './view/screens/CommunityGuidelines'
 import {CopyrightPolicyScreen} from './view/screens/CopyrightPolicy'
 import {CustomFeedLikedByScreen} from './view/screens/CustomFeedLikedBy'
@@ -40,8 +40,8 @@ import {FeedsScreen} from './view/screens/Feeds'
 import {HomeScreen} from './view/screens/Home'
 import {JSX} from 'react/jsx-runtime'
 import {LogScreen} from './view/screens/Log'
-import { LoggedOut } from "view/com/auth/LoggedOut";
-import { MissionsTab } from "view/screens/MissionsTab";
+import {LoggedOut} from 'view/com/auth/LoggedOut'
+import {MissionsTab} from 'view/screens/MissionsTab'
 import {ModerationBlockedAccounts} from 'view/screens/ModerationBlockedAccounts'
 import {ModerationMuteListsScreen} from './view/screens/ModerationMuteLists'
 import {ModerationMutedAccounts} from 'view/screens/ModerationMutedAccounts'
@@ -56,16 +56,16 @@ import {ProfileFollowersScreen} from './view/screens/ProfileFollowers'
 import {ProfileFollowsScreen} from './view/screens/ProfileFollows'
 import {ProfileListScreen} from './view/screens/ProfileList'
 import {ProfileScreen} from './view/screens/Profile'
-import { RewardsScreen } from "view/screens/Rewards";
-import { RewardsTab as RewardsTabScreen } from "view/screens/RewardsTab";
-import { SOLARPLEX_UI_URL } from "lib/constants";
+import {RewardsScreen} from 'view/screens/Rewards'
+import {RewardsTab as RewardsTabScreen} from 'view/screens/RewardsTab'
+import {SOLARPLEX_UI_URL} from 'lib/constants'
 import {SavedFeeds} from 'view/screens/SavedFeeds'
 import {SearchScreen} from './view/screens/Search'
 import {SettingsScreen} from './view/screens/Settings'
 import {StyleSheet} from 'react-native'
 import {SupportScreen} from './view/screens/Support'
 import {TermsOfServiceScreen} from './view/screens/TermsOfService'
-import { Wallets } from "view/screens/Wallets";
+import {Wallets} from 'view/screens/Wallets'
 import {bskyTitle} from 'lib/strings/headings'
 import {buildStateObject} from 'lib/routes/helpers'
 import {colors} from 'lib/styles'
@@ -87,12 +87,11 @@ const FeedsTab = createNativeStackNavigator<FeedsTabNavigatorParams>()
 const NotificationsTab =
   createNativeStackNavigator<NotificationsTabNavigatorParams>()
 const MyProfileTab = createNativeStackNavigator<MyProfileTabNavigatorParams>()
-const WalletsTab = createNativeStackNavigator<MyProfileTabNavigatorParams>();
 const Flat = createNativeStackNavigator<FlatNavigatorParams>()
 const Tab = createBottomTabNavigator<BottomTabNavigatorParams>()
 const CommunitiesTab =
-  createNativeStackNavigator<CommunitiesTabNavigatorParams>();
-const RewardsTab = createNativeStackNavigator<RewardsTabNavigatorParams>();
+  createNativeStackNavigator<CommunitiesTabNavigatorParams>()
+const RewardsTab = createNativeStackNavigator<RewardsTabNavigatorParams>()
 
 /**
  * These "common screens" are reused across stacks.
@@ -135,7 +134,7 @@ function commonScreens(Stack: typeof HomeTab, unreadCountLabel?: string) {
       <Stack.Screen
         name="SignIn"
         component={LoggedOut}
-        options={{ title: title("Sign In") }}
+        options={{title: title('Sign In')}}
       />
       <Stack.Screen
         name="Settings"
@@ -192,7 +191,7 @@ function commonScreens(Stack: typeof HomeTab, unreadCountLabel?: string) {
       <Stack.Screen
         name="CommunityFeed"
         component={CommunityFeedScreen}
-        options={{ title: title("Community") }}
+        options={{title: title('Community')}}
       />
       <Stack.Screen
         name="CustomFeedLikedBy"
@@ -247,12 +246,12 @@ function commonScreens(Stack: typeof HomeTab, unreadCountLabel?: string) {
       <Stack.Screen
         name="Reactions"
         component={MissionsTab}
-        options={{ title: title("My Rewards") }}
+        options={{title: title('My Rewards')}}
       />
       <Stack.Screen
         name="Missions"
         component={RewardsTabScreen}
-        options={{ title: title("My Reactions") }}
+        options={{title: title('My Reactions')}}
       />
       {/* <Stack.Screen
         name="Rewards"
@@ -262,7 +261,7 @@ function commonScreens(Stack: typeof HomeTab, unreadCountLabel?: string) {
       <Stack.Screen
         name="Wallets"
         component={Wallets}
-        options={{ title: title("Wallets") }}
+        options={{title: title('Wallets')}}
       />
     </>
   )
@@ -371,7 +370,7 @@ function NotificationsTabNavigator() {
 }
 
 function CommunitiesTabNavigator() {
-  const contentStyle = useColorSchemeStyle(styles.bgLight, styles.bgDark);
+  const contentStyle = useColorSchemeStyle(styles.bgLight, styles.bgDark)
   return (
     <CommunitiesTab.Navigator
       screenOptions={{
@@ -380,16 +379,15 @@ function CommunitiesTabNavigator() {
         headerShown: false,
         animationDuration: 250,
         contentStyle,
-      }}
-    >
+      }}>
       <CommunitiesTab.Screen name="Communities" component={CommunitiesScreen} />
       {commonScreens(CommunitiesTab as typeof HomeTab)}
     </CommunitiesTab.Navigator>
-  );
+  )
 }
 
 function RewardsTabNavigator() {
-  const contentStyle = useColorSchemeStyle(styles.bgLight, styles.bgDark);
+  const contentStyle = useColorSchemeStyle(styles.bgLight, styles.bgDark)
   return (
     <RewardsTab.Navigator
       screenOptions={{
@@ -398,12 +396,11 @@ function RewardsTabNavigator() {
         headerShown: false,
         animationDuration: 250,
         contentStyle,
-      }}
-    >
+      }}>
       <RewardsTab.Screen name="Rewards" component={RewardsScreen} />
       {commonScreens(RewardsTab as typeof HomeTab)}
     </RewardsTab.Navigator>
-  );
+  )
 }
 
 const MyProfileTabNavigator = observer(() => {
@@ -472,12 +469,12 @@ const FlatNavigator = observer(() => {
       <Flat.Screen
         name="Communities"
         component={CommunitiesScreen}
-        options={{ title: title("Communities") }}
+        options={{title: title('Communities')}}
       />
       <Flat.Screen
         name="Rewards"
         component={RewardsScreen}
-        options={{ title: title("Rewards") }}
+        options={{title: title('Rewards')}}
       />
       {commonScreens(Flat as typeof HomeTab, unreadCountLabel)}
     </Flat.Navigator>
@@ -490,7 +487,7 @@ const FlatNavigator = observer(() => {
  */
 
 const LINKING = {
-  prefixes: ["bsky://", SOLARPLEX_UI_URL],
+  prefixes: ['bsky://', SOLARPLEX_UI_URL],
 
   getPathFromState(state: State) {
     // find the current node in the navigation tree
@@ -516,11 +513,11 @@ const LINKING = {
       if (name === 'Notifications') {
         return buildStateObject('NotificationsTab', 'Notifications', params)
       }
-      if (name === "Communities") {
-        return buildStateObject("CommunitiesTab", "Communities", params);
+      if (name === 'Communities') {
+        return buildStateObject('CommunitiesTab', 'Communities', params)
       }
-      if (name === "Rewards") {
-        return buildStateObject("RewardsTab", "Rewards", params);
+      if (name === 'Rewards') {
+        return buildStateObject('RewardsTab', 'Rewards', params)
       }
       if (name === 'Home') {
         return buildStateObject('HomeTab', 'Home', params)
@@ -572,7 +569,9 @@ function navigate<K extends keyof AllNavigatorParams>(
   }
 }
 
-function resetToTab(tabName: 'HomeTab' | 'SearchTab' | 'NotificationsTab' | 'CommunitiesTab') {
+function resetToTab(
+  tabName: 'HomeTab' | 'SearchTab' | 'NotificationsTab' | 'CommunitiesTab',
+) {
   if (navigationRef.isReady()) {
     navigate(tabName)
     if (navigationRef.canGoBack()) {
@@ -627,8 +626,8 @@ function handleLink(url: string) {
       resetToTab('SearchTab')
     } else if (name === 'Notifications') {
       resetToTab('NotificationsTab')
-    } else if (name === "Communities") {
-      resetToTab("CommunitiesTab");
+    } else if (name === 'Communities') {
+      resetToTab('CommunitiesTab')
     } else {
       resetToTab('HomeTab')
       // @ts-ignore matchPath doesnt give us type-checked output -prf

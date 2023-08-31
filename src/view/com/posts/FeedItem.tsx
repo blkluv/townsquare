@@ -12,7 +12,7 @@ import {getTranslatorLink, isPostInLanguage} from '../../../locale/helpers'
 import {AtUri} from '@atproto/api'
 import Clipboard from '@react-native-clipboard/clipboard'
 import {ContentHider} from '../util/moderation/ContentHider'
-import { NavigationProp } from 'lib/routes/types'
+import {NavigationProp} from 'lib/routes/types'
 import {PostAlerts} from '../util/moderation/PostAlerts'
 import {PostCtrls} from '../util/post-ctrls/PostCtrls'
 import {PostEmbeds} from '../util/post-embeds'
@@ -29,7 +29,7 @@ import {s} from 'lib/styles'
 import {sanitizeDisplayName} from 'lib/strings/display-names'
 import {sanitizeHandle} from 'lib/strings/handles'
 import {useAnalytics} from 'lib/analytics/analytics'
-import { useNavigation } from '@react-navigation/native'
+import {useNavigation} from '@react-navigation/native'
 import {usePalette} from 'lib/hooks/usePalette'
 import {useStores} from 'state/index'
 
@@ -38,10 +38,6 @@ export const FeedItem = observer(function ({
   isThreadChild,
   isThreadLastChild,
   isThreadParent,
-  showFollowBtn,
-  showReplyLine,
-  ignoreMuteFor,
-  hideChild,
 }: {
   item: PostsFeedItemModel
   isThreadChild?: boolean
@@ -52,7 +48,7 @@ export const FeedItem = observer(function ({
   const store = useStores()
   const pal = usePalette('default')
   const {track} = useAnalytics()
-  const navigation = useNavigation<NavigationProp>();
+  const navigation = useNavigation<NavigationProp>()
   const [deleted, setDeleted] = useState(false)
   const record = item.postRecord
   const itemUri = item.post.uri
@@ -80,19 +76,19 @@ export const FeedItem = observer(function ({
   const onPressReply = React.useCallback(() => {
     track('FeedItem:PostReply')
     store.session.isSolarplexSession
-      ? navigation.navigate("SignIn")
+      ? navigation.navigate('SignIn')
       : store.shell.openComposer({
-      replyTo: {
-        uri: item.post.uri,
-        cid: item.post.cid,
-        text: record?.text || '',
-        author: {
-          handle: item.post.author.handle,
-          displayName: item.post.author.displayName,
-          avatar: item.post.author.avatar,
-        },
-      },
-    })
+          replyTo: {
+            uri: item.post.uri,
+            cid: item.post.cid,
+            text: record?.text || '',
+            author: {
+              handle: item.post.author.handle,
+              displayName: item.post.author.displayName,
+              avatar: item.post.author.avatar,
+            },
+          },
+        })
   }, [item, track, record, store, navigation])
 
   const onPressToggleRepost = React.useCallback(() => {
@@ -108,15 +104,18 @@ export const FeedItem = observer(function ({
       .toggleLike()
       .catch(e => store.log.error('Failed to toggle like', e))
   }, [track, item, store])
-  const onPressReaction = React.useCallback(async (reactionId: string, remove?: boolean) => {
-    track("FeedItem:PostLike");
-    // console.log("reactionId", reactionId);
-    return store.session.isSolarplexSession
-      ? navigation.navigate("SignIn")
-      : item
-          .react(reactionId, remove)
-          .catch((e) => store.log.error("Failed to add reaction", e));
-  }, [track, item, store, navigation])
+  const onPressReaction = React.useCallback(
+    async (reactionId: string, remove?: boolean) => {
+      track('FeedItem:PostLike')
+      // console.log("reactionId", reactionId);
+      return store.session.isSolarplexSession
+        ? navigation.navigate('SignIn')
+        : item
+            .react(reactionId, remove)
+            .catch(e => store.log.error('Failed to add reaction', e))
+    },
+    [track, item, store, navigation],
+  )
   const onCopyPostText = React.useCallback(() => {
     Clipboard.setString(record?.text || '')
     Toast.show('Copied to clipboard')
@@ -333,12 +332,7 @@ export const FeedItem = observer(function ({
             itemCid={itemCid}
             itemHref={itemHref}
             itemTitle={itemTitle}
-            author={{
-              avatar: item.post.author.avatar!,
-              handle: item.post.author.handle,
-              displayName: item.post.author.displayName!,
-              did: item.post.author.did,
-            }}
+            author={item.post.author}
             text={item.richText?.text || record.text}
             indexedAt={item.post.indexedAt}
             isAuthor={item.post.author.did === store.me.did}
@@ -370,6 +364,7 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     paddingLeft: 10,
     paddingRight: 15,
+    cursor: 'pointer',
   },
   outerSmallTop: {
     borderTopWidth: 0,

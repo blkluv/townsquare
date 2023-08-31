@@ -1,8 +1,8 @@
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu'
 
-import {FontAwesomeIcon, FontAwesomeIconStyle} from '@fortawesome/react-native-fontawesome'
 import {StyleSheet, View} from 'react-native'
 
+import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome'
 import Picker from '@emoji-mart/react'
 import React from 'react'
 import {textInputWebEmitter} from '../TextInput.web'

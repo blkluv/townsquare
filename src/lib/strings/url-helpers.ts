@@ -1,6 +1,6 @@
 import {AtUri} from '@atproto/api'
 import {PROD_SERVICE} from 'state/index'
-import { SOLARPLEX_UI_URL } from "lib/constants";
+import {SOLARPLEX_UI_URL} from 'lib/constants'
 import TLDs from 'tlds'
 
 export function isValidDomain(str: string): boolean {

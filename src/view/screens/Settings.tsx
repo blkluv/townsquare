@@ -3,7 +3,6 @@ import * as Toast from '../com/util/Toast'
 
 import {
   ActivityIndicator,
-  Linking,
   Platform,
   Pressable,
   StyleSheet,
@@ -13,7 +12,7 @@ import {
   ViewStyle,
 } from 'react-native'
 import {CommonNavigatorParams, NativeStackScreenProps} from 'lib/routes/types'
-import { DropdownItem, NativeDropdown } from 'view/com/util/forms/NativeDropdown'
+import {DropdownItem, NativeDropdown} from 'view/com/util/forms/NativeDropdown'
 import {
   FontAwesomeIcon,
   FontAwesomeIconStyle,

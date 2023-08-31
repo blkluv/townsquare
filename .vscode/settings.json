@@ -1,0 +1,52 @@
+{
+  "search.exclude": {
+    "**/node_modules": true
+  },
+  "files.exclude": {
+    "**/*.js": { "when": "$(basename).ts" },
+    "**/**.js": { "when": "$(basename).tsx" }
+  },
+  "editor.tabSize": 2,
+  "javascript.preferences.quoteStyle": "single",
+  "typescript.preferences.quoteStyle": "single",
+  "files.watcherExclude": {
+    "**/.git/objects/**": true,
+    "**/.git/subtree-cache/**": true,
+    "**/node_modules/*/**": true,
+    "**/.hg/store/**": true,
+    "src/scripts/wsconfig/**/*.ts": true
+  },
+  "javascript.validate.enable": false,
+  "typescript.tsdk": "./node_modules/typescript/lib",
+  "css.validate": false,
+  "less.validate": false,
+  "scss.validate": false,
+  "eslint.validate": [
+    "javascript",
+    "typescript"
+  ],
+  "eslint.nodePath": "./",
+  "eslint.options": {
+    "overrideConfig": {
+      "parserOptions": {
+        "project": "./tsconfig.json"
+      }
+    },
+  },
+  "[javascript]": {
+    "editor.codeActionsOnSave": [
+      "source.fixAll.eslint"
+    ]
+  },
+  "[typescript]": {
+    "editor.codeActionsOnSave": [
+      "source.fixAll.eslint"
+    ]
+  },
+  "[typescriptreact]": {
+    "editor.codeActionsOnSave": [
+      "source.fixAll.eslint"
+    ]
+  },
+  "npm.packageManager": "npm",
+} 

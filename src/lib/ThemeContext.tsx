@@ -1,6 +1,5 @@
-import React, {ReactNode, createContext, useContext, useMemo} from 'react'
-import {TextStyle, ViewStyle, useColorScheme} from 'react-native'
-import {darkTheme, defaultTheme} from './themes'
+import React, {ReactNode, createContext, useContext} from 'react'
+import {TextStyle, ViewStyle} from 'react-native'
 
 import {solarplexTheme} from './SolarplexTheme'
 
@@ -88,10 +87,7 @@ export const ThemeContext = createContext<Theme>(solarplexTheme)
 
 export const useTheme = () => useContext(ThemeContext)
 
-export const ThemeProvider: React.FC<ThemeProviderProps> = ({
-  theme,
-  children,
-}) => {
+export const ThemeProvider: React.FC<ThemeProviderProps> = ({children}) => {
   // const colorSchemeFromRN = useColorScheme()
 
   // if theme is 'system', use the device's configured color scheme

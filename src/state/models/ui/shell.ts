@@ -14,15 +14,14 @@ import {isWeb} from 'platform/detection'
 export type ColorMode = 'system' | 'light' | 'dark'
 
 export function isColorMode(v: unknown): v is ColorMode {
-  return v === "system" || v === "light" || v === "dark";
+  return v === 'system' || v === 'light' || v === 'dark'
 }
 
 export interface TippingModal {
-  name: "tip-modal";
-  recipientName: string;
-  recipientAddress: string;
-  tokenName: string;
-
+  name: 'tip-modal'
+  recipientName: string
+  recipientAddress: string
+  tokenName: string
 }
 
 export interface ConfirmModal {
@@ -192,7 +191,7 @@ export type Modal =
   | ConfirmModal
 
   // Tipping
-  | TippingModal;
+  | TippingModal
 
 interface LightboxModel {}
 
@@ -246,9 +245,9 @@ export interface ComposerOpts {
   onPost?: () => void
   quote?: ComposerOptsQuote
   mention?: string // handle of user to mention
-isSharing?: boolean;
-  uri?: string;
-  sharingText?: string;
+  isSharing?: boolean
+  uri?: string
+  sharingText?: string
 }
 
 export class ShellUiModel {
@@ -387,8 +386,8 @@ export class ShellUiModel {
     this.isComposerActive = true
     this.composerOpts = opts
     this.isSharing = opts.isSharing ?? false
-    this.sharedUri = opts.uri ?? ""
-    this.sharingText = opts.sharingText ?? ""
+    this.sharedUri = opts.uri ?? ''
+    this.sharingText = opts.sharingText ?? ''
   }
 
   closeComposer() {
