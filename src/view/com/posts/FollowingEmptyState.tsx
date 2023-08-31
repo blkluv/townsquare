@@ -12,6 +12,7 @@ import {Text} from '../util/text/Text'
 import {s} from 'lib/styles'
 import {useNavigation} from '@react-navigation/native'
 import {usePalette} from 'lib/hooks/usePalette'
+
 // import {isWeb} from 'platform/detection'
 
 export function FollowingEmptyState() {
@@ -62,7 +63,7 @@ export function FollowingEmptyState() {
         style={[styles.emptyBtn, s.mt10]}
         onPress={onPressDiscoverFeeds}>
         <Text type="lg-medium" style={palInverted.text}>
-          Discover new custom feeds
+          Discover new communities!
         </Text>
         <FontAwesomeIcon
           icon="angle-right"
