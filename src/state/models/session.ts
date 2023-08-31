@@ -416,6 +416,7 @@ export class SessionModel {
       headers: {
         'content-type': 'application/json',
         'Access-Control-Allow-Origin': 'no-cors',
+        Authorization: `Bearer ${agent.session.accessJwt}`,
       },
       body: JSON.stringify({
         did: did,
