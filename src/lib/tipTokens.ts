@@ -30,7 +30,7 @@ export const BSOL: TokenType = {
 }
 
 export const BLAZE: TokenType = {
-  tokenName: 'BLAZE',
+  tokenName: 'BLZE',
   mintAddress: 'BLZEEuZUBVqFhj8adcCFPJvPVCiCyVmh3hkJMrU8KuJA',
   decimals: 9,
   tokenImage:
@@ -50,6 +50,7 @@ export const TipTokens = {
   BONK,
   GUAC,
   BLAZE,
+  BSOL,
 }
 
 export function searchTokenByName(tokenName: string): TokenType | undefined {
