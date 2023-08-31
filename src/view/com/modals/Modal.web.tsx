@@ -13,11 +13,13 @@ import * as InviteCodesModal from './InviteCodes'
 import * as ListAddRemoveUserModal from './ListAddRemoveUser'
 import * as ModerationDetailsModal from './ModerationDetails'
 import * as PostLanguagesSettingsModal from './lang-settings/PostLanguagesSettings'
+import * as PreferencesHomeFeed from './PreferencesHomeFeed'
 import * as ProfilePreviewModal from './ProfilePreview'
 import * as ReportModal from './report/Modal'
 import * as RepostModal from './Repost'
 import * as SelfLabelModal from './SelfLabel'
 import * as ServerInputModal from './ServerInput'
+import * as TippingModal from './TippingModal.web'
 import * as WaitlistModal from './Waitlist'
 
 import {StyleSheet, TouchableWithoutFeedback, View} from 'react-native'
@@ -107,6 +109,10 @@ function Modal({modal}: {modal: ModalIface}) {
     element = <EditImageModal.Component {...modal} />
   } else if (modal.name === 'moderation-details') {
     element = <ModerationDetailsModal.Component {...modal} />
+  } else if (modal.name === 'tip-modal') {
+    element = <TippingModal.Component {...modal} />
+  } else if (modal.name === 'preferences-home-feed') {
+    element = <PreferencesHomeFeed.Component />
   } else {
     return null
   }
