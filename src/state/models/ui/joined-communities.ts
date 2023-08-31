@@ -105,6 +105,7 @@ export class JoinedCommunitiesModel {
         headers: {
           'content-type': 'application/json',
           'Access-Control-Allow-Origin': 'no-cors',
+          Authorization: `Bearer ${this.rootStore.session?.currentSession?.accessJwt}`,
         },
         body: JSON.stringify({
           did: this.rootStore.session.data?.did,
@@ -123,6 +124,7 @@ export class JoinedCommunitiesModel {
         headers: {
           'content-type': 'application/json',
           'Access-Control-Allow-Origin': 'no-cors',
+          Authorization: `Bearer ${this.rootStore.session?.currentSession?.accessJwt}`,
         },
         body: JSON.stringify({
           did: this.rootStore.session.data?.did,
