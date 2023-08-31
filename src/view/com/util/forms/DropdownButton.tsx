@@ -11,20 +11,17 @@ import {
 import React, {PropsWithChildren, useMemo, useRef} from 'react'
 
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome'
+import {HITSLOP_10} from 'lib/constants'
 import {IconProp} from '@fortawesome/fontawesome-svg-core'
 import RootSiblings from 'react-native-root-siblings'
 import {Text} from '../text/Text'
 import {colors} from 'lib/styles'
-import {isWeb} from 'platform/detection'
-import {shareUrl} from 'lib/sharing'
-import {toShareUrl} from 'lib/strings/url-helpers'
 import {usePalette} from 'lib/hooks/usePalette'
-import {useStores} from 'state/index'
 import {useTheme} from 'lib/ThemeContext'
 
-const HITSLOP = {left: 10, top: 10, right: 10, bottom: 10}
 const ESTIMATED_BTN_HEIGHT = 50
 const ESTIMATED_SEP_HEIGHT = 16
+const ESTIMATED_HEADING_HEIGHT = 60
 
 export interface DropdownItemButton {
   testID?: string
@@ -35,7 +32,14 @@ export interface DropdownItemButton {
 export interface DropdownItemSeparator {
   sep: true
 }
-export type DropdownItem = DropdownItemButton | DropdownItemSeparator
+export interface DropdownItemHeading {
+  heading: true
+  label: string
+}
+export type DropdownItem =
+  | DropdownItemButton
+  | DropdownItemSeparator
+  | DropdownItemHeading
 type MaybeDropdownItem = DropdownItem | false | undefined
 
 export type DropdownButtonType = ButtonType | 'bare'
@@ -49,8 +53,11 @@ interface DropdownButtonProps {
   menuWidth?: number
   children?: React.ReactNode
   openToRight?: boolean
+  openUpwards?: boolean
   rightOffset?: number
   bottomOffset?: number
+  accessibilityLabel?: string
+  accessibilityHint?: string
 }
 
 export function DropdownButton({
@@ -62,8 +69,10 @@ export function DropdownButton({
   menuWidth,
   children,
   openToRight = false,
+  openUpwards = false,
   rightOffset = 0,
   bottomOffset = 0,
+  accessibilityLabel,
 }: PropsWithChildren<DropdownButtonProps>) {
   const ref1 = useRef<TouchableOpacity>(null)
   const ref2 = useRef<View>(null)
@@ -89,13 +98,15 @@ export function DropdownButton({
             estimatedMenuHeight += ESTIMATED_SEP_HEIGHT
           } else if (item && isBtn(item)) {
             estimatedMenuHeight += ESTIMATED_BTN_HEIGHT
+          } else if (item && isHeading(item)) {
+            estimatedMenuHeight += ESTIMATED_HEADING_HEIGHT
           }
         }
         const newX = openToRight
           ? pageX + width + rightOffset
           : pageX + width - menuWidth
         let newY = pageY + height + bottomOffset
-        if (newY + estimatedMenuHeight > winHeight) {
+        if (openUpwards || newY + estimatedMenuHeight > winHeight) {
           newY -= estimatedMenuHeight
         }
         createDropdownMenu(
@@ -126,11 +137,11 @@ export function DropdownButton({
         testID={testID}
         style={style}
         onPress={onPress}
-        hitSlop={HITSLOP}
+        hitSlop={HITSLOP_10}
         ref={ref1}
         accessibilityRole="button"
-        accessibilityLabel={`Opens ${numItems} options`}
-        accessibilityHint={`Opens ${numItems} options`}>
+        accessibilityLabel={accessibilityLabel || `Opens ${numItems} options`}
+        accessibilityHint="">
         {children}
       </TouchableOpacity>
     )
@@ -146,112 +157,6 @@ export function DropdownButton({
         {children}
       </Button>
     </View>
-  )
-}
-
-export function PostDropdownBtn({
-  testID,
-  style,
-  children,
-  itemUri,
-  itemCid,
-  itemHref,
-  isAuthor,
-  isThreadMuted,
-  onCopyPostText,
-  onOpenTranslate,
-  onToggleThreadMute,
-  onDeletePost,
-}: {
-  testID?: string
-  style?: StyleProp<ViewStyle>
-  children?: React.ReactNode
-  itemUri: string
-  itemCid: string
-  itemHref: string
-  itemTitle: string
-  isAuthor: boolean
-  isThreadMuted: boolean
-  onCopyPostText: () => void
-  onOpenTranslate: () => void
-  onToggleThreadMute: () => void
-  onDeletePost: () => void
-}) {
-  const store = useStores()
-
-  const dropdownItems: DropdownItem[] = [
-    {
-      testID: 'postDropdownTranslateBtn',
-      icon: 'language',
-      label: 'Translate...',
-      onPress() {
-        onOpenTranslate()
-      },
-    },
-    {
-      testID: 'postDropdownCopyTextBtn',
-      icon: ['far', 'paste'],
-      label: 'Copy post text',
-      onPress() {
-        onCopyPostText()
-      },
-    },
-    {
-      testID: 'postDropdownShareBtn',
-      icon: 'share',
-      label: 'Share...',
-      onPress() {
-        const url = toShareUrl(itemHref)
-        shareUrl(url)
-      },
-    },
-    !store.session.isSolarplexSession && {sep: true},
-    !store.session.isSolarplexSession && {
-      testID: 'postDropdownMuteThreadBtn',
-      icon: 'comment-slash',
-      label: isThreadMuted ? 'Unmute thread' : 'Mute thread',
-      onPress() {
-        onToggleThreadMute()
-      },
-    },
-    !store.session.isSolarplexSession && {sep: true},
-    !store.session.isSolarplexSession &&
-      !isAuthor && {
-        testID: 'postDropdownReportBtn',
-        icon: 'circle-exclamation',
-        label: 'Report post',
-        onPress() {
-          store.shell.openModal({
-            name: 'report-post',
-            postUri: itemUri,
-            postCid: itemCid,
-          })
-        },
-      },
-    !store.session.isSolarplexSession &&
-      isAuthor && {
-        testID: 'postDropdownDeleteBtn',
-        icon: ['far', 'trash-can'],
-        label: 'Delete post',
-        onPress() {
-          store.shell.openModal({
-            name: 'confirm',
-            title: 'Delete this post?',
-            message: 'Are you sure? This can not be undone.',
-            onPressConfirm: onDeletePost,
-          })
-        },
-      },
-  ].filter(Boolean) as DropdownItem[]
-
-  return (
-    <DropdownButton
-      testID={testID}
-      style={style}
-      items={dropdownItems}
-      menuWidth={isWeb ? 220 : 200}>
-      {children}
-    </DropdownButton>
   )
 }
 
@@ -310,15 +215,16 @@ const DropdownItems = ({
 
   const numItems = items.filter(isBtn).length
 
+  // TODO: Refactor dropdown components to:
+  // - (On web, if not handled by React Native) use semantic <select />
+  // and <option /> elements for keyboard navigation out of the box
+  // - (On mobile) be buttons by default, accept `label` and `nativeID`
+  // props, and always have an explicit label
   return (
     <>
+      {/* This TouchableWithoutFeedback renders the background so if the user clicks outside, the dropdown closes */}
       <TouchableWithoutFeedback
         onPress={onOuterPress}
-        // TODO: Refactor dropdown components to:
-        // - (On web, if not handled by React Native) use semantic <select />
-        // and <option /> elements for keyboard navigation out of the box
-        // - (On mobile) be buttons by default, accept `label` and `nativeID`
-        // props, and always have an explicit label
         accessibilityRole="button"
         accessibilityLabel="Toggle dropdown"
         accessibilityHint="">
@@ -338,6 +244,7 @@ const DropdownItems = ({
                 key={index}
                 style={[styles.menuItem]}
                 onPress={() => onPressItem(index)}
+                accessibilityRole="button"
                 accessibilityLabel={item.label}
                 accessibilityHint={`Option ${index + 1} of ${numItems}`}>
                 {item.icon && (
@@ -354,6 +261,14 @@ const DropdownItems = ({
             return (
               <View key={index} style={[styles.separator, separatorColor]} />
             )
+          } else if (isHeading(item)) {
+            return (
+              <View style={[styles.heading, pal.border]} key={index}>
+                <Text style={[pal.text, styles.headingLabel]}>
+                  {item.label}
+                </Text>
+              </View>
+            )
           }
           return null
         })}
@@ -365,8 +280,11 @@ const DropdownItems = ({
 function isSep(item: DropdownItem): item is DropdownItemSeparator {
   return 'sep' in item && item.sep
 }
+function isHeading(item: DropdownItem): item is DropdownItemHeading {
+  return 'heading' in item && item.heading
+}
 function isBtn(item: DropdownItem): item is DropdownItemButton {
-  return !isSep(item)
+  return !isSep(item) && !isHeading(item)
 }
 
 const styles = StyleSheet.create({
@@ -400,14 +318,30 @@ const styles = StyleSheet.create({
     paddingTop: 12,
   },
   icon: {
-    marginLeft: 6,
+    marginLeft: 2,
     marginRight: 8,
+    flexShrink: 0,
   },
   label: {
     fontSize: 18,
+    flexShrink: 1,
+    flexGrow: 1,
   },
   separator: {
     borderTopWidth: 1,
     marginVertical: 8,
+  },
+  heading: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    paddingVertical: 10,
+    paddingLeft: 15,
+    paddingRight: 20,
+    borderBottomWidth: 1,
+    marginBottom: 6,
+  },
+  headingLabel: {
+    fontSize: 18,
+    fontWeight: '500',
   },
 })

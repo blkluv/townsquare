@@ -11,13 +11,13 @@ import * as EditImageModal from './EditImage'
 import * as EditProfileModal from './EditProfile'
 import * as InviteCodesModal from './InviteCodes'
 import * as ListAddRemoveUserModal from './ListAddRemoveUser'
+import * as ModerationDetailsModal from './ModerationDetails'
 import * as PostLanguagesSettingsModal from './lang-settings/PostLanguagesSettings'
-import * as PreferencesHomeFeed from './PreferencesHomeFeed'
-import * as ReportAccountModal from './report/ReportAccount'
-import * as ReportPostModal from './report/ReportPost'
+import * as ProfilePreviewModal from './ProfilePreview'
+import * as ReportModal from './report/Modal'
 import * as RepostModal from './Repost'
+import * as SelfLabelModal from './SelfLabel'
 import * as ServerInputModal from './ServerInput'
-import * as TippingModal from './TippingModal.web'
 import * as WaitlistModal from './Waitlist'
 
 import {StyleSheet, TouchableWithoutFeedback, View} from 'react-native'
@@ -69,12 +69,12 @@ function Modal({modal}: {modal: ModalIface}) {
     element = <ConfirmModal.Component {...modal} />
   } else if (modal.name === 'edit-profile') {
     element = <EditProfileModal.Component {...modal} />
+  } else if (modal.name === 'profile-preview') {
+    element = <ProfilePreviewModal.Component {...modal} />
   } else if (modal.name === 'server-input') {
     element = <ServerInputModal.Component {...modal} />
-  } else if (modal.name === 'report-post') {
-    element = <ReportPostModal.Component {...modal} />
-  } else if (modal.name === 'report-account') {
-    element = <ReportAccountModal.Component {...modal} />
+  } else if (modal.name === 'report') {
+    element = <ReportModal.Component {...modal} />
   } else if (modal.name === 'create-or-edit-mute-list') {
     element = <CreateOrEditMuteListModal.Component {...modal} />
   } else if (modal.name === 'list-add-remove-user') {
@@ -85,6 +85,8 @@ function Modal({modal}: {modal: ModalIface}) {
     element = <DeleteAccountModal.Component />
   } else if (modal.name === 'repost') {
     element = <RepostModal.Component {...modal} />
+  } else if (modal.name === 'self-label') {
+    element = <SelfLabelModal.Component {...modal} />
   } else if (modal.name === 'change-handle') {
     element = <ChangeHandleModal.Component {...modal} />
   } else if (modal.name === 'waitlist') {
@@ -103,10 +105,8 @@ function Modal({modal}: {modal: ModalIface}) {
     element = <AltTextImageModal.Component {...modal} />
   } else if (modal.name === 'edit-image') {
     element = <EditImageModal.Component {...modal} />
-  } else if (modal.name === 'preferences-home-feed') {
-    element = <PreferencesHomeFeed.Component />
-  } else if (modal.name === 'tip-modal') {
-    element = <TippingModal.Component {...modal} />
+  } else if (modal.name === 'moderation-details') {
+    element = <ModerationDetailsModal.Component {...modal} />
   } else {
     return null
   }
