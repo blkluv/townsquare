@@ -17,6 +17,7 @@
   },
   "include": [
     "src",
+    "scripts",
     ".eslintrc.js",
     "index.js",
     "index.web.js",

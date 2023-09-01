@@ -23,7 +23,8 @@
     "e2e:mock-server": "ts-node __e2e__/mock-server.ts",
     "e2e:metro": "RN_SRC_EXT=e2e.ts,e2e.tsx expo run:ios",
     "e2e:build": "detox build -c ios.sim.debug",
-    "e2e:run": "detox test --configuration ios.sim.debug --take-screenshots all"
+    "e2e:run": "detox test --configuration ios.sim.debug --take-screenshots all",
+    "upstream": "node ./scripts/merge-upstream.js"
   },
   "dependencies": {
     "@atproto/api": "^0.6.8",
@@ -201,6 +202,7 @@
     "eslint-plugin-detox": "^1.0.0",
     "eslint-plugin-ft-flow": "^2.0.3",
     "eslint-plugin-react-native-a11y": "^3.3.0",
+    "glob": "^10.3.4",
     "html-webpack-plugin": "^5.5.0",
     "husky": "^8.0.3",
     "is-ci": "^3.0.1",
