@@ -1,6 +1,5 @@
-import {TabState, getTabState} from 'lib/routes/helpers'
-
 import {useNavigationState} from '@react-navigation/native'
+import {getTabState, TabState} from 'lib/routes/helpers'
 
 export function useNavigationTabState() {
   return useNavigationState(state => {
@@ -10,8 +9,8 @@ export function useNavigationTabState() {
       isAtFeeds: getTabState(state, 'Feeds') !== TabState.Outside,
       isAtNotifications:
         getTabState(state, 'Notifications') !== TabState.Outside,
-      isAtCommunities: getTabState(state, 'Communities') !== TabState.Outside,
       isAtMyProfile: getTabState(state, 'MyProfile') !== TabState.Outside,
+      isAtCommunities: getTabState(state, 'Communities') !== TabState.Outside,
       isAtRewards: getTabState(state, 'Rewards') !== TabState.Outside,
       isAtWallets: getTabState(state, 'Wallets') !== TabState.Outside,
       isAtReactions: getTabState(state, 'Reactions') !== TabState.Outside,

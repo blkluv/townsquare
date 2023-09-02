@@ -1,37 +1,34 @@
-import * as AddAppPassword from './AddAppPasswords'
-import * as AltImageModal from './AltImage'
-import * as ChangeHandleModal from './ChangeHandle'
+import React, {useRef, useEffect} from 'react'
+import {StyleSheet} from 'react-native'
+import {SafeAreaView} from 'react-native-safe-area-context'
+import {observer} from 'mobx-react-lite'
+import BottomSheet from '@gorhom/bottom-sheet'
+import {useStores} from 'state/index'
+import {createCustomBackdrop} from '../util/BottomSheetCustomBackdrop'
+import {usePalette} from 'lib/hooks/usePalette'
+import {navigate} from '../../../Navigation'
+import once from 'lodash.once'
+
 import * as ConfirmModal from './Confirm'
-import * as ContentFilteringSettingsModal from './ContentFilteringSettings'
-import * as ContentLanguagesSettingsModal from './lang-settings/ContentLanguagesSettings'
-import * as CreateOrEditMuteListModal from './CreateOrEditMuteList'
-import * as DeleteAccountModal from './DeleteAccount'
-import * as EditImageModal from './AltImage'
 import * as EditProfileModal from './EditProfile'
-import * as InviteCodesModal from './InviteCodes'
-import * as ListAddRemoveUserModal from './ListAddRemoveUser'
-import * as ModerationDetailsModal from './ModerationDetails'
-import * as OnboardingModal from './OnboardingModal'
-import * as PostLanguagesSettingsModal from './lang-settings/PostLanguagesSettings'
-import * as PreferencesHomeFeed from './PreferencesHomeFeed'
 import * as ProfilePreviewModal from './ProfilePreview'
-import * as ReportModal from './report/Modal'
+import * as ServerInputModal from './ServerInput'
 import * as RepostModal from './Repost'
 import * as SelfLabelModal from './SelfLabel'
-import * as ServerInputModal from './ServerInput'
+import * as CreateOrEditMuteListModal from './CreateOrEditMuteList'
+import * as ListAddRemoveUserModal from './ListAddRemoveUser'
+import * as AltImageModal from './AltImage'
+import * as EditImageModal from './AltImage'
+import * as ReportModal from './report/Modal'
+import * as DeleteAccountModal from './DeleteAccount'
+import * as ChangeHandleModal from './ChangeHandle'
 import * as WaitlistModal from './Waitlist'
-
-import React, {useEffect, useRef} from 'react'
-
-import BottomSheet from '@gorhom/bottom-sheet'
-import {SafeAreaView} from 'react-native-safe-area-context'
-import {StyleSheet} from 'react-native'
-import {createCustomBackdrop} from '../util/BottomSheetCustomBackdrop'
-import {navigate} from '../../../Navigation'
-import {observer} from 'mobx-react-lite'
-import once from 'lodash.once'
-import {usePalette} from 'lib/hooks/usePalette'
-import {useStores} from 'state/index'
+import * as InviteCodesModal from './InviteCodes'
+import * as AddAppPassword from './AddAppPasswords'
+import * as ContentFilteringSettingsModal from './ContentFilteringSettings'
+import * as ContentLanguagesSettingsModal from './lang-settings/ContentLanguagesSettings'
+import * as PostLanguagesSettingsModal from './lang-settings/PostLanguagesSettings'
+import * as ModerationDetailsModal from './ModerationDetails'
 
 const DEFAULT_SNAPPOINTS = ['90%']
 
@@ -132,12 +129,6 @@ export const ModalsContainer = observer(function ModalsContainer() {
   } else if (activeModal?.name === 'post-languages-settings') {
     snapPoints = PostLanguagesSettingsModal.snapPoints
     element = <PostLanguagesSettingsModal.Component />
-  } else if (activeModal?.name === 'preferences-home-feed') {
-    snapPoints = PreferencesHomeFeed.snapPoints
-    element = <PreferencesHomeFeed.Component />
-  } else if (activeModal?.name === 'onboarding') {
-    snapPoints = OnboardingModal.snapPoints
-    element = <OnboardingModal.Component />
   } else if (activeModal?.name === 'moderation-details') {
     snapPoints = ModerationDetailsModal.snapPoints
     element = <ModerationDetailsModal.Component {...activeModal} />

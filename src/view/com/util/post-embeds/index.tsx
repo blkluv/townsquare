@@ -1,37 +1,36 @@
+import React from 'react'
 import {
-  AppBskyEmbedExternal,
+  StyleSheet,
+  StyleProp,
+  View,
+  ViewStyle,
+  Text,
+  InteractionManager,
+} from 'react-native'
+import {Image} from 'expo-image'
+import {
   AppBskyEmbedImages,
+  AppBskyEmbedExternal,
   AppBskyEmbedRecord,
   AppBskyEmbedRecordWithMedia,
   AppBskyFeedDefs,
   AppBskyGraphDefs,
   ModerationUI,
 } from '@atproto/api'
-import {
-  InteractionManager,
-  StyleProp,
-  StyleSheet,
-  Text,
-  View,
-  ViewStyle,
-} from 'react-native'
-
-import {AutoSizedImage} from '../images/AutoSizedImage'
-import {CustomFeedEmbed} from './CustomFeedEmbed'
-import {ExternalLinkEmbed} from './ExternalLinkEmbed'
-import {Image} from 'expo-image'
+import {Link} from '../Link'
 import {ImageLayoutGrid} from '../images/ImageLayoutGrid'
 import {ImagesLightbox} from 'state/models/ui/shell'
-import {Link} from '../Link'
-import {ListEmbed} from './ListEmbed'
-import {MaybeQuoteEmbed} from './QuoteEmbed'
-import React from 'react'
-import {YoutubeEmbed} from './YoutubeEmbed'
-import {getYoutubeVideoId} from 'lib/strings/url-helpers'
-import {isCauseALabelOnUri} from 'lib/moderation'
-import {isDesktopWeb} from 'platform/detection'
-import {usePalette} from 'lib/hooks/usePalette'
 import {useStores} from 'state/index'
+import {usePalette} from 'lib/hooks/usePalette'
+import {YoutubeEmbed} from './YoutubeEmbed'
+import {ExternalLinkEmbed} from './ExternalLinkEmbed'
+import {getYoutubeVideoId} from 'lib/strings/url-helpers'
+import {MaybeQuoteEmbed} from './QuoteEmbed'
+import {AutoSizedImage} from '../images/AutoSizedImage'
+import {CustomFeedEmbed} from './CustomFeedEmbed'
+import {ListEmbed} from './ListEmbed'
+import {isDesktopWeb} from 'platform/detection'
+import {isCauseALabelOnUri} from 'lib/moderation'
 
 type Embed =
   | AppBskyEmbedRecord.View

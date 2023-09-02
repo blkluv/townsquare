@@ -1,45 +1,42 @@
-import * as Toast from '../util/Toast'
-
-import {AppBskyFeedDefs, AtUri} from '@atproto/api'
+import React, {useMemo} from 'react'
+import {observer} from 'mobx-react-lite'
+import {Linking, StyleSheet, View} from 'react-native'
+import Clipboard from '@react-native-clipboard/clipboard'
+import {AtUri, AppBskyFeedDefs} from '@atproto/api'
 import {
   FontAwesomeIcon,
   FontAwesomeIconStyle,
 } from '@fortawesome/react-native-fontawesome'
-import {Linking, StyleSheet, View} from 'react-native'
-import React, {useMemo} from 'react'
-import {getTranslatorLink, isPostInLanguage} from '../../../locale/helpers'
-
-import Clipboard from '@react-native-clipboard/clipboard'
-import {ContentHider} from '../util/moderation/ContentHider'
-import {ErrorMessage} from '../util/error/ErrorMessage'
-import {Link} from '../util/Link'
-import {NavigationProp} from 'lib/routes/types'
-import {PostAlerts} from '../util/moderation/PostAlerts'
-import {PostCtrls} from '../util/post-ctrls/PostCtrls'
-import {PostDropdownBtn} from '../util/forms/PostDropdownBtn'
-import {PostEmbeds} from '../util/post-embeds'
-import {PostHider} from '../util/moderation/PostHider'
-import {PostMeta} from '../util/PostMeta'
-import {PostSandboxWarning} from '../util/PostSandboxWarning'
 import {PostThreadItemModel} from 'state/models/content/post-thread-item'
-import {PreviewableUserAvatar} from '../util/UserAvatar'
-import {ReactionList} from '../reactions/ReactionList'
+import {Link} from '../util/Link'
 import {RichText} from '../util/text/RichText'
 import {Text} from '../util/text/Text'
-import {TimeElapsed} from 'view/com/util/TimeElapsed'
-import {formatCount} from '../util/numeric/format'
-import {isDesktopWeb} from 'platform/detection'
-import {makeProfileLink} from 'lib/routes/links'
-import {niceDate} from 'lib/strings/time'
-import {observer} from 'mobx-react-lite'
-import {pluralize} from 'lib/strings/helpers'
+import {PostDropdownBtn} from '../util/forms/PostDropdownBtn'
+import * as Toast from '../util/Toast'
+import {PreviewableUserAvatar} from '../util/UserAvatar'
 import {s} from 'lib/styles'
+import {niceDate} from 'lib/strings/time'
 import {sanitizeDisplayName} from 'lib/strings/display-names'
 import {sanitizeHandle} from 'lib/strings/handles'
-import {track} from 'lib/analytics/analytics'
-import {useNavigation} from '@react-navigation/native'
-import {usePalette} from 'lib/hooks/usePalette'
+import {pluralize} from 'lib/strings/helpers'
+import {getTranslatorLink, isPostInLanguage} from '../../../locale/helpers'
 import {useStores} from 'state/index'
+import {PostMeta} from '../util/PostMeta'
+import {PostEmbeds} from '../util/post-embeds'
+import {PostCtrls} from '../util/post-ctrls/PostCtrls'
+import {PostHider} from '../util/moderation/PostHider'
+import {ContentHider} from '../util/moderation/ContentHider'
+import {PostAlerts} from '../util/moderation/PostAlerts'
+import {PostSandboxWarning} from '../util/PostSandboxWarning'
+import {ErrorMessage} from '../util/error/ErrorMessage'
+import {usePalette} from 'lib/hooks/usePalette'
+import {formatCount} from '../util/numeric/format'
+import {TimeElapsed} from 'view/com/util/TimeElapsed'
+import {makeProfileLink} from 'lib/routes/links'
+import {isDesktopWeb} from 'platform/detection'
+
+import {track} from 'lib/analytics/analytics'
+import {ReactionList} from '../reactions/ReactionList'
 
 export const PostThreadItem = observer(function PostThreadItem({
   item,
@@ -52,7 +49,6 @@ export const PostThreadItem = observer(function PostThreadItem({
 }) {
   const pal = usePalette('default')
   const store = useStores()
-  const navigation = useNavigation<NavigationProp>()
   const [deleted, setDeleted] = React.useState(false)
   const record = item.postRecord
   const hasEngagement =
@@ -86,51 +82,43 @@ export const PostThreadItem = observer(function PostThreadItem({
     [item.post, store.preferences.contentLanguages],
   )
 
-  const onPressReply = React.useCallback(async () => {
-    store.session.isSolarplexSession
-      ? navigation.navigate('SignIn')
-      : store.shell.openComposer({
-          replyTo: {
-            uri: item.post.uri,
-            cid: item.post.cid,
-            text: record?.text as string,
-            author: {
-              handle: item.post.author.handle,
-              displayName: item.post.author.displayName,
-              avatar: item.post.author.avatar,
-            },
-          },
-          onPost: onPostReply,
-        })
-  }, [store, item, record, onPostReply, navigation])
+  const onPressReply = React.useCallback(() => {
+    store.shell.openComposer({
+      replyTo: {
+        uri: item.post.uri,
+        cid: item.post.cid,
+        text: record?.text as string,
+        author: {
+          handle: item.post.author.handle,
+          displayName: item.post.author.displayName,
+          avatar: item.post.author.avatar,
+        },
+      },
+      onPost: onPostReply,
+    })
+  }, [store, item, record, onPostReply])
 
-  const onPressToggleRepost = React.useCallback(async () => {
-    return store.session.isSolarplexSession
-      ? navigation.navigate('SignIn')
-      : item
-          .toggleRepost()
-          .catch(e => store.log.error('Failed to toggle repost', e))
-  }, [item, store, navigation])
+  const onPressToggleRepost = React.useCallback(() => {
+    return item
+      .toggleRepost()
+      .catch(e => store.log.error('Failed to toggle repost', e))
+  }, [item, store])
 
-  const onPressToggleLike = React.useCallback(async () => {
-    return store.session.isSolarplexSession
-      ? navigation.navigate('SignIn')
-      : item
-          .toggleLike()
-          .catch(e => store.log.error('Failed to toggle like', e))
-  }, [item, store, navigation])
+  const onPressToggleLike = React.useCallback(() => {
+    return item
+      .toggleLike()
+      .catch(e => store.log.error('Failed to toggle like', e))
+  }, [item, store])
 
   const onPressReaction = React.useCallback(
     async (reactionId: string, remove?: boolean) => {
       track('FeedItem:PostLike')
       // console.log("reactionId", reactionId);
-      return store.session.isSolarplexSession
-        ? await navigation.navigate('SignIn')
-        : item
-            .react(reactionId, remove)
-            .catch(e => store.log.error('Failed to add reaction', e))
+      return item
+        .react(reactionId, remove)
+        .catch(e => store.log.error('Failed to add reaction', e))
     },
-    [item, store, navigation],
+    [item, store],
   )
 
   const onCopyPostText = React.useCallback(() => {
@@ -396,12 +384,7 @@ export const PostThreadItem = observer(function PostThreadItem({
                 itemCid={itemCid}
                 itemHref={itemHref}
                 itemTitle={itemTitle}
-                author={{
-                  avatar: item.post.author.avatar!,
-                  handle: item.post.author.handle,
-                  displayName: item.post.author.displayName!,
-                  did: item.post.author.did,
-                }}
+                author={item.post.author}
                 text={item.richText?.text || record.text}
                 indexedAt={item.post.indexedAt}
                 isAuthor={item.post.author.did === store.me.did}
@@ -435,6 +418,7 @@ export const PostThreadItem = observer(function PostThreadItem({
             pal.border,
             pal.view,
             item._showParentReplyLine && hasPrecedingItem && styles.noTopBorder,
+            styles.cursor,
           ]}
           moderation={item.moderation.content}>
           <PostSandboxWarning />
@@ -532,12 +516,7 @@ export const PostThreadItem = observer(function PostThreadItem({
                 itemCid={itemCid}
                 itemHref={itemHref}
                 itemTitle={itemTitle}
-                author={{
-                  avatar: item.post.author.avatar!,
-                  handle: item.post.author.handle,
-                  displayName: item.post.author.displayName!,
-                  did: item.post.author.did,
-                }}
+                author={item.post.author}
                 text={item.richText?.text || record.text}
                 indexedAt={item.post.indexedAt}
                 isAuthor={item.post.author.did === store.me.did}
@@ -687,17 +666,13 @@ const styles = StyleSheet.create({
     paddingRight: 20,
     paddingVertical: 12,
   },
-  image: {
-    // width: '100%',
-    // height: '100%',
-    resizeMode: 'contain',
-    width: 25,
-    height: 25,
-    marginLeft: -15,
-  },
   replyLine: {
     width: 2,
     marginLeft: 'auto',
     marginRight: 'auto',
+  },
+  cursor: {
+    // @ts-ignore web only
+    cursor: 'pointer',
   },
 })

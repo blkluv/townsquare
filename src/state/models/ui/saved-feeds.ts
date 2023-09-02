@@ -1,11 +1,11 @@
-import {SOLARPLEX_FEED_API, SOLARPLEX_FEED_URI_PATH} from 'lib/constants'
 import {makeAutoObservable, runInAction} from 'mobx'
-
-import {CustomFeedModel} from '../feeds/custom-feed'
 import {RootStoreModel} from '../root-store'
 import {bundleAsync} from 'lib/async/bundle'
 import {cleanError} from 'lib/strings/errors'
+import {CustomFeedModel} from '../feeds/custom-feed'
 import {track} from 'lib/analytics/analytics'
+
+import {SOLARPLEX_FEED_API, SOLARPLEX_FEED_URI_PATH} from 'lib/constants'
 
 export class SavedFeedsModel {
   // state
@@ -41,7 +41,7 @@ export class SavedFeedsModel {
   }
 
   get pinned() {
-    return this.feeds
+    return this.rootStore.preferences.pinnedFeeds
       .map(uri => this._feedModelCache[uri] as CustomFeedModel)
       .filter(Boolean)
   }
@@ -58,7 +58,7 @@ export class SavedFeedsModel {
   }
 
   get pinnedFeedNames() {
-    return Object.values(this._feedModelCache).map(f => f.displayName)
+    return this.pinned.map(f => f.displayName)
   }
 
   // public api

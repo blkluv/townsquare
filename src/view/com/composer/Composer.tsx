@@ -1,6 +1,5 @@
-import * as Toast from '../util/Toast'
-import * as apilib from 'lib/api/index'
-
+import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react'
+import {observer} from 'mobx-react-lite'
 import {
   ActivityIndicator,
   Keyboard,
@@ -11,47 +10,46 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native'
-import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react'
+import {useSafeAreaInsets} from 'react-native-safe-area-context'
+import LinearGradient from 'react-native-linear-gradient'
+import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome'
+import {RichText} from '@atproto/api'
+import {useAnalytics} from 'lib/analytics/analytics'
+import {UserAutocompleteModel} from 'state/models/discovery/user-autocomplete'
+import {useIsKeyboardVisible} from 'lib/hooks/useIsKeyboardVisible'
+import {ExternalEmbed} from './ExternalEmbed'
+import {Text} from '../util/text/Text'
+import * as Toast from '../util/Toast'
 // TODO: Prevent naming components that coincide with RN primitives
 // due to linting false positives
 import {TextInput, TextInputRef} from './text-input/TextInput'
-import {colors, gradients, s} from 'lib/styles'
-import {isAndroid, isDesktopWeb, isIOS} from 'platform/detection'
-
 import {CharProgress} from './char-progress/CharProgress'
-import {ComposerOpts} from 'state/models/ui/shell'
-import {EmojiPickerButton} from './text-input/web/EmojiPicker.web'
-import {ExternalEmbed} from './ExternalEmbed'
-import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome'
-import {Gallery} from './photos/Gallery'
-import {GalleryModel} from 'state/models/media/gallery'
-import LinearGradient from 'react-native-linear-gradient'
-import {MAX_GRAPHEME_LENGTH} from 'lib/constants'
-import {OpenCameraBtn} from './photos/OpenCameraBtn'
-import QuoteEmbed from '../util/post-embeds/QuoteEmbed'
-import {RichText} from '@atproto/api'
-import {SelectLangBtn} from './select-language/SelectLangBtn'
-import {SelectPhotoBtn} from './photos/SelectPhotoBtn'
-import {Text} from '../util/text/Text'
-import {UserAutocompleteModel} from 'state/models/discovery/user-autocomplete'
 import {UserAvatar} from '../util/UserAvatar'
-import {cleanError} from 'lib/strings/errors'
-import {insertMentionAt} from 'lib/strings/mention-manip'
-import {observer} from 'mobx-react-lite'
+import {useStores} from 'state/index'
+import * as apilib from 'lib/api/index'
+import {ComposerOpts} from 'state/models/ui/shell'
+import {s, colors, gradients} from 'lib/styles'
 import {sanitizeDisplayName} from 'lib/strings/display-names'
 import {sanitizeHandle} from 'lib/strings/handles'
+import {cleanError} from 'lib/strings/errors'
 import {shortenLinks} from 'lib/strings/rich-text-manip'
 import {toShortUrl} from 'lib/strings/url-helpers'
-import {useAnalytics} from 'lib/analytics/analytics'
-import {useExternalLinkFetch} from './useExternalLinkFetch'
-import {useIsKeyboardVisible} from 'lib/hooks/useIsKeyboardVisible'
+import {SelectPhotoBtn} from './photos/SelectPhotoBtn'
+import {OpenCameraBtn} from './photos/OpenCameraBtn'
 import {usePalette} from 'lib/hooks/usePalette'
-import {useSafeAreaInsets} from 'react-native-safe-area-context'
-import {useStores} from 'state/index'
+import QuoteEmbed from '../util/post-embeds/QuoteEmbed'
+import {useExternalLinkFetch} from './useExternalLinkFetch'
+import {isDesktopWeb, isAndroid, isIOS} from 'platform/detection'
+import {GalleryModel} from 'state/models/media/gallery'
+import {Gallery} from './photos/Gallery'
+import {MAX_GRAPHEME_LENGTH} from 'lib/constants'
+import {LabelsBtn} from './labels/LabelsBtn'
+import {SelectLangBtn} from './select-language/SelectLangBtn'
+import {EmojiPickerButton} from './text-input/web/EmojiPicker.web'
+import {insertMentionAt} from 'lib/strings/mention-manip'
 
 type Props = ComposerOpts & {
   onClose: () => void
-  uri?: string
 }
 
 export const ComposePost = observer(function ComposePost({
@@ -92,7 +90,7 @@ export const ComposePost = observer(function ComposePost({
     initQuote,
   )
   const {extLink, setExtLink} = useExternalLinkFetch({setQuote})
-  const [labels, _setLabels] = useState<string[]>([])
+  const [labels, setLabels] = useState<string[]>([])
   const [suggestedLinks, setSuggestedLinks] = useState<Set<string>>(new Set())
   const gallery = useMemo(() => new GalleryModel(store), [store])
 
@@ -242,6 +240,9 @@ export const ComposePost = observer(function ComposePost({
   const selectTextInputPlaceholder = replyTo ? 'Write your reply' : `What's up?`
 
   const canSelectImages = useMemo(() => gallery.size < 4, [gallery.size])
+  const hasMedia = gallery.size > 0 || Boolean(extLink)
+
+  const allowSetLables = false
 
   return (
     <KeyboardAvoidingView
@@ -260,7 +261,13 @@ export const ComposePost = observer(function ComposePost({
             <Text style={[pal.link, s.f18]}>Cancel</Text>
           </TouchableOpacity>
           <View style={s.flex1} />
-          {/* <LabelsBtn labels={labels} onChange={setLabels} hasMedia={hasMedia} /> */}
+          {allowSetLables && (
+            <LabelsBtn
+              labels={labels}
+              onChange={setLabels}
+              hasMedia={hasMedia}
+            />
+          )}
           {isProcessing ? (
             <View style={styles.postBtn}>
               <ActivityIndicator />

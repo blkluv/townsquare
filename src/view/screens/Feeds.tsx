@@ -1,25 +1,24 @@
-import {CogIcon, ComposeIcon2} from 'lib/icons'
-import {FeedsTabNavigatorParams, NativeStackScreenProps} from 'lib/routes/types'
-import {StyleSheet, View} from 'react-native'
-
-import {FAB} from 'view/com/util/fab/FAB'
-import {FlatList} from 'view/com/util/Views'
-import {Link} from 'view/com/util/Link'
-import {LoadLatestBtn} from 'view/com/util/load-latest/LoadLatestBtn'
-import {MultiFeed} from 'view/com/posts/MultiFeed'
-import {PostsMultiFeedModel} from 'state/models/feeds/multi-feed'
 import React from 'react'
-import {ViewHeader} from 'view/com/util/ViewHeader'
-import {isDesktopWeb} from 'platform/detection'
-import isEqual from 'lodash.isequal'
-import {observer} from 'mobx-react-lite'
-import {s} from 'lib/styles'
+import {StyleSheet, View} from 'react-native'
 import {useFocusEffect} from '@react-navigation/native'
-import {useOnMainScroll} from 'lib/hooks/useOnMainScroll'
-import {usePalette} from 'lib/hooks/usePalette'
-import {useStores} from 'state/index'
-import {useTimer} from 'lib/hooks/useTimer'
+import isEqual from 'lodash.isequal'
 import {withAuthRequired} from 'view/com/auth/withAuthRequired'
+import {FlatList} from 'view/com/util/Views'
+import {ViewHeader} from 'view/com/util/ViewHeader'
+import {LoadLatestBtn} from 'view/com/util/load-latest/LoadLatestBtn'
+import {FAB} from 'view/com/util/fab/FAB'
+import {Link} from 'view/com/util/Link'
+import {NativeStackScreenProps, FeedsTabNavigatorParams} from 'lib/routes/types'
+import {observer} from 'mobx-react-lite'
+import {PostsMultiFeedModel} from 'state/models/feeds/multi-feed'
+import {MultiFeed} from 'view/com/posts/MultiFeed'
+import {isDesktopWeb} from 'platform/detection'
+import {usePalette} from 'lib/hooks/usePalette'
+import {useTimer} from 'lib/hooks/useTimer'
+import {useStores} from 'state/index'
+import {useOnMainScroll} from 'lib/hooks/useOnMainScroll'
+import {ComposeIcon2, CogIcon} from 'lib/icons'
+import {s} from 'lib/styles'
 
 const LOAD_NEW_PROMPT_TIME = 60e3 // 60 seconds
 const HEADER_OFFSET = isDesktopWeb ? 0 : 40
@@ -98,7 +97,7 @@ export const FeedsScreen = withAuthRequired(
         </Link>
       )
     }, [pal])
-    store.log.debug('multifeed', multifeed)
+
     return (
       <View style={[pal.view, styles.container]}>
         <MultiFeed
@@ -107,7 +106,6 @@ export const FeedsScreen = withAuthRequired(
           onScroll={onMainScroll}
           scrollEventThrottle={100}
           headerOffset={HEADER_OFFSET}
-          showPostFollowBtn
         />
         <ViewHeader
           title="My Feeds"
@@ -122,16 +120,14 @@ export const FeedsScreen = withAuthRequired(
             showIndicator={loadPromptVisible}
           />
         ) : null}
-        {!store.session.isSolarplexSession && (
-          <FAB
-            testID="composeFAB"
-            onPress={onPressCompose}
-            icon={<ComposeIcon2 strokeWidth={1.5} size={29} style={s.white} />}
-            accessibilityRole="button"
-            accessibilityLabel="Compose post"
-            accessibilityHint=""
-          />
-        )}
+        <FAB
+          testID="composeFAB"
+          onPress={onPressCompose}
+          icon={<ComposeIcon2 strokeWidth={1.5} size={29} style={s.white} />}
+          accessibilityRole="button"
+          accessibilityLabel="Compose post"
+          accessibilityHint=""
+        />
       </View>
     )
   }),

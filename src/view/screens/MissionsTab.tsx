@@ -61,7 +61,7 @@ export const GrayedImage = ({
   return (
     <View>
       <Image
-        accessibilityIgnoresInvertColors={true}
+        accessibilityIgnoresInvertColors
         source={{
           uri: image,
         }}
@@ -71,7 +71,7 @@ export const GrayedImage = ({
         }}
       />
       <Image
-        accessibilityIgnoresInvertColors={true}
+        accessibilityIgnoresInvertColors
         source={{
           uri: image,
         }}
@@ -183,7 +183,7 @@ const DisplayReactions = observer(function DisplayReactions() {
                           paddingHorizontal: isMobileWeb ? 8 : 12,
                         }}>
                         <Image
-                          accessibilityIgnoresInvertColors={true}
+                          accessibilityIgnoresInvertColors
                           source={{
                             uri: item.nft_metadata.image,
                           }}

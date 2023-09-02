@@ -1,4 +1,4 @@
-import {SOLARPLEX_DID, SOLARPLEX_FEED_API} from 'lib/constants'
+import {SOLARPLEX_FEED_API} from 'lib/constants'
 import {makeAutoObservable, runInAction} from 'mobx'
 
 import {CommunityFeedModel} from '../feeds/community-feed'
@@ -32,12 +32,7 @@ export class JoinedCommunitiesModel {
       newCommunityModels = {...this._communityModelCache}
     }
     // if not logged in, use solarplex user to fetch homepage.
-    let did
-    if (this.rootStore.session.isSolarplexSession) {
-      did = SOLARPLEX_DID
-    } else {
-      did = this.rootStore.me.did
-    }
+    const did = this.rootStore.me.did
 
     // fetch the joined communities
     const response = await fetch(

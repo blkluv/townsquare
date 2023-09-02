@@ -7,7 +7,12 @@ import {
   StyleSheet,
   View,
 } from 'react-native'
-import {AppBskyEmbedImages} from '@atproto/api'
+import {
+  AppBskyEmbedImages,
+  ProfileModeration,
+  moderateProfile,
+  AppBskyEmbedRecordWithMedia,
+} from '@atproto/api'
 import {AtUri} from '@atproto/api'
 import {
   FontAwesomeIcon,
@@ -19,22 +24,20 @@ import {PostThreadModel} from 'state/models/content/post-thread'
 import {s, colors} from 'lib/styles'
 import {ago} from 'lib/strings/time'
 import {sanitizeDisplayName} from 'lib/strings/display-names'
+import {sanitizeHandle} from 'lib/strings/handles'
 import {pluralize} from 'lib/strings/helpers'
 import {HeartIconSolid} from 'lib/icons'
 import {Text} from '../util/text/Text'
-import {UserAvatar} from '../util/UserAvatar'
+import {UserAvatar, PreviewableUserAvatar} from '../util/UserAvatar'
+import {UserPreviewLink} from '../util/UserPreviewLink'
 import {ImageHorzList} from '../util/images/ImageHorzList'
 import {Post} from '../post/Post'
 import {Link, TextLink} from '../util/Link'
 import {useStores} from 'state/index'
 import {usePalette} from 'lib/hooks/usePalette'
 import {useAnimatedValue} from 'lib/hooks/useAnimatedValue'
-import {
-  getProfileViewBasicLabelInfo,
-  getProfileModeration,
-} from 'lib/labeling/helpers'
-import {ProfileModeration} from 'lib/labeling/types'
 import {formatCount} from '../util/numeric/format'
+import {makeProfileLink} from 'lib/routes/links'
 
 const MAX_AUTHORS = 5
 
@@ -42,6 +45,7 @@ const EXPANDED_AUTHOR_EL_HEIGHT = 35
 
 interface Author {
   href: string
+  did: string
   handle: string
   displayName?: string
   avatar?: string
@@ -61,10 +65,13 @@ export const FeedItem = observer(function ({
       const urip = new AtUri(item.subjectUri)
       return `/profile/${urip.host}/post/${urip.rkey}`
     } else if (item.isFollow) {
-      return `/profile/${item.author.handle}`
+      return makeProfileLink(item.author)
     } else if (item.isReply) {
       const urip = new AtUri(item.uri)
       return `/profile/${urip.host}/post/${urip.rkey}`
+    } else if (item.isCustomFeedLike) {
+      const urip = new AtUri(item.subjectUri)
+      return `/profile/${urip.host}/feed/${urip.rkey}`
     }
     return ''
   }, [item])
@@ -75,6 +82,8 @@ export const FeedItem = observer(function ({
       return item.author.handle
     } else if (item.isReply) {
       return 'Post'
+    } else if (item.isCustomFeedLike) {
+      return 'Custom Feed'
     }
   }, [item])
 
@@ -85,25 +94,24 @@ export const FeedItem = observer(function ({
   const authors: Author[] = useMemo(() => {
     return [
       {
-        href: `/profile/${item.author.handle}`,
+        href: makeProfileLink(item.author),
+        did: item.author.did,
         handle: item.author.handle,
         displayName: item.author.displayName,
         avatar: item.author.avatar,
-        moderation: getProfileModeration(
-          store,
-          getProfileViewBasicLabelInfo(item.author),
+        moderation: moderateProfile(
+          item.author,
+          store.preferences.moderationOpts,
         ),
       },
       ...(item.additional?.map(({author}) => {
         return {
-          href: `/profile/${author.handle}`,
+          href: makeProfileLink(author),
+          did: author.did,
           handle: author.handle,
           displayName: author.displayName,
           avatar: author.avatar,
-          moderation: getProfileModeration(
-            store,
-            getProfileViewBasicLabelInfo(author),
-          ),
+          moderation: moderateProfile(author, store.preferences.moderationOpts),
         }
       }) || []),
     ]
@@ -115,7 +123,7 @@ export const FeedItem = observer(function ({
   }
 
   if (item.isReply || item.isMention || item.isQuote) {
-    if (item.additionalPost?.error) {
+    if (!item.additionalPost || item.additionalPost?.error) {
       // hide errors - it doesnt help the user to show them
       return <View />
     }
@@ -127,8 +135,7 @@ export const FeedItem = observer(function ({
         noFeedback
         accessible={false}>
         <Post
-          uri={item.uri}
-          initView={item.additionalPost}
+          view={item.additionalPost}
           style={
             item.isRead
               ? undefined
@@ -149,7 +156,7 @@ export const FeedItem = observer(function ({
     action = 'liked your post'
     icon = 'HeartIconSolid'
     iconStyle = [
-      s.red3 as FontAwesomeIconStyle,
+      s.likeColor as FontAwesomeIconStyle,
       {position: 'relative', top: -4},
     ]
   } else if (item.isRepost) {
@@ -160,6 +167,13 @@ export const FeedItem = observer(function ({
     action = 'followed you'
     icon = 'user-plus'
     iconStyle = [s.blue3 as FontAwesomeIconStyle]
+  } else if (item.isCustomFeedLike) {
+    action = `liked your custom feed '${new AtUri(item.subjectUri).rkey}'`
+    icon = 'HeartIconSolid'
+    iconStyle = [
+      s.likeColor as FontAwesomeIconStyle,
+      {position: 'relative', top: -4},
+    ]
   } else {
     return null
   }
@@ -270,17 +284,13 @@ function CondensedAuthorsList({
   if (authors.length === 1) {
     return (
       <View style={styles.avis}>
-        <Link
-          style={s.mr5}
-          href={authors[0].href}
-          title={`@${authors[0].handle}`}
-          asAnchor>
-          <UserAvatar
-            size={35}
-            avatar={authors[0].avatar}
-            moderation={authors[0].moderation.avatar}
-          />
-        </Link>
+        <PreviewableUserAvatar
+          size={35}
+          did={authors[0].did}
+          handle={authors[0].handle}
+          avatar={authors[0].avatar}
+          moderation={authors[0].moderation.avatar}
+        />
       </View>
     )
   }
@@ -344,12 +354,11 @@ function ExpandedAuthorsList({
         visible ? s.mb10 : undefined,
       ]}>
       {authors.map(author => (
-        <Link
-          key={author.href}
-          href={author.href}
-          title={sanitizeDisplayName(author.displayName || author.handle)}
-          style={styles.expandedAuthor}
-          asAnchor>
+        <UserPreviewLink
+          key={author.did}
+          did={author.did}
+          handle={author.handle}
+          style={styles.expandedAuthor}>
           <View style={styles.expandedAuthorAvi}>
             <UserAvatar
               size={35}
@@ -366,11 +375,11 @@ function ExpandedAuthorsList({
               {sanitizeDisplayName(author.displayName || author.handle)}
               &nbsp;
               <Text style={[pal.textLight]} lineHeight={1.2}>
-                {author.handle}
+                {sanitizeHandle(author.handle)}
               </Text>
             </Text>
           </View>
-        </Link>
+        </UserPreviewLink>
       ))}
     </Animated.View>
   )
@@ -392,6 +401,9 @@ function AdditionalPostText({
   const text = additionalPost.thread?.postRecord.text
   const images = AppBskyEmbedImages.isView(additionalPost.thread.post.embed)
     ? additionalPost.thread.post.embed.images
+    : AppBskyEmbedRecordWithMedia.isView(additionalPost.thread.post.embed) &&
+      AppBskyEmbedImages.isView(additionalPost.thread.post.embed.media)
+    ? additionalPost.thread.post.embed.media.images
     : undefined
   return (
     <>

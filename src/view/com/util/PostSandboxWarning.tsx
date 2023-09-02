@@ -1,9 +1,8 @@
-import {StyleSheet, View} from 'react-native'
-
 import React from 'react'
+import {StyleSheet, View} from 'react-native'
 import {Text} from './text/Text'
-import {usePalette} from 'lib/hooks/usePalette'
 import {useStores} from 'state/index'
+import {usePalette} from 'lib/hooks/usePalette'
 
 export function PostSandboxWarning() {
   const store = useStores()

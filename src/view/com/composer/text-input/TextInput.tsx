@@ -1,34 +1,33 @@
-import {AppBskyRichtextFacet, RichText} from '@atproto/api'
+import React, {
+  forwardRef,
+  useCallback,
+  useRef,
+  useMemo,
+  ComponentProps,
+} from 'react'
 import {
   NativeSyntheticEvent,
-  TextInput as RNTextInput,
   StyleSheet,
+  TextInput as RNTextInput,
   TextInputSelectionChangeEventData,
   View,
 } from 'react-native'
 import PasteInput, {
-  PasteInputRef,
   PastedFile,
+  PasteInputRef,
 } from '@mattermost/react-native-paste-input'
-import React, {
-  ComponentProps,
-  forwardRef,
-  useCallback,
-  useMemo,
-  useRef,
-} from 'react'
-import {getMentionAt, insertMentionAt} from 'lib/strings/mention-manip'
-
-import {Autocomplete} from './mobile/Autocomplete'
-import {POST_IMG_MAX} from 'lib/constants'
-import {Text} from 'view/com/util/text/Text'
-import {UserAutocompleteModel} from 'state/models/discovery/user-autocomplete'
-import {cleanError} from 'lib/strings/errors'
-import {downloadAndResize} from 'lib/media/manip'
+import {AppBskyRichtextFacet, RichText} from '@atproto/api'
 import isEqual from 'lodash.isequal'
-import {isUriImage} from 'lib/media/util'
+import {UserAutocompleteModel} from 'state/models/discovery/user-autocomplete'
+import {Autocomplete} from './mobile/Autocomplete'
+import {Text} from 'view/com/util/text/Text'
+import {cleanError} from 'lib/strings/errors'
+import {getMentionAt, insertMentionAt} from 'lib/strings/mention-manip'
 import {usePalette} from 'lib/hooks/usePalette'
 import {useTheme} from 'lib/ThemeContext'
+import {isUriImage} from 'lib/media/util'
+import {downloadAndResize} from 'lib/media/manip'
+import {POST_IMG_MAX} from 'lib/constants'
 
 export interface TextInputRef {
   focus: () => void

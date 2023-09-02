@@ -1,16 +1,14 @@
-import * as apilib from 'lib/api/index'
-
+import {makeAutoObservable, runInAction} from 'mobx'
 import {
-  AppBskyFeedDefs,
   AppBskyFeedGetPostThread as GetPostThread,
+  AppBskyFeedDefs,
   PostModeration,
 } from '@atproto/api'
-import {makeAutoObservable, runInAction} from 'mobx'
-
 import {AtUri} from '@atproto/api'
-import {PostThreadItemModel} from './post-thread-item'
 import {RootStoreModel} from '../root-store'
+import * as apilib from 'lib/api/index'
 import {cleanError} from 'lib/strings/errors'
+import {PostThreadItemModel} from './post-thread-item'
 
 export class PostThreadModel {
   // state

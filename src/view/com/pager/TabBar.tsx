@@ -1,11 +1,10 @@
-import {LayoutChangeEvent, ScrollView, StyleSheet, View} from 'react-native'
-import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react'
-import {isDesktopWeb, isMobileWeb} from 'platform/detection'
-
-import {DraggableScrollView} from './DraggableScrollView'
-import {PressableWithHover} from '../util/PressableWithHover'
+import React, {useRef, useMemo, useEffect, useState, useCallback} from 'react'
+import {StyleSheet, View, ScrollView, LayoutChangeEvent} from 'react-native'
 import {Text} from '../util/text/Text'
+import {PressableWithHover} from '../util/PressableWithHover'
 import {usePalette} from 'lib/hooks/usePalette'
+import {isDesktopWeb, isMobileWeb} from 'platform/detection'
+import {DraggableScrollView} from './DraggableScrollView'
 
 export interface TabBarProps {
   testID?: string
@@ -96,7 +95,6 @@ const styles = isDesktopWeb
   ? StyleSheet.create({
       outer: {
         flexDirection: 'row',
-
         width: 598,
       },
       contentContainer: {
@@ -111,14 +109,15 @@ const styles = isDesktopWeb
         paddingHorizontal: 10,
         borderBottomWidth: 3,
         borderBottomColor: 'transparent',
+        justifyContent: 'center',
       },
     })
   : StyleSheet.create({
       outer: {
         flex: 1,
         flexDirection: 'row',
-
         backgroundColor: 'transparent',
+        maxWidth: '100%',
       },
       contentContainer: {
         columnGap: isMobileWeb ? 0 : 20,
@@ -132,5 +131,6 @@ const styles = isDesktopWeb
         paddingHorizontal: isMobileWeb ? 8 : 0,
         borderBottomWidth: 3,
         borderBottomColor: 'transparent',
+        justifyContent: 'center',
       },
     })

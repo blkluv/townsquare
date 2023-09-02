@@ -62,7 +62,7 @@ export const Component = observer(function ({image, gallery}: Props) {
   const [position, setPosition] = useState<Position | undefined>(
     image.attributes.position,
   )
-  const [altText, setAltText] = useState('')
+  const [altText, setAltText] = useState(image?.altText ?? '')
 
   const onFlipHorizontal = useCallback(() => {
     image.flipHorizontal()
@@ -300,7 +300,7 @@ export const Component = observer(function ({image, gallery}: Props) {
         </Pressable>
         <Pressable onPress={onPressSave} accessibilityRole="button">
           <LinearGradient
-            colors={[gradients.blueLight.start, gradients.blueLight.end]}
+            colors={[gradients.purple.start, gradients.purple.end]}
             start={{x: 0, y: 0}}
             end={{x: 1, y: 1}}
             style={[styles.btn]}>

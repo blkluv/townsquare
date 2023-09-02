@@ -1,25 +1,27 @@
+import React from 'react'
 import {
-  AnalyticsProvider,
   createClient,
+  AnalyticsProvider,
   useAnalytics as useAnalyticsOrig,
 } from '@segment/analytics-react'
-
-import React from 'react'
 import {RootStoreModel} from 'state/models/root-store'
-import {sha256} from 'js-sha256'
 import {useStores} from 'state/models/root-store'
+import {sha256} from 'js-sha256'
 
+const splx = true
 const segmentClient = createClient(
   {
     writeKey: 'aqLhAgXweRt74dGXU3NVMqW9LVB2dmZ9',
   },
-  {
-    // integrations: {
-    //   "Segment.io": {
-    //     apiHost: "api.evt.bsky.app/v1",
-    //   },
-    // },
-  },
+  splx
+    ? {}
+    : {
+        integrations: {
+          'Segment.io': {
+            apiHost: 'api.evt.bsky.app/v1',
+          },
+        },
+      },
 )
 export const track = segmentClient?.track?.bind?.(segmentClient)
 

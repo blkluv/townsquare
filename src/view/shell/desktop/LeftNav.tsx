@@ -1,76 +1,70 @@
-import * as fa from '@fortawesome/free-solid-svg-icons'
-
-import {
-  BellIcon,
-  BellIconSolid,
-  CommunitiesIcon,
-  ComposeIcon2,
-  HomeIcon,
-  HomeIconSolid,
-  MagnifyingGlassIcon2,
-  MagnifyingGlassIcon2Solid,
-  RegularRankingStarIcon,
-  RegularReactionIcon,
-  SolidRankingStarIcon,
-  SolidReactionIcon,
-  UserIcon,
-  UserIconSolid,
-} from 'lib/icons'
-import {CommonNavigatorParams, NavigationProp} from 'lib/routes/types'
-import {
-  FontAwesomeIcon,
-  FontAwesomeIconStyle,
-} from '@fortawesome/react-native-fontawesome'
-import {
-  StyleProp,
-  StyleSheet,
-  TouchableOpacity,
-  View,
-  ViewStyle,
-} from 'react-native'
-import {colors, s} from 'lib/styles'
-import {getCurrentRoute, isStateAtTabRoot, isTab} from 'lib/routes/helpers'
+import React from 'react'
+import {observer} from 'mobx-react-lite'
+import {StyleSheet, TouchableOpacity, View} from 'react-native'
+import {PressableWithHover} from 'view/com/util/PressableWithHover'
 import {
   useLinkProps,
   useNavigation,
   useNavigationState,
 } from '@react-navigation/native'
-
-import {Banner} from '../Banner'
-import {Link} from 'view/com/util/Link'
-import {PressableWithHover} from 'view/com/util/PressableWithHover'
-import React from 'react'
+import {
+  FontAwesomeIcon,
+  FontAwesomeIconStyle,
+} from '@fortawesome/react-native-fontawesome'
 import {Text} from 'view/com/util/text/Text'
 import {UserAvatar} from 'view/com/util/UserAvatar'
-import {observer} from 'mobx-react-lite'
-import {router} from '../../../routes'
-import {useAnalytics} from 'lib/analytics/analytics'
+import {Link} from 'view/com/util/Link'
+import {LoadingPlaceholder} from 'view/com/util/LoadingPlaceholder'
 import {usePalette} from 'lib/hooks/usePalette'
 import {useStores} from 'state/index'
+import {s, colors} from 'lib/styles'
+import {
+  HomeIcon,
+  HomeIconSolid,
+  MagnifyingGlassIcon2,
+  MagnifyingGlassIcon2Solid,
+  BellIcon,
+  BellIconSolid,
+  UserIcon,
+  UserIconSolid,
+  CogIcon,
+  CogIconSolid,
+  ComposeIcon2,
+  HandIcon,
+  SatelliteDishIcon,
+  SatelliteDishIconSolid,
+  CommunitiesIcon,
+  RegularRankingStarIcon,
+  RegularReactionIcon,
+  SolidRankingStarIcon,
+  SolidReactionIcon,
+} from 'lib/icons'
+import {getCurrentRoute, isTab, isStateAtTabRoot} from 'lib/routes/helpers'
+import {NavigationProp, CommonNavigatorParams} from 'lib/routes/types'
+import {router} from '../../../routes'
+import {makeProfileLink} from 'lib/routes/links'
+
+import * as fa from '@fortawesome/free-solid-svg-icons'
+import {Banner} from '../Banner'
+import {useAnalytics} from 'lib/analytics/analytics'
 
 const ProfileCard = observer(() => {
   const store = useStores()
-
-  return (
-    <View>
-      <Link
-        href={`/profile/${store.me.handle}`}
-        style={styles.profileCard}
-        asAnchor>
-        <UserAvatar avatar={store.me.avatar} size={64} />
-      </Link>
-      {/* <View style={{ paddingLeft: 12 }}>
-        <ScoreCard />
-      </View> */}
+  return store.me.handle ? (
+    <Link href={makeProfileLink(store.me)} style={styles.profileCard} asAnchor>
+      <UserAvatar avatar={store.me.avatar} size={64} />
+    </Link>
+  ) : (
+    <View style={styles.profileCard}>
+      <LoadingPlaceholder width={64} height={64} style={{borderRadius: 64}} />
     </View>
   )
 })
 
 function BackBtn() {
   const pal = usePalette('default')
-  const store = useStores()
   const navigation = useNavigation<NavigationProp>()
-  const shouldShow = useNavigationState(state => isStateAtTabRoot(state))
+  const shouldShow = useNavigationState(state => !isStateAtTabRoot(state))
 
   const onPressBack = React.useCallback(() => {
     if (navigation.canGoBack()) {
@@ -84,22 +78,19 @@ function BackBtn() {
     return <></>
   }
   return (
-    store.session.hasSession &&
-    !store.session.isSolarplexSession && (
-      <TouchableOpacity
-        testID="viewHeaderBackOrMenuBtn"
-        onPress={onPressBack}
-        style={styles.backBtn}
-        accessibilityRole="button"
-        accessibilityLabel="Go back"
-        accessibilityHint="">
-        <FontAwesomeIcon
-          size={24}
-          icon="angle-left"
-          style={pal.text as FontAwesomeIconStyle}
-        />
-      </TouchableOpacity>
-    )
+    <TouchableOpacity
+      testID="viewHeaderBackOrMenuBtn"
+      onPress={onPressBack}
+      style={styles.backBtn}
+      accessibilityRole="button"
+      accessibilityLabel="Go back"
+      accessibilityHint="">
+      <FontAwesomeIcon
+        size={24}
+        icon="angle-left"
+        style={pal.text as FontAwesomeIconStyle}
+      />
+    </TouchableOpacity>
   )
 }
 
@@ -110,7 +101,7 @@ interface NavItemProps {
   iconFilled: JSX.Element
   label: string
 }
-export const NavItem = observer(
+const NavItem = observer(
   ({count, href, icon, iconFilled, label}: NavItemProps) => {
     const pal = usePalette('default')
     const store = useStores()
@@ -203,7 +194,22 @@ export function SignOutBtn({onPressHandler}: SignOutProps) {
 
 function ComposeBtn() {
   const store = useStores()
-  const onPressCompose = () => store.shell.openComposer({})
+  const {getState} = useNavigation()
+
+  const getProfileHandle = () => {
+    const {routes} = getState()
+    const currentRoute = routes[routes.length - 1]
+    if (currentRoute.name === 'Profile') {
+      const {name: handle} =
+        currentRoute.params as CommonNavigatorParams['Profile']
+      if (handle === store.me.handle) return undefined
+      return handle
+    }
+    return undefined
+  }
+
+  const onPressCompose = () =>
+    store.shell.openComposer({mention: getProfileHandle()})
 
   return (
     <TouchableOpacity
@@ -236,6 +242,8 @@ export const DesktopLeftNav = observer(function DesktopLeftNav() {
     store.session.logout()
   }, [track, store])
 
+  const splx = true
+
   return (
     <View style={[styles.leftNav, pal.view]}>
       <Banner />
@@ -253,14 +261,98 @@ export const DesktopLeftNav = observer(function DesktopLeftNav() {
         }
         label="Home"
       />
-      {store.session.hasSession && (
+      {!splx ? (
+        <>
+          <NavItem
+            href="/search"
+            icon={
+              <MagnifyingGlassIcon2
+                strokeWidth={2}
+                size={24}
+                style={pal.text}
+              />
+            }
+            iconFilled={
+              <MagnifyingGlassIcon2Solid
+                strokeWidth={2}
+                size={24}
+                style={pal.text}
+              />
+            }
+            label="Search"
+          />
+          <NavItem
+            href="/feeds"
+            icon={
+              <SatelliteDishIcon
+                strokeWidth={1.75}
+                style={pal.text as FontAwesomeIconStyle}
+                size={24}
+              />
+            }
+            iconFilled={
+              <SatelliteDishIconSolid
+                strokeWidth={1.75}
+                style={pal.text as FontAwesomeIconStyle}
+                size={24}
+              />
+            }
+            label="My Feeds"
+          />
+          <NavItem
+            href="/notifications"
+            count={store.me.notifications.unreadCountLabel}
+            icon={<BellIcon strokeWidth={2} size={24} style={pal.text} />}
+            iconFilled={
+              <BellIconSolid strokeWidth={1.5} size={24} style={pal.text} />
+            }
+            label="Notifications"
+          />
+          <NavItem
+            href="/moderation"
+            icon={
+              <HandIcon
+                strokeWidth={5.5}
+                style={pal.text as FontAwesomeIconStyle}
+                size={24}
+              />
+            }
+            iconFilled={
+              <FontAwesomeIcon
+                icon="hand"
+                style={pal.text as FontAwesomeIconStyle}
+                size={20}
+              />
+            }
+            label="Moderation"
+          />
+          {store.session.hasSession && (
+            <NavItem
+              href={makeProfileLink(store.me)}
+              icon={<UserIcon strokeWidth={1.75} size={28} style={pal.text} />}
+              iconFilled={
+                <UserIconSolid strokeWidth={1.75} size={28} style={pal.text} />
+              }
+              label="Profile"
+            />
+          )}
+          <NavItem
+            href="/settings"
+            icon={<CogIcon strokeWidth={1.75} size={28} style={pal.text} />}
+            iconFilled={
+              <CogIconSolid strokeWidth={1.5} size={28} style={pal.text} />
+            }
+            label="Settings"
+          />
+        </>
+      ) : (
         <>
           <NavItem
             href="/notifications"
             count={store.me.notifications.unreadCountLabel}
-            icon={<BellIcon strokeWidth={2} size={22} style={pal.text} />}
+            icon={<BellIcon strokeWidth={2} size={24} style={pal.text} />}
             iconFilled={
-              <BellIconSolid strokeWidth={1.5} size={22} style={pal.text} />
+              <BellIconSolid strokeWidth={1.5} size={24} style={pal.text} />
             }
             label="Notifications"
           />
@@ -281,24 +373,23 @@ export const DesktopLeftNav = observer(function DesktopLeftNav() {
             label="Communities"
           />
           <NavItem
-            href={`/search`}
-            iconFilled={
-              <MagnifyingGlassIcon2Solid
-                style={pal.text as StyleProp<ViewStyle>}
-                size={24}
-                strokeWidth={1.7}
-              />
-            }
+            href="/search"
             icon={
               <MagnifyingGlassIcon2
-                style={pal.text as StyleProp<ViewStyle>}
+                strokeWidth={2}
                 size={24}
-                strokeWidth={1.7}
+                style={pal.text}
+              />
+            }
+            iconFilled={
+              <MagnifyingGlassIcon2Solid
+                strokeWidth={2}
+                size={24}
+                style={pal.text}
               />
             }
             label="Search"
           />
-
           <NavItem
             href={`/rewards/missions`}
             icon={<RegularRankingStarIcon />}
@@ -311,14 +402,16 @@ export const DesktopLeftNav = observer(function DesktopLeftNav() {
             iconFilled={<SolidReactionIcon />}
             label="Reactions"
           />
-          <NavItem
-            href={`/profile/${store.me.handle}`}
-            icon={<UserIcon size={24} strokeWidth={1.7} style={[pal.text]} />}
-            iconFilled={
-              <UserIconSolid size={24} strokeWidth={1.7} style={[pal.text]} />
-            }
-            label="Profile"
-          />
+          {store.session.hasSession && (
+            <NavItem
+              href={makeProfileLink(store.me)}
+              icon={<UserIcon strokeWidth={1.75} size={28} style={pal.text} />}
+              iconFilled={
+                <UserIconSolid strokeWidth={1.75} size={28} style={pal.text} />
+              }
+              label="Profile"
+            />
+          )}
           <NavItem
             href="/wallets"
             icon={
@@ -338,9 +431,9 @@ export const DesktopLeftNav = observer(function DesktopLeftNav() {
             label="Wallets"
           />
           <SignOutBtn onPressHandler={() => onPressSignout()} />
-          <ComposeBtn />
         </>
       )}
+      {store.session.hasSession && <ComposeBtn />}
       {!store.session.hasSession && (
         <NavItem
           href="/signin"
@@ -372,12 +465,10 @@ const styles = StyleSheet.create({
 
   backBtn: {
     position: 'absolute',
-    top: 48,
+    top: 12,
     right: 12,
     width: 30,
     height: 30,
-    marginTop: 8,
-    zIndex: 100,
   },
 
   navItemWrapper: {
@@ -411,31 +502,21 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    width: 150,
+    width: 140,
     borderRadius: 24,
     paddingVertical: 10,
     paddingHorizontal: 16,
     backgroundColor: colors.splx.primary[50],
     marginLeft: 12,
-    marginTop: 8,
-    marginBottom: 8,
+    marginTop: 20,
+    marginBottom: 10,
   },
   newPostBtnIconWrapper: {
     marginRight: 8,
   },
   newPostBtnLabel: {
     color: colors.white,
-    fontSize: 14,
+    fontSize: 16,
     fontWeight: 'bold',
-  },
-  btn: {
-    borderRadius: 32,
-    paddingVertical: 16,
-    marginBottom: 20,
-    marginHorizontal: 20,
-  },
-  btnLabel: {
-    textAlign: 'center',
-    fontSize: 21,
   },
 })

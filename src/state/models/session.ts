@@ -1,18 +1,17 @@
+import {makeAutoObservable, runInAction} from 'mobx'
 import {
-  AtpSessionData,
-  AtpSessionEvent,
   BskyAgent,
+  AtpSessionEvent,
+  AtpSessionData,
   ComAtprotoServerDescribeServer as DescribeServer,
 } from '@atproto/api'
-import {IS_PROD, SOLARPLEX_FEED_API, SOLARPLEX_IDENTIFIER} from 'lib/constants'
-import {hasProp, isObj} from 'lib/type-guards'
-import {makeAutoObservable, runInAction} from 'mobx'
-
-import {DEFAULT_SERVICE} from '..'
-import {RootStoreModel} from './root-store'
-import {networkRetry} from 'lib/async/retry'
 import normalizeUrl from 'normalize-url'
+import {isObj, hasProp} from 'lib/type-guards'
+import {networkRetry} from 'lib/async/retry'
 import {z} from 'zod'
+import {RootStoreModel} from './root-store'
+import {IS_PROD, SOLARPLEX_FEED_API} from 'lib/constants'
+import {track} from 'lib/analytics/analytics'
 
 export type ServiceDescription = DescribeServer.OutputSchema
 
@@ -95,19 +94,7 @@ export class SessionModel {
     )
   }
 
-  get isSolarplexSession() {
-    return this.currentSession?.handle === SOLARPLEX_IDENTIFIER
-  }
-
   get hasSession() {
-    return (
-      !!this.currentSession &&
-      !!this.rootStore.agent.session &&
-      !this.isSolarplexSession
-    )
-  }
-
-  get hasAnySession() {
     return !!this.currentSession && !!this.rootStore.agent.session
   }
 
@@ -296,11 +283,6 @@ export class SessionModel {
       return false
     }
 
-    if (account.service !== DEFAULT_SERVICE) {
-      this._log('SessionModel:resumeSession aborted due service mismatch  ')
-      return false
-    }
-
     const agent = new BskyAgent({
       service: account.service,
       persistSession: (evt: AtpSessionEvent, sess?: AtpSessionData) => {
@@ -434,6 +416,7 @@ export class SessionModel {
 
     await this.setActiveSession(agent, did)
     this._log('SessionModel:createAccount succeeded')
+    track('Create Account Successfully')
   }
 
   /**
@@ -452,11 +435,8 @@ export class SessionModel {
         )
       })
     }*/
-
-    if (!this.isSolarplexSession) {
-      this.clearSessionTokens()
-      this.rootStore.clearAllSessionState()
-    }
+    this.clearSessionTokens()
+    this.rootStore.clearAllSessionState()
   }
 
   /**

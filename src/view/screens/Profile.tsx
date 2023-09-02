@@ -1,35 +1,34 @@
+import React, {useEffect, useState} from 'react'
 import {ActivityIndicator, StyleSheet, View} from 'react-native'
-import {CommonNavigatorParams, NativeStackScreenProps} from 'lib/routes/types'
+import {observer} from 'mobx-react-lite'
+import {useFocusEffect} from '@react-navigation/native'
+import {NativeStackScreenProps, CommonNavigatorParams} from 'lib/routes/types'
+import {withAuthRequired} from 'view/com/auth/withAuthRequired'
+import {ViewSelector, ViewSelectorHandle} from '../com/util/ViewSelector'
+import {CenteredView} from '../com/util/Views'
+import {ScreenHider} from 'view/com/util/moderation/ScreenHider'
+import {ProfileUiModel, Sections} from 'state/models/ui/profile'
+import {useStores} from 'state/index'
+import {PostsFeedSliceModel} from 'state/models/feeds/posts-slice'
+import {ProfileHeader} from '../com/profile/ProfileHeader'
+import {FeedSlice} from '../com/posts/FeedSlice'
+import {ListCard} from 'view/com/lists/ListCard'
 import {
   PostFeedLoadingPlaceholder,
   ProfileCardFeedLoadingPlaceholder,
 } from '../com/util/LoadingPlaceholder'
-import {ProfileUiModel, Sections} from 'state/models/ui/profile'
-import React, {useEffect, useState} from 'react'
-import {ViewSelector, ViewSelectorHandle} from '../com/util/ViewSelector'
-import {colors, s} from 'lib/styles'
-
-import {CenteredView} from '../com/util/Views'
+import {ErrorScreen} from '../com/util/error/ErrorScreen'
+import {ErrorMessage} from '../com/util/error/ErrorMessage'
+import {EmptyState} from '../com/util/EmptyState'
+import {Text} from '../com/util/text/Text'
+import {FAB} from '../com/util/fab/FAB'
+import {s, colors} from 'lib/styles'
+import {useAnalytics} from 'lib/analytics/analytics'
 import {ComposeIcon2} from 'lib/icons'
 import {CustomFeed} from 'view/com/feeds/CustomFeed'
 import {CustomFeedModel} from 'state/models/feeds/custom-feed'
-import {EmptyState} from '../com/util/EmptyState'
-import {ErrorMessage} from '../com/util/error/ErrorMessage'
-import {ErrorScreen} from '../com/util/error/ErrorScreen'
-import {FAB} from '../com/util/fab/FAB'
-import {FeedSlice} from '../com/posts/FeedSlice'
-import {ListCard} from 'view/com/lists/ListCard'
-import {PostsFeedSliceModel} from 'state/models/feeds/posts-slice'
-import {ProfileHeader} from '../com/profile/ProfileHeader'
-import {ScreenHider} from 'view/com/util/moderation/ScreenHider'
-import {Text} from '../com/util/text/Text'
-import {combinedDisplayName} from 'lib/strings/display-names'
-import {observer} from 'mobx-react-lite'
-import {useAnalytics} from 'lib/analytics/analytics'
-import {useFocusEffect} from '@react-navigation/native'
 import {useSetTitle} from 'lib/hooks/useSetTitle'
-import {useStores} from 'state/index'
-import {withAuthRequired} from 'view/com/auth/withAuthRequired'
+import {combinedDisplayName} from 'lib/strings/display-names'
 
 type Props = NativeStackScreenProps<CommonNavigatorParams, 'Profile'>
 export const ProfileScreen = withAuthRequired(
@@ -280,16 +279,14 @@ export const ProfileScreen = withAuthRequired(
         ) : (
           <CenteredView>{renderHeader()}</CenteredView>
         )}
-        {!store.session.isSolarplexSession && (
-          <FAB
-            testID="composeFAB"
-            onPress={onPressCompose}
-            icon={<ComposeIcon2 strokeWidth={1.5} size={29} style={s.white} />}
-            accessibilityRole="button"
-            accessibilityLabel="Compose post"
-            accessibilityHint=""
-          />
-        )}
+        <FAB
+          testID="composeFAB"
+          onPress={onPressCompose}
+          icon={<ComposeIcon2 strokeWidth={1.5} size={29} style={s.white} />}
+          accessibilityRole="button"
+          accessibilityLabel="Compose post"
+          accessibilityHint=""
+        />
       </ScreenHider>
     )
   }),

@@ -1,28 +1,26 @@
 import * as React from 'react'
-
+import {StyleSheet, View} from 'react-native'
+import {observer} from 'mobx-react-lite'
 import {
   AppBskyActorDefs,
-  ProfileModeration,
   moderateProfile,
+  ProfileModeration,
 } from '@atproto/api'
-import {StyleSheet, View} from 'react-native'
-import {
-  describeModerationCause,
-  getModerationCauseKey,
-  getProfileModerationCauses,
-} from 'lib/moderation'
-
-import {FollowButton} from './FollowButton'
 import {Link} from '../util/Link'
 import {Text} from '../util/text/Text'
 import {UserAvatar} from '../util/UserAvatar'
-import {makeProfileLink} from 'lib/routes/links'
-import {observer} from 'mobx-react-lite'
 import {s} from 'lib/styles'
-import {sanitizeDisplayName} from 'lib/strings/display-names'
-import {sanitizeHandle} from 'lib/strings/handles'
 import {usePalette} from 'lib/hooks/usePalette'
 import {useStores} from 'state/index'
+import {FollowButton} from './FollowButton'
+import {sanitizeDisplayName} from 'lib/strings/display-names'
+import {sanitizeHandle} from 'lib/strings/handles'
+import {makeProfileLink} from 'lib/routes/links'
+import {
+  describeModerationCause,
+  getProfileModerationCauses,
+  getModerationCauseKey,
+} from 'lib/moderation'
 
 export const ProfileCard = observer(
   ({

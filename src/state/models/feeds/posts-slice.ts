@@ -1,7 +1,7 @@
+import {makeAutoObservable} from 'mobx'
+import {RootStoreModel} from '../root-store'
 import {FeedViewPostsSlice} from 'lib/api/feed-manip'
 import {PostsFeedItemModel} from './post'
-import {RootStoreModel} from '../root-store'
-import {makeAutoObservable} from 'mobx'
 
 export class PostsFeedSliceModel {
   // ui state

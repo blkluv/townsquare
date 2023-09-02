@@ -20,7 +20,7 @@ export const ReactionList = observer(({reactions}: {reactions: string[]}) => {
         ) {
           return (
             <Image
-              accessibilityIgnoresInvertColors={true}
+              accessibilityIgnoresInvertColors
               style={styles.image}
               key={store.reactions.reactionTypes[item]?.id}
               source={

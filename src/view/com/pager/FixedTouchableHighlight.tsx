@@ -1,6 +1,6 @@
-import {GestureResponderEvent, TouchableHighlight} from 'react-native'
 // FixedTouchableHighlight.tsx
 import React, {ComponentProps, useRef} from 'react'
+import {GestureResponderEvent, TouchableHighlight} from 'react-native'
 
 type Position = {pageX: number; pageY: number}
 

@@ -1,25 +1,32 @@
-import {ActivityIndicator, StyleSheet} from 'react-native'
-
+import React from 'react'
+import {
+  ActivityIndicator,
+  Linking,
+  StyleSheet,
+  TouchableOpacity,
+} from 'react-native'
+import {observer} from 'mobx-react-lite'
+import {useStores} from 'state/index'
 import {CenteredView} from '../util/Views'
 import {LoggedOut} from './LoggedOut'
-// import {LoggedOut} from './LoggedOut'
-import React from 'react'
+import {Onboarding} from './Onboarding'
 import {Text} from '../util/text/Text'
-import {observer} from 'mobx-react-lite'
 import {usePalette} from 'lib/hooks/usePalette'
-import {useStores} from 'state/index'
+import {STATUS_PAGE_URL} from 'lib/constants'
 
 export const withAuthRequired = <P extends object>(
   Component: React.ComponentType<P>,
 ): React.FC<P> =>
   observer((props: P) => {
     const store = useStores()
-
     if (store.session.isResumingSession) {
       return <Loading />
     }
     if (!store.session.hasSession) {
       return <LoggedOut />
+    }
+    if (store.onboarding.isActive) {
+      return <Onboarding />
     }
     return <Component {...props} />
   })
@@ -29,7 +36,7 @@ export function Loading() {
 
   const [isTakingTooLong, setIsTakingTooLong] = React.useState(false)
   React.useEffect(() => {
-    const t = setTimeout(() => setIsTakingTooLong(true), 15e3)
+    const t = setTimeout(() => setIsTakingTooLong(true), 15e3) // 15 seconds
     return () => clearTimeout(t)
   }, [setIsTakingTooLong])
 
@@ -41,6 +48,17 @@ export function Loading() {
           ? "This is taking too long. There may be a problem with your internet or with the service, but we're going to try a couple more times..."
           : 'Connecting...'}
       </Text>
+      {isTakingTooLong ? (
+        <TouchableOpacity
+          onPress={() => {
+            Linking.openURL(STATUS_PAGE_URL)
+          }}
+          accessibilityRole="button">
+          <Text type="2xl" style={[styles.loadingText, pal.link]}>
+            Check Bluesky status page
+          </Text>
+        </TouchableOpacity>
+      ) : null}
     </CenteredView>
   )
 }

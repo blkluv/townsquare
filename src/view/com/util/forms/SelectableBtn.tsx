@@ -1,9 +1,8 @@
-import {Pressable, StyleProp, StyleSheet, ViewStyle} from 'react-native'
-
 import React from 'react'
+import {Pressable, ViewStyle, StyleProp, StyleSheet} from 'react-native'
 import {Text} from '../text/Text'
-import {isDesktopWeb} from '../../../../platform/detection'
-import {usePalette} from '../../../../lib/hooks/usePalette'
+import {usePalette} from 'lib/hooks/usePalette'
+import {isDesktopWeb} from 'platform/detection'
 
 interface SelectableBtnProps {
   testID?: string

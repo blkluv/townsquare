@@ -1,5 +1,6 @@
-import React, {ReactNode, createContext, useContext} from 'react'
-import {TextStyle, ViewStyle} from 'react-native'
+import React, {ReactNode, createContext, useContext, useMemo} from 'react'
+import {TextStyle, useColorScheme, ViewStyle} from 'react-native'
+import {darkTheme, defaultTheme} from './themes'
 
 import {solarplexTheme} from './SolarplexTheme'
 
@@ -83,22 +84,25 @@ export interface ThemeProviderProps {
   theme?: 'light' | 'dark' | 'system'
 }
 
-export const ThemeContext = createContext<Theme>(solarplexTheme)
+export const ThemeContext = createContext<Theme>(defaultTheme)
 
 export const useTheme = () => useContext(ThemeContext)
 
-export const ThemeProvider: React.FC<ThemeProviderProps> = ({children}) => {
-  // const colorSchemeFromRN = useColorScheme()
+export const ThemeProvider: React.FC<ThemeProviderProps> = ({
+  theme,
+  children,
+}) => {
+  const colorSchemeFromRN = useColorScheme()
 
   // if theme is 'system', use the device's configured color scheme
-  // let colorScheme = theme === 'system' ? colorSchemeFromRN : theme
+  let colorScheme = theme === 'system' ? colorSchemeFromRN : theme
 
-  // const value = useMemo(
-  //   () => (colorScheme === 'dark' ? solarplexTheme : solarplexTheme),
-  //   [colorScheme],
-  // )
+  let value = useMemo(
+    () => (colorScheme === 'dark' ? darkTheme : defaultTheme),
+    [colorScheme],
+  )
 
-  const value = solarplexTheme
+  value = solarplexTheme
 
   return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>
 }

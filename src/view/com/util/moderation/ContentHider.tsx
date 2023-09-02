@@ -1,13 +1,12 @@
-import {Pressable, StyleProp, StyleSheet, View, ViewStyle} from 'react-native'
-
-import {ModerationUI} from '@atproto/api'
 import React from 'react'
-import {ShieldExclamation} from 'lib/icons'
-import {Text} from '../text/Text'
-import {describeModerationCause} from 'lib/moderation'
-import {isDesktopWeb} from 'platform/detection'
+import {Pressable, StyleProp, StyleSheet, View, ViewStyle} from 'react-native'
 import {usePalette} from 'lib/hooks/usePalette'
+import {ModerationUI} from '@atproto/api'
+import {Text} from '../text/Text'
+import {ShieldExclamation} from 'lib/icons'
+import {describeModerationCause} from 'lib/moderation'
 import {useStores} from 'state/index'
+import {isDesktopWeb} from 'platform/detection'
 
 export function ContentHider({
   testID,

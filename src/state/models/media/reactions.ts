@@ -100,6 +100,7 @@ export class SplxReactionModel {
         Object.values(reactionSets).forEach((reactionPack: any) => {
           reactionPack.forEach((reaction: any) => {
             this.reactionTypes[reaction.id] = reaction
+            // This assumes that each reaction name is unique, so we better make sure it is.
             this.reactionNameToCollectionId[reaction.name] =
               reaction.collection_id
           })

@@ -1,9 +1,8 @@
-import {StyleSheet, View} from 'react-native'
-import {colors, s} from 'lib/styles'
-
-import {InfoCircleIcon} from 'lib/icons'
 import React from 'react'
+import {StyleSheet, View} from 'react-native'
 import {Text} from 'view/com/util/text/Text'
+import {InfoCircleIcon} from 'lib/icons'
+import {s, colors} from 'lib/styles'
 import {useColorSchemeStyle} from 'lib/hooks/useColorSchemeStyle'
 
 export function HelpTip({text}: {text: string}) {

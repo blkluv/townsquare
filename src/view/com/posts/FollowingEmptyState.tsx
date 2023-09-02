@@ -1,62 +1,70 @@
+import React from 'react'
+import {StyleSheet, View} from 'react-native'
+import {useNavigation} from '@react-navigation/native'
 import {
   FontAwesomeIcon,
   FontAwesomeIconStyle,
 } from '@fortawesome/react-native-fontawesome'
-import {StyleSheet, View} from 'react-native'
-
+import {Text} from '../util/text/Text'
 import {Button} from '../util/forms/Button'
 import {MagnifyingGlassIcon} from 'lib/icons'
 import {NavigationProp} from 'lib/routes/types'
-import React from 'react'
-import {Text} from '../util/text/Text'
-import {s} from 'lib/styles'
-import {useNavigation} from '@react-navigation/native'
 import {usePalette} from 'lib/hooks/usePalette'
-
-// import {isWeb} from 'platform/detection'
+import {s} from 'lib/styles'
+import {isWeb} from 'platform/detection'
 
 export function FollowingEmptyState() {
   const pal = usePalette('default')
   const palInverted = usePalette('inverted')
   const navigation = useNavigation<NavigationProp>()
 
-  // const onPressFindAccounts = React.useCallback(() => {
-  //   if (isWeb) {
-  //     navigation.navigate('Search', {})
-  //   } else {
-  //     navigation.navigate('SearchTab')
-  //     navigation.popToTop()
-  //   }
-  // }, [navigation])
-
-  const onPressDiscoverFeeds = React.useCallback(() => {
-    navigation.navigate('DiscoverFeeds')
+  const onPressFindAccounts = React.useCallback(() => {
+    if (isWeb) {
+      navigation.navigate('Search', {})
+    } else {
+      navigation.navigate('SearchTab')
+      navigation.popToTop()
+    }
   }, [navigation])
 
+  const onPressDiscoverFeeds = React.useCallback(() => {
+    navigation.navigate('Communities')
+  }, [navigation])
+
+  const allowFindAccounts = false
+
+  const splx = true
   return (
     <View style={styles.emptyContainer}>
       <View style={styles.emptyIconContainer}>
         <MagnifyingGlassIcon style={[styles.emptyIcon, pal.text]} size={62} />
       </View>
-      {/* <Text type="xl-medium" style={[s.textCenter, pal.text]}>
-        Your following feed is empty! Find some accounts to follow to fix this.
-      </Text>
-      <Button
-        type="inverted"
-        style={styles.emptyBtn}
-        onPress={onPressFindAccounts}>
-        <Text type="lg-medium" style={palInverted.text}>
-          Find accounts to follow
-        </Text>
-        <FontAwesomeIcon
-          icon="angle-right"
-          style={palInverted.text as FontAwesomeIconStyle}
-          size={14}
-        />
-      </Button> */}
-
+      {allowFindAccounts && (
+        <>
+          {!splx && (
+            <Text type="xl-medium" style={[s.textCenter, pal.text]}>
+              Your following feed is empty! Find some accounts to follow to fix
+              this.
+            </Text>
+          )}
+          <Button
+            type="inverted"
+            style={styles.emptyBtn}
+            onPress={onPressFindAccounts}>
+            <Text type="lg-medium" style={palInverted.text}>
+              Find accounts to follow
+            </Text>
+            <FontAwesomeIcon
+              icon="angle-right"
+              style={palInverted.text as FontAwesomeIconStyle}
+              size={14}
+            />
+          </Button>
+        </>
+      )}
       <Text type="xl-medium" style={[s.textCenter, pal.text, s.mt20]}>
-        You can also discover new Custom Feeds to follow.
+        You aren't following anyone right now! Discover new communities to join
+        and find people to follow!
       </Text>
       <Button
         type="inverted"

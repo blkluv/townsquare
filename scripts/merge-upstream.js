@@ -39,7 +39,7 @@ async function copySingle(fromPath, toPath) {
     await mkdir(dirPath)
   }
 
-  return await copyFile(fromPath, toPath)
+  return await copyFile(fromPath, toPath, 2)
 }
 
 async function copyAll() {

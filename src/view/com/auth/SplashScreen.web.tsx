@@ -1,22 +1,22 @@
-import {StyleSheet, TouchableOpacity, View} from 'react-native'
-
-import {CenteredView} from '../util/Views'
-import {ErrorBoundary} from 'view/com/util/ErrorBoundary'
 import React from 'react'
+import {StyleSheet, TouchableOpacity, View} from 'react-native'
 import {Text} from 'view/com/util/text/Text'
 import {TextLink} from '../util/Link'
-import {colors} from 'lib/styles'
-import {isMobileWeb} from 'platform/detection'
+import {ErrorBoundary} from 'view/com/util/ErrorBoundary'
+import {s, colors} from 'lib/styles'
 import {usePalette} from 'lib/hooks/usePalette'
+import {CenteredView} from '../util/Views'
+import {isMobileWeb} from 'platform/detection'
 
 export const SplashScreen = ({
   onPressSignin,
+  onPressCreateAccount,
 }: {
   onPressSignin: () => void
   onPressCreateAccount: () => void
 }) => {
   const pal = usePalette('default')
-
+  const allowCreation = true
   return (
     <CenteredView style={[styles.container, pal.view]}>
       <View
@@ -35,35 +35,29 @@ export const SplashScreen = ({
             Welcome to Solarplex.
           </Text>
           <View testID="signinOrCreateAccount" style={styles.btns}>
-            {/* <TouchableOpacity
-              testID="createAccountButton"
-              style={[styles.btn, {backgroundColor: colors.blue3}]}
-              onPress={onPressCreateAccount}
-              // TODO: web accessibility
-              accessibilityRole="button">
-              <Text style={[s.white, styles.btnLabel]}>
-                Create a new account
-              </Text>
-            </TouchableOpacity> */}
+            {allowCreation && (
+              <TouchableOpacity
+                testID="createAccountButton"
+                style={[styles.btn]}
+                onPress={onPressCreateAccount}
+                // TODO: web accessibility
+                accessibilityRole="button">
+                <Text style={[s.white, styles.btnLabel]}>
+                  Create a new account
+                </Text>
+              </TouchableOpacity>
+            )}
             <TouchableOpacity
               testID="signInButton"
               style={[styles.btn]}
               onPress={onPressSignin}
               // TODO: web accessibility
               accessibilityRole="button">
-              <Text style={[styles.btnLabel]}>Sign In</Text>
+              <Text style={[pal.text, styles.btnLabel]}>Sign In</Text>
             </TouchableOpacity>
           </View>
           <Text type="xl" style={[styles.notice]} lineHeight={1.3}>
-            Help communities better engage their members and have fun!
-            {/* <TouchableOpacity
-              onPress={onPressWaitlist}
-              // TODO: web accessibility
-              accessibilityRole="button">
-              <Text type="xl" style={pal.link}>
-                Join the waitlist
-              </Text>
-            </TouchableOpacity>{' '} */}
+            Solarplex empowers communities to better connect, engage and thrive.
           </Text>
         </ErrorBoundary>
       </View>

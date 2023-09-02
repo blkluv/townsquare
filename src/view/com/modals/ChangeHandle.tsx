@@ -1,27 +1,26 @@
+import React, {useState} from 'react'
+import Clipboard from '@react-native-clipboard/clipboard'
 import * as Toast from '../util/Toast'
-
 import {
   ActivityIndicator,
   StyleSheet,
   TouchableOpacity,
   View,
 } from 'react-native'
-import React, {useState} from 'react'
-import {ScrollView, TextInput} from './util'
-import {createFullHandle, makeValidHandle} from 'lib/strings/handles'
-
-import {Button} from '../util/forms/Button'
-import Clipboard from '@react-native-clipboard/clipboard'
-import {ErrorMessage} from '../util/error/ErrorMessage'
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome'
-import {ServiceDescription} from 'state/models/session'
+import {ScrollView, TextInput} from './util'
 import {Text} from '../util/text/Text'
-import {cleanError} from 'lib/strings/errors'
-import {s} from 'lib/styles'
-import {useAnalytics} from 'lib/analytics/analytics'
-import {usePalette} from 'lib/hooks/usePalette'
+import {Button} from '../util/forms/Button'
+import {SelectableBtn} from '../util/forms/SelectableBtn'
+import {ErrorMessage} from '../util/error/ErrorMessage'
 import {useStores} from 'state/index'
+import {ServiceDescription} from 'state/models/session'
+import {s} from 'lib/styles'
+import {createFullHandle, makeValidHandle} from 'lib/strings/handles'
+import {usePalette} from 'lib/hooks/usePalette'
 import {useTheme} from 'lib/ThemeContext'
+import {useAnalytics} from 'lib/analytics/analytics'
+import {cleanError} from 'lib/strings/errors'
 
 export const snapPoints = ['100%']
 
@@ -313,13 +312,13 @@ function CustomHandleForm({
   const theme = useTheme()
   const [isVerifying, setIsVerifying] = React.useState(false)
   const [error, setError] = React.useState<string>('')
-
+  const [isDNSForm, setDNSForm] = React.useState<boolean>(true)
   // events
   // =
   const onPressCopy = React.useCallback(() => {
-    Clipboard.setString(`did=${store.me.did}`)
+    Clipboard.setString(isDNSForm ? `did=${store.me.did}` : store.me.did)
     Toast.show('Copied to clipboard')
-  }, [store.me.did])
+  }, [store.me.did, isDNSForm])
   const onChangeHandle = React.useCallback(
     (v: string) => {
       setHandle(v)
@@ -388,39 +387,94 @@ function CustomHandleForm({
         />
       </View>
       <View style={styles.spacer} />
-      <Text type="md" style={[pal.text, s.pb5, s.pl5]}>
-        Add the following record to your domain:
-      </Text>
-      <View style={[styles.dnsTable, pal.btn]}>
-        <Text type="md-medium" style={[styles.dnsLabel, pal.text]}>
-          Domain:
-        </Text>
-        <View style={[styles.dnsValue]}>
-          <Text type="mono" style={[styles.monoText, pal.text]}>
+
+      <View style={[styles.selectableBtns]}>
+        <SelectableBtn
+          selected={isDNSForm}
+          label="DNS Panel"
+          left
+          onSelect={() => setDNSForm(true)}
+          accessibilityHint="Use the DNS panel"
+          style={s.flex1}
+        />
+        <SelectableBtn
+          selected={!isDNSForm}
+          label="No DNS Panel"
+          right
+          onSelect={() => setDNSForm(false)}
+          accessibilityHint="Use a file on your server"
+          style={s.flex1}
+        />
+      </View>
+      <View style={styles.spacer} />
+      {isDNSForm ? (
+        <>
+          <Text type="md" style={[pal.text, s.pb5, s.pl5]}>
+            Add the following DNS record to your domain:
+          </Text>
+          <View style={[styles.dnsTable, pal.btn]}>
+            <Text type="md-medium" style={[styles.dnsLabel, pal.text]}>
+              Host:
+            </Text>
+            <View style={[styles.dnsValue]}>
+              <Text type="mono" style={[styles.monoText, pal.text]}>
+                _atproto
+              </Text>
+            </View>
+            <Text type="md-medium" style={[styles.dnsLabel, pal.text]}>
+              Type:
+            </Text>
+            <View style={[styles.dnsValue]}>
+              <Text type="mono" style={[styles.monoText, pal.text]}>
+                TXT
+              </Text>
+            </View>
+            <Text type="md-medium" style={[styles.dnsLabel, pal.text]}>
+              Value:
+            </Text>
+            <View style={[styles.dnsValue]}>
+              <Text type="mono" style={[styles.monoText, pal.text]}>
+                did={store.me.did}
+              </Text>
+            </View>
+          </View>
+          <Text type="md" style={[pal.text, s.pt20, s.pl5]}>
+            This should create a domain record at:{' '}
+          </Text>
+          <Text type="mono" style={[styles.monoText, pal.text, s.pt5, s.pl5]}>
             _atproto.{handle}
           </Text>
-        </View>
-        <Text type="md-medium" style={[styles.dnsLabel, pal.text]}>
-          Type:
-        </Text>
-        <View style={[styles.dnsValue]}>
-          <Text type="mono" style={[styles.monoText, pal.text]}>
-            TXT
+        </>
+      ) : (
+        <>
+          <Text type="md" style={[pal.text, s.pb5, s.pl5]}>
+            Upload a text file to:
           </Text>
-        </View>
-        <Text type="md-medium" style={[styles.dnsLabel, pal.text]}>
-          Value:
-        </Text>
-        <View style={[styles.dnsValue]}>
-          <Text type="mono" style={[styles.monoText, pal.text]}>
-            did={store.me.did}
+          <View style={[styles.valueContainer, pal.btn]}>
+            <View style={[styles.dnsValue]}>
+              <Text type="mono" style={[styles.monoText, pal.text]}>
+                https://{handle}/.well-known/atproto-did
+              </Text>
+            </View>
+          </View>
+          <View style={styles.spacer} />
+          <Text type="md" style={[pal.text, s.pb5, s.pl5]}>
+            That contains the following:
           </Text>
-        </View>
-      </View>
+          <View style={[styles.valueContainer, pal.btn]}>
+            <View style={[styles.dnsValue]}>
+              <Text type="mono" style={[styles.monoText, pal.text]}>
+                {store.me.did}
+              </Text>
+            </View>
+          </View>
+        </>
+      )}
+
       <View style={styles.spacer} />
       <Button type="default" style={[s.p20, s.mb10]} onPress={onPressCopy}>
         <Text type="xl" style={[pal.link, s.textCenter]}>
-          Copy Domain Value
+          Copy {isDNSForm ? 'Domain Value' : 'File Contents'}
         </Text>
       </Button>
       {canSave === true && (
@@ -445,7 +499,9 @@ function CustomHandleForm({
           <ActivityIndicator color="white" />
         ) : (
           <Text type="xl-medium" style={[s.white, s.textCenter]}>
-            {canSave ? `Update to ${handle}` : 'Verify DNS Record'}
+            {canSave
+              ? `Update to ${handle}`
+              : `Verify ${isDNSForm ? 'DNS Record' : 'Text File'}`}
           </Text>
         )}
       </Button>
@@ -453,7 +509,7 @@ function CustomHandleForm({
       <TouchableOpacity
         onPress={onToggleCustom}
         accessibilityLabel="Use default provider"
-        accessibilityHint="Use v2.solarplex.xyz as hosting provider">
+        accessibilityHint="Use bsky.social as hosting provider">
         <Text type="md-medium" style={[pal.link, s.pl10, s.pt5]}>
           Nevermind, create a handle for me
         </Text>
@@ -474,6 +530,10 @@ const styles = StyleSheet.create({
   },
   dimmed: {
     opacity: 0.7,
+  },
+
+  selectableBtns: {
+    flexDirection: 'row',
   },
 
   title: {
@@ -515,6 +575,11 @@ const styles = StyleSheet.create({
     letterSpacing: 0.25,
     fontWeight: '400',
     borderRadius: 10,
+  },
+
+  valueContainer: {
+    borderRadius: 4,
+    paddingVertical: 16,
   },
 
   dnsTable: {

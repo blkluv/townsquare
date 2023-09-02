@@ -179,7 +179,10 @@ export class CommunitiesModel {
   // TODO(zfaizal2): fix db for communities to add handle
   _fetch = actions.wrapAction(
     async (reset: boolean = false) => {
-      const [communities] = await Promise.all([this._getAllCommunities()])
+      const [communities] = await Promise.all([
+        this._getAllCommunities(),
+        this.rootStore.me.joinedCommunities.updateCache(reset),
+      ])
       communities?.map(c => {
         c.uri = makeRecordUri(SOLARPLEX_DID, 'app.bsky.feed.generator', c.id)
       })

@@ -1,16 +1,15 @@
+import React from 'react'
+import {StyleProp, View, ViewStyle} from 'react-native'
+import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome'
+import {toShareUrl} from 'lib/strings/url-helpers'
+import {useStores} from 'state/index'
+import {useTheme} from 'lib/ThemeContext'
+import {shareUrl} from 'lib/sharing'
 import {
   NativeDropdown,
   DropdownItem as NativeDropdownItem,
 } from './NativeDropdown'
-import {StyleProp, View, ViewStyle} from 'react-native'
-
 import {EventStopper} from '../EventStopper'
-import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome'
-import React from 'react'
-import {shareUrl} from 'lib/sharing'
-import {toShareUrl} from 'lib/strings/url-helpers'
-import {useStores} from 'state/index'
-import {useTheme} from 'lib/ThemeContext'
 
 export function PostDropdownBtn({
   testID,

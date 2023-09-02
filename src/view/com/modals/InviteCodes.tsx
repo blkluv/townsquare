@@ -1,20 +1,18 @@
-import * as Toast from '../util/Toast'
-
+import React from 'react'
+import {StyleSheet, TouchableOpacity, View} from 'react-native'
+import {observer} from 'mobx-react-lite'
 import {
   FontAwesomeIcon,
   FontAwesomeIconStyle,
 } from '@fortawesome/react-native-fontawesome'
-import {StyleSheet, TouchableOpacity, View} from 'react-native'
-
-import {Button} from '../util/forms/Button'
 import Clipboard from '@react-native-clipboard/clipboard'
-import React from 'react'
-import {ScrollView} from './util'
 import {Text} from '../util/text/Text'
-import {isDesktopWeb} from 'platform/detection'
-import {observer} from 'mobx-react-lite'
-import {usePalette} from 'lib/hooks/usePalette'
+import {Button} from '../util/forms/Button'
+import * as Toast from '../util/Toast'
 import {useStores} from 'state/index'
+import {ScrollView} from './util'
+import {usePalette} from 'lib/hooks/usePalette'
+import {isDesktopWeb} from 'platform/detection'
 
 export const snapPoints = ['70%']
 
@@ -36,6 +34,7 @@ export function Component({}: {}) {
           </Text>
         </View>
         <View style={styles.flex1} />
+        <View style={styles.smallSpacer} />
         <View style={styles.btnContainer}>
           <Button
             type="primary"
@@ -196,5 +195,8 @@ const styles = StyleSheet.create({
   },
   btnLabel: {
     fontSize: 18,
+  },
+  smallSpacer: {
+    height: 20,
   },
 })

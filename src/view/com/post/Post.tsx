@@ -1,5 +1,4 @@
-import * as Toast from '../util/Toast'
-
+import React, {useState, useMemo} from 'react'
 import {
   ActivityIndicator,
   Linking,
@@ -8,63 +7,45 @@ import {
   View,
   ViewStyle,
 } from 'react-native'
-import React, {useEffect, useMemo, useState} from 'react'
-import {colors, s} from 'lib/styles'
-import {getTranslatorLink, isPostInLanguage} from '../../../locale/helpers'
-
-import {AtUri} from '@atproto/api'
-import Clipboard from '@react-native-clipboard/clipboard'
-import {ContentHider} from '../util/moderation/ContentHider'
 import {AppBskyFeedPost as FeedPost} from '@atproto/api'
-import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome'
-import {Link} from '../util/Link'
-import {NavigationProp} from 'lib/routes/types'
-import {PostAlerts} from '../util/moderation/PostAlerts'
-import {PostCtrls} from '../util/post-ctrls/PostCtrls'
-import {PostEmbeds} from '../util/post-embeds'
-import {PostMeta} from '../util/PostMeta'
-import {PostThreadItemModel} from 'state/models/content/post-thread-item'
-import {PostThreadModel} from 'state/models/content/post-thread'
-import {PreviewableUserAvatar} from '../util/UserAvatar'
-import {RichText} from '../util/text/RichText'
-import {Text} from '../util/text/Text'
-import {UserInfoText} from '../util/UserInfoText'
-import {makeProfileLink} from 'lib/routes/links'
 import {observer} from 'mobx-react-lite'
-import {track} from 'lib/analytics/analytics'
-import {useNavigation} from '@react-navigation/native'
-import {usePalette} from 'lib/hooks/usePalette'
+import Clipboard from '@react-native-clipboard/clipboard'
+import {AtUri} from '@atproto/api'
+import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome'
+import {PostThreadModel} from 'state/models/content/post-thread'
+import {PostThreadItemModel} from 'state/models/content/post-thread-item'
+import {Link} from '../util/Link'
+import {UserInfoText} from '../util/UserInfoText'
+import {PostMeta} from '../util/PostMeta'
+import {PostEmbeds} from '../util/post-embeds'
+import {PostCtrls} from '../util/post-ctrls/PostCtrls'
+import {ContentHider} from '../util/moderation/ContentHider'
+import {PostAlerts} from '../util/moderation/PostAlerts'
+import {Text} from '../util/text/Text'
+import {RichText} from '../util/text/RichText'
+import * as Toast from '../util/Toast'
+import {PreviewableUserAvatar} from '../util/UserAvatar'
 import {useStores} from 'state/index'
+import {s, colors} from 'lib/styles'
+import {usePalette} from 'lib/hooks/usePalette'
+import {getTranslatorLink, isPostInLanguage} from '../../../locale/helpers'
+import {makeProfileLink} from 'lib/routes/links'
+
+import {track} from 'lib/analytics/analytics'
 
 export const Post = observer(function Post({
-  uri,
-  initView,
+  view,
   showReplyLine,
   hideError,
   style,
 }: {
-  uri: string
-  initView?: PostThreadModel
+  view: PostThreadModel
   showReplyLine?: boolean
   hideError?: boolean
   style?: StyleProp<ViewStyle>
 }) {
   const pal = usePalette('default')
-  const store = useStores()
-  const [view, setView] = useState<PostThreadModel | undefined>(initView)
   const [deleted, setDeleted] = useState(false)
-
-  useEffect(() => {
-    if (initView || view?.params.uri === uri) {
-      if (initView !== view) {
-        setView(initView)
-      }
-      return
-    }
-    const newView = new PostThreadModel(store, {uri, depth: 0})
-    setView(newView)
-    newView.setup().catch(err => store.log.error('Failed to fetch post', err))
-  }, [initView, setView, uri, view, view?.params.uri, store])
 
   // deleted
   // =
@@ -74,11 +55,7 @@ export const Post = observer(function Post({
 
   // loading
   // =
-  if (
-    !view ||
-    (!view.hasContent && view.isLoading) ||
-    view.params.uri !== uri
-  ) {
+  if (!view.hasContent && view.isLoading) {
     return (
       <View style={pal.view}>
         <ActivityIndicator />
@@ -129,7 +106,6 @@ const PostLoaded = observer(
   }) => {
     const pal = usePalette('default')
     const store = useStores()
-    const navigation = useNavigation<NavigationProp>()
 
     const itemUri = item.post.uri
     const itemCid = item.post.cid
@@ -150,50 +126,42 @@ const PostLoaded = observer(
       [item.post, store.preferences.contentLanguages],
     )
 
-    const onPressReply = React.useCallback(async () => {
-      store.session.isSolarplexSession
-        ? navigation.navigate('SignIn')
-        : store.shell.openComposer({
-            replyTo: {
-              uri: item.post.uri,
-              cid: item.post.cid,
-              text: record.text as string,
-              author: {
-                handle: item.post.author.handle,
-                displayName: item.post.author.displayName,
-                avatar: item.post.author.avatar,
-              },
-            },
-          })
-    }, [store, item, record, navigation])
+    const onPressReply = React.useCallback(() => {
+      store.shell.openComposer({
+        replyTo: {
+          uri: item.post.uri,
+          cid: item.post.cid,
+          text: record.text as string,
+          author: {
+            handle: item.post.author.handle,
+            displayName: item.post.author.displayName,
+            avatar: item.post.author.avatar,
+          },
+        },
+      })
+    }, [store, item, record])
 
-    const onPressToggleRepost = React.useCallback(async () => {
-      return store.session.isSolarplexSession
-        ? navigation.navigate('SignIn')
-        : item
-            .toggleRepost()
-            .catch(e => store.log.error('Failed to toggle repost', e))
-    }, [item, store, navigation])
+    const onPressToggleRepost = React.useCallback(() => {
+      return item
+        .toggleRepost()
+        .catch(e => store.log.error('Failed to toggle repost', e))
+    }, [item, store])
 
-    const onPressToggleLike = React.useCallback(async () => {
-      return store.session.isSolarplexSession
-        ? navigation.navigate('SignIn')
-        : item
-            .toggleLike()
-            .catch(e => store.log.error('Failed to toggle like', e))
-    }, [item, store, navigation])
+    const onPressToggleLike = React.useCallback(() => {
+      return item
+        .toggleLike()
+        .catch(e => store.log.error('Failed to toggle like', e))
+    }, [item, store])
 
     const onPressReaction = React.useCallback(
       async (reactionId: string, remove?: boolean) => {
         track('FeedItem:PostLike')
         // console.log("reactionId", reactionId);
-        return store.session.isSolarplexSession
-          ? await navigation.navigate('SignIn')
-          : item
-              .react(reactionId, remove)
-              .catch(e => store.log.error('Failed to add reaction', e))
+        item
+          .react(reactionId, remove)
+          .catch(e => store.log.error('Failed to add reaction', e))
       },
-      [item, store, navigation],
+      [item, store],
     )
 
     const onCopyPostText = React.useCallback(() => {
@@ -317,12 +285,7 @@ const PostLoaded = observer(
               itemCid={itemCid}
               itemHref={itemHref}
               itemTitle={itemTitle}
-              author={{
-                avatar: item.post.author.avatar!,
-                handle: item.post.author.handle,
-                displayName: item.post.author.displayName!,
-                did: item.post.author.did,
-              }}
+              author={item.post.author}
               indexedAt={item.post.indexedAt}
               text={item.richText?.text || record.text}
               isAuthor={item.post.author.did === store.me.did}
@@ -357,6 +320,7 @@ const styles = StyleSheet.create({
     paddingBottom: 5,
     paddingLeft: 10,
     borderTopWidth: 1,
+    cursor: 'pointer',
   },
   layout: {
     flexDirection: 'row',

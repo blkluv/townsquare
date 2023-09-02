@@ -1,18 +1,20 @@
-import {SafeAreaView, StyleSheet, TouchableOpacity, View} from 'react-native'
-
-import {CenteredView} from '../util/Views'
-import {ErrorBoundary} from 'view/com/util/ErrorBoundary'
 import React from 'react'
+import {SafeAreaView, StyleSheet, TouchableOpacity, View} from 'react-native'
 import {Text} from 'view/com/util/text/Text'
+import {ErrorBoundary} from 'view/com/util/ErrorBoundary'
+import {s, colors} from 'lib/styles'
 import {usePalette} from 'lib/hooks/usePalette'
+import {CenteredView} from '../util/Views'
 
 export const SplashScreen = ({
   onPressSignin,
+  onPressCreateAccount,
 }: {
   onPressSignin: () => void
   onPressCreateAccount: () => void
 }) => {
   const pal = usePalette('default')
+  const allowCreation = true
   return (
     <CenteredView style={[styles.container, pal.view]}>
       <SafeAreaView testID="noSessionView" style={styles.container}>
@@ -24,17 +26,19 @@ export const SplashScreen = ({
             </Text>
           </View>
           <View testID="signinOrCreateAccount" style={styles.btns}>
-            {/* <TouchableOpacity
-              testID="createAccountButton"
-              style={[styles.btn, {backgroundColor: colors.blue3}]}
-              onPress={onPressCreateAccount}
-              accessibilityRole="button"
-              accessibilityLabel="Create new account"
-              accessibilityHint="Opens flow to create a new Bluesky account">
-              <Text style={[s.white, styles.btnLabel]}>
-                Create a new account
-              </Text>
-            </TouchableOpacity> */}
+            {allowCreation && (
+              <TouchableOpacity
+                testID="createAccountButton"
+                style={[styles.btn, {backgroundColor: colors.blue3}]}
+                onPress={onPressCreateAccount}
+                accessibilityRole="button"
+                accessibilityLabel="Create new account"
+                accessibilityHint="Opens flow to create a new Solarplex account">
+                <Text style={[s.white, styles.btnLabel]}>
+                  Create a new account
+                </Text>
+              </TouchableOpacity>
+            )}
             <TouchableOpacity
               testID="signInButton"
               style={[styles.btn, pal.btn]}

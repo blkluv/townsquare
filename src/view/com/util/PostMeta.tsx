@@ -1,17 +1,16 @@
-import {StyleSheet, View} from 'react-native'
-
-import {DesktopWebTextLink} from './Link'
 import React from 'react'
+import {StyleSheet, View} from 'react-native'
 import {Text} from './text/Text'
-import {TimeElapsed} from './TimeElapsed'
-import {UserAvatar} from './UserAvatar'
-import {isAndroid} from 'platform/detection'
-import {makeProfileLink} from 'lib/routes/links'
+import {DesktopWebTextLink} from './Link'
 import {niceDate} from 'lib/strings/time'
+import {usePalette} from 'lib/hooks/usePalette'
+import {UserAvatar} from './UserAvatar'
 import {observer} from 'mobx-react-lite'
 import {sanitizeDisplayName} from 'lib/strings/display-names'
 import {sanitizeHandle} from 'lib/strings/handles'
-import {usePalette} from 'lib/hooks/usePalette'
+import {isAndroid} from 'platform/detection'
+import {TimeElapsed} from './TimeElapsed'
+import {makeProfileLink} from 'lib/routes/links'
 
 interface PostMetaOpts {
   author: {

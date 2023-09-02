@@ -1,20 +1,18 @@
-import * as Toast from '../util/Toast'
-
-import {Pressable, StyleSheet, View} from 'react-native'
-import {colors, gradients, s} from 'lib/styles'
-import {isDesktopWeb, isIOS} from 'platform/detection'
-
-import {CONFIGURABLE_LABEL_GROUPS} from 'lib/labeling/const'
-import {LabelPreference} from 'state/models/ui/preferences'
-import LinearGradient from 'react-native-linear-gradient'
 import React from 'react'
+import {StyleSheet, Pressable, View} from 'react-native'
+import LinearGradient from 'react-native-linear-gradient'
+import {observer} from 'mobx-react-lite'
 import {ScrollView} from './util'
+import {useStores} from 'state/index'
+import {LabelPreference} from 'state/models/ui/preferences'
+import {s, colors, gradients} from 'lib/styles'
 import {Text} from '../util/text/Text'
 import {TextLink} from '../util/Link'
 import {ToggleButton} from '../util/forms/ToggleButton'
-import {observer} from 'mobx-react-lite'
 import {usePalette} from 'lib/hooks/usePalette'
-import {useStores} from 'state/index'
+import {CONFIGURABLE_LABEL_GROUPS} from 'lib/labeling/const'
+import {isDesktopWeb, isIOS} from 'platform/detection'
+import * as Toast from '../util/Toast'
 
 export const snapPoints = ['90%']
 
@@ -23,7 +21,7 @@ export const Component = observer(({}: {}) => {
   const pal = usePalette('default')
 
   React.useEffect(() => {
-    store.preferences.sync({clearCache: true})
+    store.preferences.sync()
   }, [store])
 
   const onToggleAdultContent = React.useCallback(async () => {
@@ -50,15 +48,17 @@ export const Component = observer(({}: {}) => {
       <ScrollView style={styles.scrollContainer}>
         <View style={s.mb10}>
           {isIOS ? (
-            <Text type="md" style={pal.textLight}>
-              Adult content can only be enabled via the Web at{' '}
-              <TextLink
-                style={pal.link}
-                href="https://bsky.app"
-                text="bsky.app"
-              />
-              .
-            </Text>
+            store.preferences.adultContentEnabled ? null : (
+              <Text type="md" style={pal.textLight}>
+                Adult content can only be enabled via the Web at{' '}
+                <TextLink
+                  style={pal.link}
+                  href="https://bsky.app"
+                  text="bsky.app"
+                />
+                .
+              </Text>
+            )
           ) : (
             <ToggleButton
               type="default-light"
@@ -98,7 +98,7 @@ export const Component = observer(({}: {}) => {
           accessibilityLabel="Done"
           accessibilityHint="">
           <LinearGradient
-            colors={[gradients.blueLight.start, gradients.blueLight.end]}
+            colors={[gradients.purple.start, gradients.purple.end]}
             start={{x: 0, y: 0}}
             end={{x: 1, y: 1}}
             style={[styles.btn]}>
@@ -190,7 +190,7 @@ function SelectGroup({current, onChange, group}: SelectGroupProps) {
       />
       <SelectableBtn
         current={current}
-        value="show"
+        value="ignore"
         label="Show"
         right
         onChange={onChange}

@@ -1,17 +1,17 @@
+import {makeAutoObservable, runInAction} from 'mobx'
 import {
   ComAtprotoServerDefs,
   ComAtprotoServerListAppPasswords,
 } from '@atproto/api'
-import {hasProp, isObj} from 'lib/type-guards'
-import {makeAutoObservable, runInAction} from 'mobx'
+import {RootStoreModel} from './root-store'
+import {PostsFeedModel} from './feeds/posts'
+import {NotificationsFeedModel} from './feeds/notifications'
+import {MyFollowsCache} from './cache/my-follows'
+import {isObj, hasProp} from 'lib/type-guards'
+import {SavedFeedsModel} from './ui/saved-feeds'
 
 import {JoinedCommunitiesModel} from './ui/joined-communities'
-import {MyFollowsCache} from './cache/my-follows'
 import {NftModel} from './content/nft'
-import {NotificationsFeedModel} from './feeds/notifications'
-import {PostsFeedModel} from './feeds/posts'
-import {RootStoreModel} from './root-store'
-import {SavedFeedsModel} from './ui/saved-feeds'
 
 const PROFILE_UPDATE_INTERVAL = 10 * 60 * 1e3 // 10min
 const NOTIFS_UPDATE_INTERVAL = 30 * 1e3 // 30sec
@@ -24,7 +24,6 @@ export class MeModel {
   avatar: string = ''
   followsCount: number | undefined
   followersCount: number | undefined
-  joinedCommunities: JoinedCommunitiesModel
   mainFeed: PostsFeedModel
   savedFeeds: SavedFeedsModel
   notifications: NotificationsFeedModel
@@ -33,6 +32,7 @@ export class MeModel {
   appPasswords: ComAtprotoServerListAppPasswords.AppPassword[] = []
   lastProfileStateUpdate = Date.now()
   lastNotifsUpdate = Date.now()
+  joinedCommunities: JoinedCommunitiesModel
   nft: NftModel
 
   get invitesAvailable() {
@@ -62,7 +62,6 @@ export class MeModel {
   clear() {
     this.mainFeed.clear()
     this.notifications.clear()
-    this.joinedCommunities.clear()
     this.follows.clear()
     this.rootStore.profiles.cache.clear()
     this.rootStore.posts.cache.clear()
@@ -73,6 +72,7 @@ export class MeModel {
     this.avatar = ''
     this.invites = []
     this.appPasswords = []
+    this.joinedCommunities.clear()
   }
 
   serialize(): unknown {

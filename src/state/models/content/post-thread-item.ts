@@ -1,13 +1,12 @@
-import {
-  AppBskyFeedDefs,
-  AppBskyFeedPost as FeedPost,
-  PostModeration,
-  RichText,
-} from '@atproto/api'
-
-import {PostsFeedItemModel} from '../feeds/post'
-import {RootStoreModel} from '../root-store'
 import {makeAutoObservable} from 'mobx'
+import {
+  AppBskyFeedPost as FeedPost,
+  AppBskyFeedDefs,
+  RichText,
+  PostModeration,
+} from '@atproto/api'
+import {RootStoreModel} from '../root-store'
+import {PostsFeedItemModel} from '../feeds/post'
 
 type PostView = AppBskyFeedDefs.PostView
 

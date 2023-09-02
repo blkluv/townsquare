@@ -1,5 +1,4 @@
 import {NavigationState, PartialState} from '@react-navigation/native'
-
 import type {NativeStackNavigationProp} from '@react-navigation/native-stack'
 
 export type {NativeStackScreenProps} from '@react-navigation/native-stack'
@@ -11,7 +10,6 @@ export type CommonNavigatorParams = {
   ModerationMutedAccounts: undefined
   ModerationBlockedAccounts: undefined
   DiscoverFeeds: undefined
-  SignIn: undefined
   Settings: undefined
   Profile: {name: string; hideBackButton?: boolean}
   ProfileFollowers: {name: string}
@@ -21,7 +19,6 @@ export type CommonNavigatorParams = {
   PostLikedBy: {name: string; rkey: string}
   PostRepostedBy: {name: string; rkey: string}
   CustomFeed: {name: string; rkey: string}
-  CommunityFeed: {name: string; rkey: string}
   CustomFeedLikedBy: {name: string; rkey: string}
   Debug: undefined
   Log: undefined
@@ -32,9 +29,12 @@ export type CommonNavigatorParams = {
   CopyrightPolicy: undefined
   AppPasswords: undefined
   SavedFeeds: undefined
+  PreferencesHomeFeed: undefined
+  CommunityFeed: {name: string; rkey: string}
   Rewards: undefined
   Missions: undefined
   Reactions: undefined
+  SignIn: undefined
   Wallets: undefined
 }
 

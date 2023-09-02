@@ -1,3 +1,6 @@
+import React, {useRef} from 'react'
+import {runInAction} from 'mobx'
+import {observer} from 'mobx-react-lite'
 import {
   ActivityIndicator,
   RefreshControl,
@@ -5,28 +8,25 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native'
+import {AppBskyFeedDefs} from '@atproto/api'
 import {CenteredView, FlatList} from '../util/Views'
+import {PostThreadModel} from 'state/models/content/post-thread'
+import {PostThreadItemModel} from 'state/models/content/post-thread-item'
 import {
   FontAwesomeIcon,
   FontAwesomeIconStyle,
 } from '@fortawesome/react-native-fontawesome'
-import React, {useRef} from 'react'
-import {isDesktopWeb, isIOS, isMobileWeb} from 'platform/detection'
-
-import {AppBskyFeedDefs} from '@atproto/api'
+import {PostThreadItem} from './PostThreadItem'
 import {ComposePrompt} from '../composer/Prompt'
 import {ErrorMessage} from '../util/error/ErrorMessage'
-import {NavigationProp} from 'lib/routes/types'
-import {PostThreadItem} from './PostThreadItem'
-import {PostThreadItemModel} from 'state/models/content/post-thread-item'
-import {PostThreadModel} from 'state/models/content/post-thread'
 import {Text} from '../util/text/Text'
-import {observer} from 'mobx-react-lite'
 import {s} from 'lib/styles'
-import {sanitizeDisplayName} from 'lib/strings/display-names'
-import {useNavigation} from '@react-navigation/native'
+import {isIOS, isDesktopWeb, isMobileWeb} from 'platform/detection'
 import {usePalette} from 'lib/hooks/usePalette'
 import {useSetTitle} from 'lib/hooks/useSetTitle'
+import {useNavigation} from '@react-navigation/native'
+import {NavigationProp} from 'lib/routes/types'
+import {sanitizeDisplayName} from 'lib/strings/display-names'
 
 const MAINTAIN_VISIBLE_CONTENT_POSITION = {minIndexForVisible: 0}
 
@@ -362,7 +362,9 @@ function* flattenThread(
       }
     }
   } else if (!isAscending && !post.parent && post.post.replyCount) {
-    post._hasMore = true
+    runInAction(() => {
+      post._hasMore = true
+    })
   }
 }
 

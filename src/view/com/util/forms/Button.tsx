@@ -1,17 +1,16 @@
+import React from 'react'
 import {
   GestureResponderEvent,
-  Pressable,
-  PressableStateCallbackType,
   StyleProp,
   StyleSheet,
   TextStyle,
+  Pressable,
   ViewStyle,
+  PressableStateCallbackType,
 } from 'react-native'
-
-import React from 'react'
 import {Text} from '../text/Text'
-import {choose} from 'lib/functions'
 import {useTheme} from 'lib/ThemeContext'
+import {choose} from 'lib/functions'
 
 type Event =
   | React.MouseEvent<HTMLAnchorElement, MouseEvent>
@@ -60,8 +59,8 @@ export function Button({
   accessibilityLabel?: string
   accessibilityHint?: string
   accessibilityLabelledBy?: string
-  disabled?: boolean
   onAccessibilityEscape?: () => void
+  disabled?: boolean
 }>) {
   const theme = useTheme()
   const typeOuterStyle = choose<ViewStyle, Record<ButtonType, ViewStyle>>(
@@ -165,7 +164,6 @@ export function Button({
 
   return (
     <Pressable
-      disabled={disabled}
       style={getStyle}
       onPress={onPressWrapped}
       testID={testID}
@@ -173,7 +171,8 @@ export function Button({
       accessibilityLabel={accessibilityLabel}
       accessibilityHint={accessibilityHint}
       accessibilityLabelledBy={accessibilityLabelledBy}
-      onAccessibilityEscape={onAccessibilityEscape}>
+      onAccessibilityEscape={onAccessibilityEscape}
+      disabled={disabled}>
       {label ? (
         <Text type="button" style={[typeLabelStyle, labelStyle]}>
           {label}

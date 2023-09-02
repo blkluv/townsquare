@@ -1,23 +1,22 @@
+import React from 'react'
+import {StyleProp, StyleSheet, View, ViewStyle} from 'react-native'
 import {
-  AppBskyEmbedImages,
   AppBskyEmbedRecord,
-  AppBskyEmbedRecordWithMedia,
   AppBskyFeedPost,
+  AppBskyEmbedImages,
+  AppBskyEmbedRecordWithMedia,
   ModerationUI,
 } from '@atproto/api'
-import {StyleProp, StyleSheet, View, ViewStyle} from 'react-native'
-
 import {AtUri} from '@atproto/api'
-import {ComposerOptsQuote} from 'state/models/ui/shell'
-import {InfoCircleIcon} from 'lib/icons'
-import {Link} from '../Link'
-import {PostAlerts} from '../moderation/PostAlerts'
-import {PostEmbeds} from '.'
 import {PostMeta} from '../PostMeta'
-import React from 'react'
+import {Link} from '../Link'
 import {Text} from '../text/Text'
-import {makeProfileLink} from 'lib/routes/links'
 import {usePalette} from 'lib/hooks/usePalette'
+import {ComposerOptsQuote} from 'state/models/ui/shell'
+import {PostEmbeds} from '.'
+import {PostAlerts} from '../moderation/PostAlerts'
+import {makeProfileLink} from 'lib/routes/links'
+import {InfoCircleIcon} from 'lib/icons'
 
 export function MaybeQuoteEmbed({
   embed,

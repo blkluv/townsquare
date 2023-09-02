@@ -1,12 +1,10 @@
-import * as Toast from '../util/Toast'
-
-import {Button, ButtonType} from '../util/forms/Button'
-
-import {FollowState} from 'state/models/cache/my-follows'
 import React from 'react'
 import {View} from 'react-native'
 import {observer} from 'mobx-react-lite'
+import {Button, ButtonType} from '../util/forms/Button'
 import {useStores} from 'state/index'
+import * as Toast from '../util/Toast'
+import {FollowState} from 'state/models/cache/my-follows'
 
 export const FollowButton = observer(
   ({

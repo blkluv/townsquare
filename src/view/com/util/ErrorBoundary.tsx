@@ -1,7 +1,6 @@
 import React, {Component, ErrorInfo, ReactNode} from 'react'
-
-import {CenteredView} from './Views'
 import {ErrorScreen} from './error/ErrorScreen'
+import {CenteredView} from './Views'
 
 interface Props {
   children?: ReactNode

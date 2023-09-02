@@ -1,15 +1,14 @@
+import React from 'react'
 import {Pressable, StyleProp, StyleSheet, View, ViewStyle} from 'react-native'
+import {ProfileModeration} from '@atproto/api'
+import {Text} from '../text/Text'
+import {usePalette} from 'lib/hooks/usePalette'
+import {ShieldExclamation} from 'lib/icons'
 import {
   describeModerationCause,
   getProfileModerationCauses,
-} from '../../../../lib/moderation'
-
-import {ProfileModeration} from '@atproto/api'
-import React from 'react'
-import {ShieldExclamation} from '../../../../lib/icons'
-import {Text} from '../text/Text'
-import {usePalette} from '../../../../lib/hooks/usePalette'
-import {useStores} from '../../../../state/index'
+} from 'lib/moderation'
+import {useStores} from 'state/index'
 
 export function ProfileHeaderAlerts({
   moderation,

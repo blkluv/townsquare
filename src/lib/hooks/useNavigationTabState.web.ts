@@ -1,5 +1,5 @@
-import {getCurrentRoute} from '../../lib/routes/helpers'
 import {useNavigationState} from '@react-navigation/native'
+import {getCurrentRoute} from 'lib/routes/helpers'
 
 export function useNavigationTabState() {
   return useNavigationState(state => {

@@ -1,46 +1,44 @@
-import {StyleSheet, TouchableOpacity, View} from 'react-native'
-
-import {DesktopSearch} from './Search'
-import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome'
 import React from 'react'
-import {RewardsCardSidebar} from '../../../view/com/rewards/RewardsCardSidebar'
-import {Text} from '../../../view/com/util/text/Text'
-import {TextLink} from '../../../view/com/util/Link'
-import {formatCount} from '../../../view/com/util/numeric/format'
 import {observer} from 'mobx-react-lite'
-import {pluralize} from '../../../lib/strings/helpers'
-import {s} from '../../../lib/styles'
+import {StyleSheet, TouchableOpacity, View} from 'react-native'
+import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome'
+import {usePalette} from 'lib/hooks/usePalette'
+import {DesktopSearch} from './Search'
+import {Text} from 'view/com/util/text/Text'
+import {TextLink} from 'view/com/util/Link'
+import {s} from 'lib/styles'
+import {useStores} from 'state/index'
+import {pluralize} from 'lib/strings/helpers'
+import {formatCount} from 'view/com/util/numeric/format'
 import {useNavigationTabState} from '../../../lib/hooks/useNavigationTabState.web'
-import {usePalette} from '../../../lib/hooks/usePalette'
-import {useStores} from '../../../state/index'
+
+import {RewardsCardSidebar} from '../../../view/com/rewards/RewardsCardSidebar'
 
 export const DesktopRightNav = observer(function DesktopRightNav() {
   const store = useStores()
   const pal = usePalette('default')
+  const palError = usePalette('error')
+
   const {isAtRewards, isAtSignIn} = useNavigationTabState()
   const did = store.session?.currentSession?.did ?? ''
+
+  const splx = true
 
   return (
     <View style={[styles.rightNav, pal.view]}>
       {store.session.hasSession && <DesktopSearch />}
       <View style={styles.message}>
-        {/* {store.session.isSandbox ? (
+        {!splx && store.session.isSandbox ? (
           <View style={[palError.view, styles.messageLine, s.p10]}>
             <Text type="md" style={[palError.text, s.bold]}>
               SANDBOX. Posts and accounts are not permanent.
             </Text>
           </View>
-        ) : (
-          <Text type="md" style={[pal.textLight, styles.messageLine]}>
-            Welcome to Bluesky! This is a beta application that's still in
-            development.
-          </Text>
-        )} */}
-
+        ) : undefined}
         {isAtRewards || isAtSignIn || !store.session.hasSession ? null : (
           <RewardsCardSidebar userId={did} />
         )}
-        <View style={[s.flexRow, {paddingHorizontal: 6}]}>
+        <View style={[s.flexRow]}>
           <TextLink
             type="md"
             style={pal.link}
@@ -91,34 +89,31 @@ const InviteCodes = observer(() => {
     store.shell.openModal({name: 'invite-codes'})
   }, [store])
   return (
-    store.session.hasSession &&
-    !store.session.isSolarplexSession && (
-      <TouchableOpacity
-        style={[styles.inviteCodes, pal.border]}
-        onPress={onPress}
-        accessibilityRole="button"
-        accessibilityLabel={
-          invitesAvailable === 1
-            ? 'Invite codes: 1 available'
-            : `Invite codes: ${invitesAvailable} available`
-        }
-        accessibilityHint="Opens list of invite codes">
-        <FontAwesomeIcon
-          icon="ticket"
-          style={[
-            styles.inviteCodesIcon,
-            store.me.invitesAvailable > 0 ? pal.link : pal.textLight,
-          ]}
-          size={16}
-        />
-        <Text
-          type="md-medium"
-          style={store.me.invitesAvailable > 0 ? pal.link : pal.textLight}>
-          {formatCount(store.me.invitesAvailable)} invite{' '}
-          {pluralize(store.me.invitesAvailable, 'code')} available
-        </Text>
-      </TouchableOpacity>
-    )
+    <TouchableOpacity
+      style={[styles.inviteCodes, pal.border]}
+      onPress={onPress}
+      accessibilityRole="button"
+      accessibilityLabel={
+        invitesAvailable === 1
+          ? 'Invite codes: 1 available'
+          : `Invite codes: ${invitesAvailable} available`
+      }
+      accessibilityHint="Opens list of invite codes">
+      <FontAwesomeIcon
+        icon="ticket"
+        style={[
+          styles.inviteCodesIcon,
+          store.me.invitesAvailable > 0 ? pal.link : pal.textLight,
+        ]}
+        size={16}
+      />
+      <Text
+        type="md-medium"
+        style={store.me.invitesAvailable > 0 ? pal.link : pal.textLight}>
+        {formatCount(store.me.invitesAvailable)} invite{' '}
+        {pluralize(store.me.invitesAvailable, 'code')} available
+      </Text>
+    </TouchableOpacity>
   )
 })
 
@@ -131,8 +126,6 @@ const styles = StyleSheet.create({
   },
 
   message: {
-    flexDirection: 'column',
-    alignItems: 'center',
     marginTop: 20,
     paddingHorizontal: 10,
   },

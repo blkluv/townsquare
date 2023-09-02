@@ -1,48 +1,132 @@
-import * as Toast from 'view/com/util/Toast'
-
-import {DropdownButton, DropdownItem} from 'view/com/util/forms/DropdownButton'
-import {FlatList, StyleSheet, View} from 'react-native'
-import {HeartIcon, HeartIconSolid} from 'lib/icons'
 import React, {useMemo, useRef} from 'react'
-import {colors, s} from 'lib/styles'
-
-import {Button} from 'view/com/util/forms/Button'
-import {CommonNavigatorParams} from 'lib/routes/types'
-import {EmptyState} from 'view/com/util/EmptyState'
-import {Feed} from 'view/com/posts/Feed'
-import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome'
-import {Haptics} from 'lib/haptics'
-import {LoadLatestBtn} from 'view/com/util/load-latest/LoadLatestBtn'
 import {NativeStackScreenProps} from '@react-navigation/native-stack'
+import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome'
+import {useNavigation} from '@react-navigation/native'
+import {usePalette} from 'lib/hooks/usePalette'
+import {HeartIcon, HeartIconSolid} from 'lib/icons'
+import {CommonNavigatorParams} from 'lib/routes/types'
+import {makeRecordUri} from 'lib/strings/url-helpers'
+import {colors, s} from 'lib/styles'
+import {observer} from 'mobx-react-lite'
+import {FlatList, StyleSheet, View, ActivityIndicator} from 'react-native'
+import {useStores} from 'state/index'
 import {PostsFeedModel} from 'state/models/feeds/posts'
-import {Text} from 'view/com/util/text/Text'
+import {useCustomFeed} from 'lib/hooks/useCustomFeed'
+import {withAuthRequired} from 'view/com/auth/withAuthRequired'
+import {Feed} from 'view/com/posts/Feed'
+import {pluralize} from 'lib/strings/helpers'
+import {sanitizeHandle} from 'lib/strings/handles'
 import {TextLink} from 'view/com/util/Link'
 import {UserAvatar} from 'view/com/util/UserAvatar'
 import {ViewHeader} from 'view/com/util/ViewHeader'
+import {Button} from 'view/com/util/forms/Button'
+import {Text} from 'view/com/util/text/Text'
+import * as Toast from 'view/com/util/Toast'
 import {isDesktopWeb} from 'platform/detection'
-import {makeRecordUri} from 'lib/strings/url-helpers'
-import {observer} from 'mobx-react-lite'
-import {pluralize} from 'lib/strings/helpers'
+import {useSetTitle} from 'lib/hooks/useSetTitle'
 import {shareUrl} from 'lib/sharing'
 import {toShareUrl} from 'lib/strings/url-helpers'
-import {useAnalytics} from 'lib/analytics/analytics'
-import {useCustomFeed} from 'lib/hooks/useCustomFeed'
+import {Haptics} from 'lib/haptics'
+import {ComposeIcon2} from 'lib/icons'
+import {FAB} from '../com/util/fab/FAB'
+import {LoadLatestBtn} from 'view/com/util/load-latest/LoadLatestBtn'
 import {useOnMainScroll} from 'lib/hooks/useOnMainScroll'
-import {usePalette} from 'lib/hooks/usePalette'
-import {useSetTitle} from 'lib/hooks/useSetTitle'
-import {useStores} from 'state/index'
-import {withAuthRequired} from 'view/com/auth/withAuthRequired'
+import {EmptyState} from 'view/com/util/EmptyState'
+import {useAnalytics} from 'lib/analytics/analytics'
+import {NativeDropdown, DropdownItem} from 'view/com/util/forms/NativeDropdown'
+import {makeProfileLink} from 'lib/routes/links'
+import {resolveName} from 'lib/api'
+import {CenteredView} from 'view/com/util/Views'
+import {NavigationProp} from 'lib/routes/types'
 
 type Props = NativeStackScreenProps<CommonNavigatorParams, 'CustomFeed'>
+
 export const CustomFeedScreen = withAuthRequired(
-  observer(({route}: Props) => {
+  observer((props: Props) => {
+    const pal = usePalette('default')
+    const store = useStores()
+    const navigation = useNavigation<NavigationProp>()
+
+    const {name: handleOrDid} = props.route.params
+
+    const [feedOwnerDid, setFeedOwnerDid] = React.useState<string | undefined>()
+    const [error, setError] = React.useState<string | undefined>()
+
+    const onPressBack = React.useCallback(() => {
+      if (navigation.canGoBack()) {
+        navigation.goBack()
+      } else {
+        navigation.navigate('Home')
+      }
+    }, [navigation])
+
+    React.useEffect(() => {
+      /*
+       * We must resolve the DID of the feed owner before we can fetch the feed.
+       */
+      async function fetchDid() {
+        try {
+          const did = await resolveName(store, handleOrDid)
+          setFeedOwnerDid(did)
+        } catch (e) {
+          setError(
+            `We're sorry, but we were unable to resolve this feed. If this persists, please contact the feed creator, @${handleOrDid}.`,
+          )
+        }
+      }
+
+      fetchDid()
+    }, [store, handleOrDid, setFeedOwnerDid])
+
+    if (error) {
+      return (
+        <CenteredView>
+          <View style={[pal.view, pal.border, styles.notFoundContainer]}>
+            <Text type="title-lg" style={[pal.text, s.mb10]}>
+              Could not load feed
+            </Text>
+            <Text type="md" style={[pal.text, s.mb20]}>
+              {error}
+            </Text>
+
+            <View style={{flexDirection: 'row'}}>
+              <Button
+                type="default"
+                accessibilityLabel="Go Back"
+                accessibilityHint="Return to previous page"
+                onPress={onPressBack}
+                style={{flexShrink: 1}}>
+                <Text type="button" style={pal.text}>
+                  Go Back
+                </Text>
+              </Button>
+            </View>
+          </View>
+        </CenteredView>
+      )
+    }
+
+    return feedOwnerDid ? (
+      <CustomFeedScreenInner {...props} feedOwnerDid={feedOwnerDid} />
+    ) : (
+      <CenteredView>
+        <View style={s.p20}>
+          <ActivityIndicator size="large" />
+        </View>
+      </CenteredView>
+    )
+  }),
+)
+
+export const CustomFeedScreenInner = observer(
+  ({route, feedOwnerDid}: Props & {feedOwnerDid: string}) => {
     const store = useStores()
     const pal = usePalette('default')
     const {track} = useAnalytics()
-    const {rkey, name} = route.params
+    const {rkey, name: handleOrDid} = route.params
     const uri = useMemo(
-      () => makeRecordUri(name, 'app.bsky.feed.generator', rkey),
-      [rkey, name],
+      () => makeRecordUri(feedOwnerDid, 'app.bsky.feed.generator', rkey),
+      [rkey, feedOwnerDid],
     )
     const scrollElRef = useRef<FlatList>(null)
     const currentFeed = useCustomFeed(uri)
@@ -99,31 +183,80 @@ export const CustomFeedScreen = withAuthRequired(
     }, [store, currentFeed])
 
     const onPressShare = React.useCallback(() => {
-      const url = toShareUrl(`/profile/${name}/feed/${rkey}`)
+      const url = toShareUrl(`/profile/${handleOrDid}/feed/${rkey}`)
       shareUrl(url)
       track('CustomFeed:Share')
-    }, [name, rkey, track])
+    }, [handleOrDid, rkey, track])
+
+    const onPressReport = React.useCallback(() => {
+      if (!currentFeed) return
+      store.shell.openModal({
+        name: 'report',
+        uri: currentFeed.uri,
+        cid: currentFeed.data.cid,
+      })
+    }, [store, currentFeed])
 
     const onScrollToTop = React.useCallback(() => {
       scrollElRef.current?.scrollToOffset({offset: 0, animated: true})
       resetMainScroll()
     }, [scrollElRef, resetMainScroll])
 
+    const onPressCompose = React.useCallback(() => {
+      store.shell.openComposer({})
+    }, [store])
+
     const dropdownItems: DropdownItem[] = React.useMemo(() => {
       let items: DropdownItem[] = [
         {
-          testID: 'feedHeaderDropdownRemoveBtn',
-          label: 'Remove from my communities',
+          testID: 'feedHeaderDropdownToggleSavedBtn',
+          label: currentFeed?.isSaved
+            ? 'Remove from my communities'
+            : 'Add to my communities',
           onPress: onToggleSaved,
+          icon: currentFeed?.isSaved
+            ? {
+                ios: {
+                  name: 'trash',
+                },
+                android: 'ic_delete',
+                web: 'trash',
+              }
+            : {
+                ios: {
+                  name: 'plus',
+                },
+                android: '',
+                web: 'plus',
+              },
+        },
+        {
+          testID: 'feedHeaderDropdownReportBtn',
+          label: 'Report feed',
+          onPress: onPressReport,
+          icon: {
+            ios: {
+              name: 'exclamationmark.triangle',
+            },
+            android: 'ic_menu_report_image',
+            web: 'circle-exclamation',
+          },
         },
         {
           testID: 'feedHeaderDropdownShareBtn',
           label: 'Share link',
           onPress: onPressShare,
+          icon: {
+            ios: {
+              name: 'square.and.arrow.up',
+            },
+            android: 'ic_menu_share',
+            web: 'share',
+          },
         },
       ]
       return items
-    }, [onToggleSaved, onPressShare])
+    }, [currentFeed?.isSaved, onToggleSaved, onPressReport, onPressShare])
 
     const renderHeaderBtns = React.useCallback(() => {
       return (
@@ -156,19 +289,7 @@ export const CustomFeedScreen = withAuthRequired(
               />
             </Button>
           ) : undefined}
-          {currentFeed?.isSaved ? (
-            <DropdownButton
-              testID="feedHeaderDropdownBtn"
-              type="default-light"
-              items={dropdownItems}
-              menuWidth={250}>
-              <FontAwesomeIcon
-                icon="ellipsis"
-                color={pal.colors.textLight}
-                size={18}
-              />
-            </DropdownButton>
-          ) : (
+          {!currentFeed?.isSaved ? (
             <Button
               type="default-light"
               onPress={onToggleSaved}
@@ -180,7 +301,21 @@ export const CustomFeedScreen = withAuthRequired(
                 Add to My Feeds
               </Text>
             </Button>
-          )}
+          ) : null}
+          <NativeDropdown testID="feedHeaderDropdownBtn" items={dropdownItems}>
+            <View
+              style={{
+                paddingLeft: currentFeed?.isSaved ? 12 : 6,
+                paddingRight: 12,
+                paddingVertical: 8,
+              }}>
+              <FontAwesomeIcon
+                icon="ellipsis"
+                size={20}
+                color={pal.colors.textLight}
+              />
+            </View>
+          </NativeDropdown>
         </View>
       )
     }, [
@@ -212,14 +347,17 @@ export const CustomFeedScreen = withAuthRequired(
                     'you'
                   ) : (
                     <TextLink
-                      text={`@${currentFeed.data.creator.handle}`}
-                      href={`/profile/${currentFeed.data.creator.did}`}
+                      text={sanitizeHandle(
+                        currentFeed.data.creator.handle,
+                        '@',
+                      )}
+                      href={makeProfileLink(currentFeed.data.creator)}
                       style={[pal.textLight]}
                     />
                   )}
                 </Text>
               )}
-              {isDesktopWeb && !store.session.isSolarplexSession && (
+              {isDesktopWeb && (
                 <View style={[styles.headerBtns, styles.headerBtnsDesktop]}>
                   <Button
                     type={currentFeed?.isSaved ? 'default' : 'inverted'}
@@ -272,6 +410,17 @@ export const CustomFeedScreen = withAuthRequired(
                       color={pal.colors.icon}
                     />
                   </Button>
+                  <Button
+                    type="default"
+                    accessibilityLabel="Report this community"
+                    accessibilityHint=""
+                    onPress={onPressReport}>
+                    <FontAwesomeIcon
+                      icon="circle-exclamation"
+                      size={18}
+                      color={pal.colors.icon}
+                    />
+                  </Button>
                 </View>
               )}
             </View>
@@ -294,7 +443,7 @@ export const CustomFeedScreen = withAuthRequired(
                 <TextLink
                   type="md-medium"
                   style={pal.textLight}
-                  href={`/profile/${name}/feed/${rkey}/liked-by`}
+                  href={`/profile/${handleOrDid}/feed/${rkey}/liked-by`}
                   text={`Liked by ${currentFeed.data.likeCount} ${pluralize(
                     currentFeed?.data.likeCount || 0,
                     'user',
@@ -320,22 +469,24 @@ export const CustomFeedScreen = withAuthRequired(
       onToggleSaved,
       onToggleLiked,
       onPressShare,
-      name,
+      handleOrDid,
+      onPressReport,
       rkey,
       isPinned,
       onTogglePinned,
-      store.session.isSolarplexSession,
     ])
 
     const renderEmptyState = React.useCallback(() => {
-      return <EmptyState icon="feed" message="This list is empty!" />
-    }, [])
+      return (
+        <View style={[pal.border, {borderTopWidth: 1, paddingTop: 20}]}>
+          <EmptyState icon="feed" message="This feed is empty!" />
+        </View>
+      )
+    }, [pal.border])
 
     return (
       <View style={s.hContentRegion}>
-        {!store.session.isSolarplexSession && (
-          <ViewHeader title="" renderButton={currentFeed && renderHeaderBtns} />
-        )}
+        <ViewHeader title="" renderButton={currentFeed && renderHeaderBtns} />
         <Feed
           scrollElRef={scrollElRef}
           feed={algoFeed}
@@ -352,9 +503,17 @@ export const CustomFeedScreen = withAuthRequired(
             showIndicator={false}
           />
         ) : null}
+        <FAB
+          testID="composeFAB"
+          onPress={onPressCompose}
+          icon={<ComposeIcon2 strokeWidth={1.5} size={29} style={s.white} />}
+          accessibilityRole="button"
+          accessibilityLabel="Compose post"
+          accessibilityHint=""
+        />
       </View>
     )
-  }),
+  },
 )
 
 const styles = StyleSheet.create({
@@ -408,5 +567,11 @@ const styles = StyleSheet.create({
   top2: {
     position: 'relative',
     top: 2,
+  },
+  notFoundContainer: {
+    margin: 10,
+    paddingHorizontal: 18,
+    paddingVertical: 14,
+    borderRadius: 6,
   },
 })

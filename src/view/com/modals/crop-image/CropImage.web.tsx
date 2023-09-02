@@ -141,7 +141,7 @@ export function Component({
           accessibilityLabel="Save image crop"
           accessibilityHint="Saves image crop settings">
           <LinearGradient
-            colors={[gradients.blueLight.start, gradients.blueLight.end]}
+            colors={[gradients.purple.start, gradients.purple.end]}
             start={{x: 0, y: 0}}
             end={{x: 1, y: 1}}
             style={[styles.btn]}>

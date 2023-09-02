@@ -1,37 +1,33 @@
-import * as Toast from '../util/Toast'
-
-import {DesktopWebTextLink, Link} from '../util/Link'
+import React, {useMemo, useState} from 'react'
+import {observer} from 'mobx-react-lite'
+import {Linking, StyleSheet, View} from 'react-native'
+import Clipboard from '@react-native-clipboard/clipboard'
+import {AtUri} from '@atproto/api'
 import {
   FontAwesomeIcon,
   FontAwesomeIconStyle,
 } from '@fortawesome/react-native-fontawesome'
-import {Linking, StyleSheet, View} from 'react-native'
-import React, {useMemo, useState} from 'react'
-import {getTranslatorLink, isPostInLanguage} from '../../../locale/helpers'
-
-import {AtUri} from '@atproto/api'
-import Clipboard from '@react-native-clipboard/clipboard'
-import {ContentHider} from '../util/moderation/ContentHider'
-import {NavigationProp} from 'lib/routes/types'
-import {PostAlerts} from '../util/moderation/PostAlerts'
-import {PostCtrls} from '../util/post-ctrls/PostCtrls'
-import {PostEmbeds} from '../util/post-embeds'
-import {PostMeta} from '../util/PostMeta'
-import {PostSandboxWarning} from '../util/PostSandboxWarning'
 import {PostsFeedItemModel} from 'state/models/feeds/post'
-import {PreviewableUserAvatar} from '../util/UserAvatar'
-import {RichText} from '../util/text/RichText'
+import {Link, DesktopWebTextLink} from '../util/Link'
 import {Text} from '../util/text/Text'
 import {UserInfoText} from '../util/UserInfoText'
-import {makeProfileLink} from 'lib/routes/links'
-import {observer} from 'mobx-react-lite'
+import {PostMeta} from '../util/PostMeta'
+import {PostCtrls} from '../util/post-ctrls/PostCtrls'
+import {PostEmbeds} from '../util/post-embeds'
+import {ContentHider} from '../util/moderation/ContentHider'
+import {PostAlerts} from '../util/moderation/PostAlerts'
+import {RichText} from '../util/text/RichText'
+import {PostSandboxWarning} from '../util/PostSandboxWarning'
+import * as Toast from '../util/Toast'
+import {PreviewableUserAvatar} from '../util/UserAvatar'
 import {s} from 'lib/styles'
+import {useStores} from 'state/index'
+import {usePalette} from 'lib/hooks/usePalette'
+import {useAnalytics} from 'lib/analytics/analytics'
 import {sanitizeDisplayName} from 'lib/strings/display-names'
 import {sanitizeHandle} from 'lib/strings/handles'
-import {useAnalytics} from 'lib/analytics/analytics'
-import {useNavigation} from '@react-navigation/native'
-import {usePalette} from 'lib/hooks/usePalette'
-import {useStores} from 'state/index'
+import {getTranslatorLink, isPostInLanguage} from '../../../locale/helpers'
+import {makeProfileLink} from 'lib/routes/links'
 
 export const FeedItem = observer(function ({
   item,
@@ -48,7 +44,6 @@ export const FeedItem = observer(function ({
   const store = useStores()
   const pal = usePalette('default')
   const {track} = useAnalytics()
-  const navigation = useNavigation<NavigationProp>()
   const [deleted, setDeleted] = useState(false)
   const record = item.postRecord
   const itemUri = item.post.uri
@@ -75,21 +70,19 @@ export const FeedItem = observer(function ({
 
   const onPressReply = React.useCallback(() => {
     track('FeedItem:PostReply')
-    store.session.isSolarplexSession
-      ? navigation.navigate('SignIn')
-      : store.shell.openComposer({
-          replyTo: {
-            uri: item.post.uri,
-            cid: item.post.cid,
-            text: record?.text || '',
-            author: {
-              handle: item.post.author.handle,
-              displayName: item.post.author.displayName,
-              avatar: item.post.author.avatar,
-            },
-          },
-        })
-  }, [item, track, record, store, navigation])
+    store.shell.openComposer({
+      replyTo: {
+        uri: item.post.uri,
+        cid: item.post.cid,
+        text: record?.text || '',
+        author: {
+          handle: item.post.author.handle,
+          displayName: item.post.author.displayName,
+          avatar: item.post.author.avatar,
+        },
+      },
+    })
+  }, [item, track, record, store])
 
   const onPressToggleRepost = React.useCallback(() => {
     track('FeedItem:PostRepost')
@@ -108,13 +101,11 @@ export const FeedItem = observer(function ({
     async (reactionId: string, remove?: boolean) => {
       track('FeedItem:PostLike')
       // console.log("reactionId", reactionId);
-      return store.session.isSolarplexSession
-        ? navigation.navigate('SignIn')
-        : item
-            .react(reactionId, remove)
-            .catch(e => store.log.error('Failed to add reaction', e))
+      return item
+        .react(reactionId, remove)
+        .catch(e => store.log.error('Failed to add reaction', e))
     },
-    [track, item, store, navigation],
+    [track, item, store],
   )
   const onCopyPostText = React.useCallback(() => {
     Clipboard.setString(record?.text || '')

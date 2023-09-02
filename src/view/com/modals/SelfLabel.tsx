@@ -1,15 +1,14 @@
 import React, {useState} from 'react'
 import {StyleSheet, TouchableOpacity, View} from 'react-native'
-import {colors, s} from 'lib/styles'
-
-import {Button} from '../util/forms/Button'
-import {ScrollView} from 'view/com/modals/util'
-import {SelectableBtn} from '../util/forms/SelectableBtn'
-import {Text} from '../util/text/Text'
-import {isDesktopWeb} from 'platform/detection'
 import {observer} from 'mobx-react-lite'
-import {usePalette} from 'lib/hooks/usePalette'
+import {Text} from '../util/text/Text'
 import {useStores} from 'state/index'
+import {s, colors} from 'lib/styles'
+import {usePalette} from 'lib/hooks/usePalette'
+import {isDesktopWeb} from 'platform/detection'
+import {Button} from '../util/forms/Button'
+import {SelectableBtn} from '../util/forms/SelectableBtn'
+import {ScrollView} from 'view/com/modals/util'
 
 const ADULT_CONTENT_LABELS = ['sexual', 'nudity', 'porn']
 

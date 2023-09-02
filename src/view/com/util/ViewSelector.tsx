@@ -1,20 +1,19 @@
+import React, {useEffect, useState} from 'react'
 import {
   Pressable,
   RefreshControl,
-  ScrollView,
   StyleSheet,
   View,
+  ScrollView,
 } from 'react-native'
-import React, {useEffect, useState} from 'react'
-import {colors, s} from 'lib/styles'
-
 import {FlatList} from './Views'
 import {OnScrollCb} from 'lib/hooks/useOnMainScroll'
-import {Text} from './text/Text'
-import {clamp} from 'lib/numbers'
-import {isAndroid} from 'platform/detection'
 import {useColorSchemeStyle} from 'lib/hooks/useColorSchemeStyle'
+import {Text} from './text/Text'
 import {usePalette} from 'lib/hooks/usePalette'
+import {clamp} from 'lib/numbers'
+import {s, colors} from 'lib/styles'
+import {isAndroid} from 'platform/detection'
 
 const HEADER_ITEM = {_reactKey: '__header__'}
 const SELECTOR_ITEM = {_reactKey: '__selector__'}
@@ -169,6 +168,7 @@ export function Selector({
         backgroundColor: pal.colors.background,
       }}>
       <ScrollView
+        testID="selector"
         horizontal
         showsHorizontalScrollIndicator={false}
         style={{position: 'absolute'}}>

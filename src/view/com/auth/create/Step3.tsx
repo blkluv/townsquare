@@ -1,23 +1,23 @@
-import {CreateAccountModel} from 'state/models/ui/create-account'
-import {Policies} from './Policies'
 import React from 'react'
-import {Text} from 'view/com/util/text/Text'
-import {TextInput} from '../util/TextInput'
-import {View} from 'react-native'
-import {createFullHandle} from 'lib/strings/handles'
+import {StyleSheet, View} from 'react-native'
 import {observer} from 'mobx-react-lite'
+import {CreateAccountModel} from 'state/models/ui/create-account'
+import {Text} from 'view/com/util/text/Text'
 import {s} from 'lib/styles'
+import {TextInput} from '../util/TextInput'
+import {createFullHandle} from 'lib/strings/handles'
 import {usePalette} from 'lib/hooks/usePalette'
+import {ErrorMessage} from 'view/com/util/error/ErrorMessage'
 
+/** STEP 3: Your user handle
+ * @field User handle
+ */
 export const Step3 = observer(({model}: {model: CreateAccountModel}) => {
   const pal = usePalette('default')
   return (
     <View>
       {/* <StepHeader step="3" title="Your user handle" /> */}
       <View style={s.pb10}>
-        <Text type="md-medium" style={[pal.text, s.mb2]} nativeID="birthDate">
-          Your username
-        </Text>
         <TextInput
           testID="handleInput"
           icon="at"
@@ -29,23 +29,22 @@ export const Step3 = observer(({model}: {model: CreateAccountModel}) => {
           accessibilityLabel="User handle"
           accessibilityHint="Input your user handle"
         />
-
-        <Text type="lg-bold" style={[pal.text, s.pl5, s.pt10]}>
-          <Text type="lg" style={[pal.text]}>
-            Your Handle will be
-          </Text>{' '}
-          @{createFullHandle(model.handle, model.userDomain)}
+        <Text type="lg" style={[pal.text, s.pl5, s.pt10]}>
+          Your full handle will be{' '}
+          <Text type="lg-bold" style={pal.text}>
+            @{createFullHandle(model.handle, model.userDomain)}
+          </Text>
         </Text>
       </View>
-      {/* {model.error ? (
+      {model.error ? (
         <ErrorMessage message={model.error} style={styles.error} />
-      ) : undefined} */}
-      {model.serviceDescription && (
-        <Policies
-          serviceDescription={model.serviceDescription}
-          needsGuardian={!model.isAge18}
-        />
-      )}
+      ) : undefined}
     </View>
   )
+})
+
+const styles = StyleSheet.create({
+  error: {
+    borderRadius: 6,
+  },
 })

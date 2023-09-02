@@ -1,12 +1,11 @@
-import {Animated, StyleSheet, TouchableWithoutFeedback} from 'react-native'
 import React, {ComponentProps} from 'react'
-
+import {observer} from 'mobx-react-lite'
+import {Animated, StyleSheet, TouchableWithoutFeedback} from 'react-native'
 import LinearGradient from 'react-native-linear-gradient'
 import {colors} from 'lib/styles'
-import {isMobileWeb} from 'platform/detection'
-import {observer} from 'mobx-react-lite'
 import {useAnimatedValue} from 'lib/hooks/useAnimatedValue'
 import {useStores} from 'state/index'
+import {isMobileWeb} from 'platform/detection'
 
 export interface FABProps
   extends ComponentProps<typeof TouchableWithoutFeedback> {

@@ -1,24 +1,23 @@
+import React from 'react'
+import {
+  TouchableWithoutFeedback,
+  StyleProp,
+  StyleSheet,
+  View,
+  ViewStyle,
+} from 'react-native'
 import {
   FontAwesomeIcon,
   FontAwesomeIconStyle,
 } from '@fortawesome/react-native-fontawesome'
-import {
-  StyleProp,
-  StyleSheet,
-  TouchableWithoutFeedback,
-  View,
-  ViewStyle,
-} from 'react-native'
-
-import {Button} from '../forms/Button'
-import {ModerationUI} from '@atproto/api'
-import {NavigationProp} from 'lib/routes/types'
-import React from 'react'
-import {Text} from '../text/Text'
-import {describeModerationCause} from 'lib/moderation'
-import {isDesktopWeb} from 'platform/detection'
 import {useNavigation} from '@react-navigation/native'
+import {ModerationUI} from '@atproto/api'
 import {usePalette} from 'lib/hooks/usePalette'
+import {NavigationProp} from 'lib/routes/types'
+import {Text} from '../text/Text'
+import {Button} from '../forms/Button'
+import {isDesktopWeb} from 'platform/detection'
+import {describeModerationCause} from 'lib/moderation'
 import {useStores} from 'state/index'
 
 export function ScreenHider({

@@ -1,25 +1,23 @@
-import * as backHandler from 'lib/routes/back-handler'
-
-import {RoutesContainer, TabsNavigator} from '../../Navigation'
-import {StyleSheet, View, useWindowDimensions} from 'react-native'
-
-import {Composer} from './Composer'
-import {Drawer} from 'react-native-drawer-layout'
-import {DrawerContent} from './Drawer'
-import {ErrorBoundary} from 'view/com/util/ErrorBoundary'
-import {Lightbox} from 'view/com/lightbox/Lightbox'
-import {ModalsContainer} from 'view/com/modals/Modal'
 import React from 'react'
-import {SafeAreaProvider} from 'react-native-safe-area-context'
-import {StatusBar} from 'expo-status-bar'
-import {isStateAtTabRoot} from 'lib/routes/helpers'
 import {observer} from 'mobx-react-lite'
-import {useNavigationState} from '@react-navigation/native'
-import {useOTAUpdate} from 'lib/hooks/useOTAUpdate'
-import {usePalette} from 'lib/hooks/usePalette'
+import {StatusBar} from 'expo-status-bar'
+import {StyleSheet, useWindowDimensions, View} from 'react-native'
 import {useSafeAreaInsets} from 'react-native-safe-area-context'
+import {Drawer} from 'react-native-drawer-layout'
+import {useNavigationState} from '@react-navigation/native'
 import {useStores} from 'state/index'
+import {ModalsContainer} from 'view/com/modals/Modal'
+import {Lightbox} from 'view/com/lightbox/Lightbox'
+import {ErrorBoundary} from 'view/com/util/ErrorBoundary'
+import {DrawerContent} from './Drawer'
+import {Composer} from './Composer'
 import {useTheme} from 'lib/ThemeContext'
+import {usePalette} from 'lib/hooks/usePalette'
+import * as backHandler from 'lib/routes/back-handler'
+import {RoutesContainer, TabsNavigator} from '../../Navigation'
+import {isStateAtTabRoot} from 'lib/routes/helpers'
+import {SafeAreaProvider} from 'react-native-safe-area-context'
+import {useOTAUpdate} from 'lib/hooks/useOTAUpdate'
 
 const ShellInner = observer(() => {
   const store = useStores()
@@ -54,15 +52,17 @@ const ShellInner = observer(() => {
             onOpen={onOpenDrawer}
             onClose={onCloseDrawer}
             swipeEdgeWidth={winDim.width / 2}
-            swipeEnabled={!canGoBack && !store.shell.isDrawerSwipeDisabled}>
+            swipeEnabled={
+              !canGoBack &&
+              store.session.hasSession &&
+              !store.shell.isDrawerSwipeDisabled
+            }>
             <TabsNavigator />
           </Drawer>
         </ErrorBoundary>
       </View>
       <Composer
-        active={
-          store.shell.isComposerActive && !store.session.isSolarplexSession
-        }
+        active={store.shell.isComposerActive}
         onClose={() => store.shell.closeComposer()}
         winHeight={winDim.height}
         replyTo={store.shell.composerOpts?.replyTo}

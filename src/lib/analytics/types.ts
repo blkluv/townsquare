@@ -127,6 +127,8 @@ interface TrackPropertiesMap {
   // ONBOARDING events
   'Onboarding:Begin': {}
   'Onboarding:Complete': {}
+  'Onboarding:Skipped': {}
+  'Onboarding:Reset': {}
   // Communities
   'CommunityFeed:Join': {}
   'CommunityFeed:Leave': {}

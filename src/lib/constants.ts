@@ -1,11 +1,34 @@
+import getGlobal from 'globalthis'
 import {Insets} from 'react-native'
 
-// Global constants
-export const FEEDBACK_FORM_URL =
-  'https://twitter.com/intent/tweet?text=Hey%20@solarplex_xyz%20I%20have%20some%20feedback%20for%20Live%3A'
+const HELP_DESK_LANG = 'en-us'
+export const HELP_DESK_URL = `https://blueskyweb.zendesk.com/hc/${HELP_DESK_LANG}`
 
-export const BLUESKY_INTENT_LINK =
+export const SOLARPLEX_INTENT_LINK =
   'https://twitter.com/intent/tweet?text=Let%27s%20get%20out%20of%20the%20echo%20chamber%21%20I%27m%20on%20the%20waitlist%20for%20@solarplex_xyz%20V2%21%20I%20need%20an%20invite%2C%20who%27s%20got%20one%3F'
+
+const BASE_FEEDBACK_FORM_URL = `${HELP_DESK_URL}/requests/new`
+export function FEEDBACK_FORM_URL({
+  email,
+  handle,
+}: {
+  email?: string
+  handle?: string
+}): string {
+  let str = BASE_FEEDBACK_FORM_URL
+  if (email) {
+    str += `?tf_anonymous_requester_email=${encodeURIComponent(email)}`
+    if (handle) {
+      str += `&tf_17205412673421=${encodeURIComponent(handle)}`
+    }
+  }
+  return (
+    'https://twitter.com/intent/tweet?text=Hey%20@solarplex_xyz%20I%20have%20some%20feedback%20for%20Live%3A' ??
+    str
+  )
+}
+
+// Global constants
 
 export const MAX_DISPLAY_NAME = 64
 export const MAX_DESCRIPTION = 256
@@ -19,6 +42,8 @@ export const POST_IMG_MAX = {
 // Recommended is 100 per: https://www.w3.org/WAI/GL/WCAG20/tests/test3.html
 // but increasing limit per user feedback
 export const MAX_ALT_TEXT = 300
+
+export const STATUS_PAGE_URL = 'placeholder'
 
 // Solarplex realm based for environments and testing
 // For now, since we've set up the environment in a way
@@ -62,7 +87,6 @@ const STAGING_CONSTANTS = {
   CLOUDFRONT_IMAGE_BUCKET: 'https://d30z0599kmgs5o.cloudfront.net',
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const LOCALHOST_CONSTANTS = {
   SPLX_PDS_URL: 'http://localhost:2583',
   SPLX_V1_API: 'http://localhost:3001',
@@ -77,20 +101,7 @@ export const SOLARPLEX_IDENTIFIER =
 
 let ACTIVE_CONSTANTS
 ACTIVE_CONSTANTS =
-  SOLARPLEX_REALM == 'prod' ? PROD_CONSTANTS : STAGING_CONSTANTS
-
-export const SOLARPLEX_FEED_API = ACTIVE_CONSTANTS.SPLX_FEED_API
-// export const SOLARPLEX_FEED_API = "http://localhost:3000";
-//export const SOLARPLEX_FEED_API = SOLARPLEX_FEED_API_LOCAL;
-// export const SOLARPLEX_FEED_API = STAGING_CONSTANTS.SPLX_FEED_API;
-
-export const SOLARPLEX_DID = ACTIVE_CONSTANTS.SPLX_USER_DID
-export const SOLARPLEX_V1_API = ACTIVE_CONSTANTS.SPLX_V1_API
-export const HELIUS_RPC_API = ACTIVE_CONSTANTS.HELIUS_RPC_API
-export const SOLARPLEX_USER_DID = ACTIVE_CONSTANTS.SPLX_USER_DID
-export const SOLARPLEX_UI_URL = ACTIVE_CONSTANTS.SPLX_UI_URL
-export const SOLARPLEX_PDS_URL = ACTIVE_CONSTANTS.SPLX_PDS_URL
-export const RPC_API = ACTIVE_CONSTANTS.RPC_API
+  SOLARPLEX_REALM === 'prod' ? PROD_CONSTANTS : STAGING_CONSTANTS
 
 // ("constants:", ACTIVE_CONSTANTS);
 // console.log("did:", SOLARPLEX_DID);
@@ -111,6 +122,27 @@ export function IS_PROD(url: string) {
   // -prf
   return url.startsWith('https://live.solarplex.xyz')
 }
+
+const currUrl = getGlobal().location?.href ?? ''
+
+if (IS_LOCAL_DEV(currUrl) && SOLARPLEX_REALM === 'prod') {
+  ACTIVE_CONSTANTS.SPLX_V1_API = LOCALHOST_CONSTANTS.SPLX_V1_API
+}
+
+console.log(ACTIVE_CONSTANTS)
+
+export const SOLARPLEX_FEED_API = ACTIVE_CONSTANTS.SPLX_FEED_API
+// export const SOLARPLEX_FEED_API = "http://localhost:3000";
+//export const SOLARPLEX_FEED_API = SOLARPLEX_FEED_API_LOCAL;
+// export const SOLARPLEX_FEED_API = STAGING_CONSTANTS.SPLX_FEED_API;
+
+export const SOLARPLEX_DID = ACTIVE_CONSTANTS.SPLX_USER_DID
+export const SOLARPLEX_V1_API = ACTIVE_CONSTANTS.SPLX_V1_API
+export const HELIUS_RPC_API = ACTIVE_CONSTANTS.HELIUS_RPC_API
+export const SOLARPLEX_USER_DID = ACTIVE_CONSTANTS.SPLX_USER_DID
+export const SOLARPLEX_UI_URL = ACTIVE_CONSTANTS.SPLX_UI_URL
+export const SOLARPLEX_PDS_URL = ACTIVE_CONSTANTS.SPLX_PDS_URL
+export const RPC_API = ACTIVE_CONSTANTS.RPC_API
 
 export const PROD_TEAM_HANDLES = [
   'viksit.live.solarplex.xyz',

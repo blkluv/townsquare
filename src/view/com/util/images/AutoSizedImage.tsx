@@ -1,17 +1,10 @@
 import React from 'react'
-import {
-  StyleProp,
-  StyleSheet,
-  TouchableOpacity,
-  View,
-  ViewStyle,
-} from 'react-native'
+import {StyleProp, StyleSheet, Pressable, View, ViewStyle} from 'react-native'
 import {Image} from 'expo-image'
 import {clamp} from 'lib/numbers'
 import {useStores} from 'state/index'
 import {Dimensions} from 'lib/media/types'
 
-export const DELAY_PRESS_IN = 500
 const MIN_ASPECT_RATIO = 0.33 // 1/3
 const MAX_ASPECT_RATIO = 5 // 5/1
 
@@ -57,25 +50,23 @@ export function AutoSizedImage({
 
   if (onPress || onLongPress || onPressIn) {
     return (
-      <TouchableOpacity
+      <Pressable
         onPress={onPress}
         onLongPress={onLongPress}
         onPressIn={onPressIn}
-        delayPressIn={DELAY_PRESS_IN}
         style={[styles.container, style]}
         accessible={true}
-        accessibilityLabel="Share image"
-        accessibilityHint="Opens ways of sharing image">
+        accessibilityRole="button"
+        accessibilityLabel={alt || 'Image'}
+        accessibilityHint="Tap to view fully">
         <Image
           style={[styles.image, {aspectRatio}]}
           source={uri}
-          accessible={true} // Must set for `accessibilityLabel` to work
+          accessible={false} // Must set for `accessibilityLabel` to work
           accessibilityIgnoresInvertColors
-          accessibilityLabel={alt}
-          accessibilityHint=""
         />
         {children}
-      </TouchableOpacity>
+      </Pressable>
     )
   }
 

@@ -1,5 +1,4 @@
-import * as EmailValidator from 'email-validator'
-
+import React, {useState, useEffect, useRef} from 'react'
 import {
   ActivityIndicator,
   Keyboard,
@@ -9,29 +8,28 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native'
-import {DEFAULT_SERVICE, RootStoreModel, useStores} from 'state/index'
-import React, {useEffect, useRef, useState} from 'react'
-import {colors, gradients, s} from 'lib/styles'
-
-import {AccountData} from 'state/models/session'
+import {
+  FontAwesomeIcon,
+  FontAwesomeIconStyle,
+} from '@fortawesome/react-native-fontawesome'
+import * as EmailValidator from 'email-validator'
 import {BskyAgent} from '@atproto/api'
-import {Button} from 'view/com/util/forms/Button'
-import {CenteredView} from 'view/com/util/Views'
-import {ErrorBoundary} from 'view/com/util/ErrorBoundary'
-import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome'
-import {NavigationProp} from 'lib/routes/types'
-import {SOLARPLEX_IDENTIFIER} from 'lib/constants'
-import {ServiceDescription} from 'state/models/session'
+import {useAnalytics} from 'lib/analytics/analytics'
 import {Text} from '../../util/text/Text'
 import {UserAvatar} from '../../util/UserAvatar'
-import {cleanError} from 'lib/strings/errors'
+import {LoggedOutLayout} from 'view/com/util/layouts/LoggedOutLayout'
+import {s, colors} from 'lib/styles'
 import {createFullHandle} from 'lib/strings/handles'
-import {isMobileWeb} from 'platform/detection'
+import {toNiceDomain} from 'lib/strings/url-helpers'
+import {useStores, RootStoreModel, DEFAULT_SERVICE} from 'state/index'
+import {ServiceDescription} from 'state/models/session'
+import {AccountData} from 'state/models/session'
 import {isNetworkError} from 'lib/strings/errors'
-import {useAnalytics} from 'lib/analytics/analytics'
-import {useNavigation} from '@react-navigation/native'
 import {usePalette} from 'lib/hooks/usePalette'
 import {useTheme} from 'lib/ThemeContext'
+import {cleanError} from 'lib/strings/errors'
+
+import {SOLARPLEX_IDENTIFIER} from 'lib/constants'
 
 enum Forms {
   Login,
@@ -41,13 +39,7 @@ enum Forms {
   PasswordUpdated,
 }
 
-export const Login = ({
-  onPressBack,
-  onPressCreateAccount,
-}: {
-  onPressBack: () => void
-  onPressCreateAccount: () => void
-}) => {
+export const Login = ({onPressBack}: {onPressBack: () => void}) => {
   const pal = usePalette('default')
   const store = useStores()
   const {track} = useAnalytics()
@@ -59,9 +51,7 @@ export const Login = ({
   >(undefined)
   const [initialHandle, setInitialHandle] = useState<string>('')
   const [currentForm, setCurrentForm] = useState<Forms>(
-    store.session.hasAccounts && !store.session.isSolarplexSession
-      ? Forms.ChooseAccount
-      : Forms.Login,
+    store.session.hasAccounts ? Forms.ChooseAccount : Forms.Login,
   )
 
   const onSelectAccount = (account?: AccountData) => {
@@ -112,53 +102,69 @@ export const Login = ({
   }
 
   return (
-    <KeyboardAvoidingView
-      testID="signIn"
-      behavior="padding"
-      style={[pal.view, s.pt10]}>
+    <KeyboardAvoidingView testID="signIn" behavior="padding" style={pal.view}>
       {currentForm === Forms.Login ? (
-        <LoginForm
-          store={store}
-          error={error}
-          serviceUrl={serviceUrl}
-          serviceDescription={serviceDescription}
-          initialHandle={initialHandle}
-          setError={setError}
-          setServiceUrl={setServiceUrl}
-          onPressBack={onPressBack}
-          onPressForgotPassword={onPressForgotPassword}
-          onPressRetryConnect={onPressRetryConnect}
-          onPressCreateAccount={onPressCreateAccount}
-        />
+        <LoggedOutLayout
+          leadin=""
+          title="Sign in"
+          description="Enter your username and password">
+          <LoginForm
+            store={store}
+            error={error}
+            serviceUrl={serviceUrl}
+            serviceDescription={serviceDescription}
+            initialHandle={initialHandle}
+            setError={setError}
+            setServiceUrl={setServiceUrl}
+            onPressBack={onPressBack}
+            onPressForgotPassword={onPressForgotPassword}
+            onPressRetryConnect={onPressRetryConnect}
+          />
+        </LoggedOutLayout>
       ) : undefined}
       {currentForm === Forms.ChooseAccount ? (
-        <ChooseAccountForm
-          store={store}
-          onSelectAccount={onSelectAccount}
-          onPressBack={onPressBack}
-        />
+        <LoggedOutLayout
+          leadin=""
+          title="Sign in as..."
+          description="Select from an existing account">
+          <ChooseAccountForm
+            store={store}
+            onSelectAccount={onSelectAccount}
+            onPressBack={onPressBack}
+          />
+        </LoggedOutLayout>
       ) : undefined}
       {currentForm === Forms.ForgotPassword ? (
-        <ForgotPasswordForm
-          store={store}
-          error={error}
-          serviceUrl={serviceUrl}
-          serviceDescription={serviceDescription}
-          setError={setError}
-          setServiceUrl={setServiceUrl}
-          onPressBack={gotoForm(Forms.Login)}
-          onEmailSent={gotoForm(Forms.SetNewPassword)}
-        />
+        <LoggedOutLayout
+          leadin=""
+          title="Forgot Password"
+          description="Let's get your password reset!">
+          <ForgotPasswordForm
+            store={store}
+            error={error}
+            serviceUrl={serviceUrl}
+            serviceDescription={serviceDescription}
+            setError={setError}
+            setServiceUrl={setServiceUrl}
+            onPressBack={gotoForm(Forms.Login)}
+            onEmailSent={gotoForm(Forms.SetNewPassword)}
+          />
+        </LoggedOutLayout>
       ) : undefined}
       {currentForm === Forms.SetNewPassword ? (
-        <SetNewPasswordForm
-          store={store}
-          error={error}
-          serviceUrl={serviceUrl}
-          setError={setError}
-          onPressBack={gotoForm(Forms.ForgotPassword)}
-          onPasswordSet={gotoForm(Forms.PasswordUpdated)}
-        />
+        <LoggedOutLayout
+          leadin=""
+          title="Forgot Password"
+          description="Let's get your password reset!">
+          <SetNewPasswordForm
+            store={store}
+            error={error}
+            serviceUrl={serviceUrl}
+            setError={setError}
+            onPressBack={gotoForm(Forms.ForgotPassword)}
+            onPasswordSet={gotoForm(Forms.PasswordUpdated)}
+          />
+        </LoggedOutLayout>
       ) : undefined}
       {currentForm === Forms.PasswordUpdated ? (
         <PasswordUpdatedForm onPressNext={gotoForm(Forms.Login)} />
@@ -281,9 +287,10 @@ const LoginForm = ({
   serviceDescription,
   initialHandle,
   setError,
+  setServiceUrl,
   onPressRetryConnect,
+  onPressBack,
   onPressForgotPassword,
-  onPressCreateAccount,
 }: {
   store: RootStoreModel
   error: string
@@ -295,16 +302,24 @@ const LoginForm = ({
   onPressRetryConnect: () => void
   onPressBack: () => void
   onPressForgotPassword: () => void
-  onPressCreateAccount: () => void
 }) => {
   const {track} = useAnalytics()
   const pal = usePalette('default')
   const theme = useTheme()
-  const navigation = useNavigation<NavigationProp>()
   const [isProcessing, setIsProcessing] = useState<boolean>(false)
   const [identifier, setIdentifier] = useState<string>(initialHandle)
   const [password, setPassword] = useState<string>('')
   const passwordInputRef = useRef<TextInput>(null)
+
+  const onPressSelectService = () => {
+    store.shell.openModal({
+      name: 'server-input',
+      initialService: serviceUrl,
+      onSelect: setServiceUrl,
+    })
+    Keyboard.dismiss()
+    track('Signin:PressedSelectService')
+  }
 
   const onPressNext = async () => {
     Keyboard.dismiss()
@@ -333,7 +348,6 @@ const LoginForm = ({
           )
         }
       }
-      // store.session.removeAccount(SOLARPLEX_IDENTIFIER)
 
       await store.session.login({
         service: serviceUrl,
@@ -346,8 +360,6 @@ const LoginForm = ({
       setIsProcessing(false)
       if (errMsg.includes('Authentication Required')) {
         setError('Invalid username or password')
-      } else if (errMsg.includes('Invalid identifier or password')) {
-        setError('Invalid username or password')
       } else if (isNetworkError(e)) {
         setError(
           'Unable to contact your service. Please check your Internet connection.',
@@ -357,271 +369,175 @@ const LoginForm = ({
       }
     } finally {
       track('Sign In', {resumedSession: false})
-      if (store.session.hasSession) {
-        navigation.navigate('Home')
-      }
     }
   }
 
   const isReady = !!serviceDescription && !!identifier && !!password
 
+  const allowSelectService = false
   return (
-    <>
-      {isMobileWeb && (
-        <View style={[s.flex1, s.p20, s.alignCenter]}>
-          {/*<SolarplexLogo />*/}
-        </View>
+    <View testID="loginForm">
+      <Text type="sm-bold" style={[pal.text, styles.groupLabel]}>
+        Sign in to Solarplex
+      </Text>
+      {allowSelectService && (
+        <>
+          <View style={[pal.borderDark, styles.group]}>
+            <View
+              style={[pal.borderDark, styles.groupContent, styles.noTopBorder]}>
+              <FontAwesomeIcon
+                icon="globe"
+                style={[pal.textLight, styles.groupContentIcon]}
+              />
+              <TouchableOpacity
+                testID="loginSelectServiceButton"
+                style={styles.textBtn}
+                onPress={onPressSelectService}
+                accessibilityRole="button"
+                accessibilityLabel="Select service"
+                accessibilityHint="Sets server for the Solarplex client">
+                <Text type="xl" style={[pal.text, styles.textBtnLabel]}>
+                  {toNiceDomain(serviceUrl)}
+                </Text>
+                <View style={[pal.btn, styles.textBtnFakeInnerBtn]}>
+                  <FontAwesomeIcon
+                    icon="pen"
+                    size={12}
+                    style={pal.textLight as FontAwesomeIconStyle}
+                  />
+                </View>
+              </TouchableOpacity>
+            </View>
+          </View>
+          <Text type="sm-bold" style={[pal.text, styles.groupLabel]}>
+            Account
+          </Text>
+        </>
       )}
-      <View testID="loginForm">
-        <Text type="sm-bold" style={[pal.text, styles.groupLabel]}>
-          Sign in to Solarplex
-        </Text>
-        {/* <View style={[pal.borderDark, styles.group]}>
-          <View
-            style={[pal.borderDark, styles.groupContent, styles.noTopBorder]}
-          >
-            <FontAwesomeIcon
-              icon="globe"
-              style={[pal.textLight, styles.groupContentIcon]}
-            />
-            <TouchableOpacity
-              testID="loginSelectServiceButton"
-              style={styles.textBtn}
-              onPress={onPressSelectService}
-              accessibilityRole="button"
-              accessibilityLabel="Select service"
-              accessibilityHint="Sets server for the Bluesky client"
-            >
-              <Text type="xl" style={[pal.text, styles.textBtnLabel]}>
-                {toNiceDomain(serviceUrl)}
-              </Text>
-              <View style={[pal.btn, styles.textBtnFakeInnerBtn]}>
-                <FontAwesomeIcon
-                  icon="pen"
-                  size={12}
-                  style={pal.textLight as FontAwesomeIconStyle}
-                />
-              </View>
-            </TouchableOpacity>
-          </View>
-        </View> */}
-        {/* <Text type="sm-bold" style={[pal.text, styles.groupLabel]}>
-          Account
-        </Text> */}
-        <View style={[pal.borderDark, styles.group]}>
-          <View
-            style={[pal.borderDark, styles.groupContent, styles.noTopBorder]}>
-            <FontAwesomeIcon
-              icon="at"
-              style={[pal.textLight, styles.groupContentIcon]}
-            />
-            <TextInput
-              testID="loginUsernameInput"
-              style={[pal.text, styles.textInput]}
-              placeholder="Username or email address"
-              placeholderTextColor={pal.colors.textLight}
-              autoCapitalize="none"
-              autoFocus
-              autoCorrect={false}
-              autoComplete="username"
-              returnKeyType="next"
-              onSubmitEditing={() => {
-                passwordInputRef.current?.focus()
-              }}
-              blurOnSubmit={false} // prevents flickering due to onSubmitEditing going to next field
-              keyboardAppearance={theme.colorScheme}
-              value={identifier}
-              onChangeText={str => setIdentifier((str || '').toLowerCase())}
-              editable={!isProcessing}
-              accessibilityLabel="Username or email address"
-              accessibilityHint="Input the username or email address you used at signup"
-            />
-          </View>
-          <View style={[pal.borderDark, styles.groupContent]}>
-            <FontAwesomeIcon
-              icon="lock"
-              style={[pal.textLight, styles.groupContentIcon]}
-            />
-            <TextInput
-              testID="loginPasswordInput"
-              ref={passwordInputRef}
-              style={[pal.text, styles.textInput]}
-              placeholder="Password"
-              placeholderTextColor={pal.colors.textLight}
-              autoCapitalize="none"
-              autoCorrect={false}
-              autoComplete="password"
-              returnKeyType="done"
-              enablesReturnKeyAutomatically={true}
-              keyboardAppearance={theme.colorScheme}
-              secureTextEntry={true}
-              textContentType="password"
-              clearButtonMode="while-editing"
-              value={password}
-              onChangeText={setPassword}
-              onSubmitEditing={onPressNext}
-              blurOnSubmit={false} // HACK: https://github.com/facebook/react-native/issues/21911#issuecomment-558343069 Keyboard blur behavior is now handled in onSubmitEditing
-              editable={!isProcessing}
-              accessibilityLabel="Password"
-              accessibilityHint={
-                identifier === ''
-                  ? 'Input your password'
-                  : `Input the password tied to ${identifier}`
-              }
-            />
-            <TouchableOpacity
-              testID="forgotPasswordButton"
-              style={styles.textInputInnerBtn}
-              onPress={onPressForgotPassword}
-              accessibilityRole="button"
-              accessibilityLabel="Forgot password"
-              accessibilityHint="Opens password reset form">
-              <Text style={pal.link}>Forgot</Text>
-            </TouchableOpacity>
-          </View>
+      <View style={[pal.borderDark, styles.group]}>
+        <View style={[pal.borderDark, styles.groupContent, styles.noTopBorder]}>
+          <FontAwesomeIcon
+            icon="at"
+            style={[pal.textLight, styles.groupContentIcon]}
+          />
+          <TextInput
+            testID="loginUsernameInput"
+            style={[pal.text, styles.textInput]}
+            placeholder="Username or email address"
+            placeholderTextColor={pal.colors.textLight}
+            autoCapitalize="none"
+            autoFocus
+            autoCorrect={false}
+            autoComplete="username"
+            returnKeyType="next"
+            onSubmitEditing={() => {
+              passwordInputRef.current?.focus()
+            }}
+            blurOnSubmit={false} // prevents flickering due to onSubmitEditing going to next field
+            keyboardAppearance={theme.colorScheme}
+            value={identifier}
+            onChangeText={str =>
+              setIdentifier((str || '').toLowerCase().trim())
+            }
+            editable={!isProcessing}
+            accessibilityLabel="Username or email address"
+            accessibilityHint="Input the username or email address you used at signup"
+          />
         </View>
-
-        {error ? (
-          <View style={styles.error}>
-            <View style={styles.errorIcon}>
-              <FontAwesomeIcon icon="exclamation" style={s.white} size={10} />
-            </View>
-            <View style={s.flex1}>
-              <Text style={[s.white, s.bold]}>{error}</Text>
-            </View>
-          </View>
-        ) : undefined}
-        <View style={[s.flexRow, s.alignCenter, s.pl20, s.pr20]}>
-          {/* <TouchableOpacity onPress={onPressBack} accessibilityRole="button">
-            <Text type="xl" style={[pal.link, s.pl5]}>
-              Back
-            </Text>
-          </TouchableOpacity> */}
-          <View style={s.flex1} />
-          {!serviceDescription && error ? (
-            <TouchableOpacity
-              testID="loginRetryButton"
-              onPress={onPressRetryConnect}
-              accessibilityRole="button"
-              accessibilityLabel="Retry"
-              accessibilityHint="Retries login">
-              <Text type="xl-bold" style={[pal.link, s.pr5]}>
-                Retry
-              </Text>
-            </TouchableOpacity>
-          ) : !serviceDescription ? (
-            <>
-              <ActivityIndicator />
-              <Text type="xl" style={[pal.textLight, s.pl10]}>
-                Connecting...
-              </Text>
-            </>
-          ) : isProcessing ? (
-            <ActivityIndicator />
-          ) : isReady ? (
-            <Button
-              testID="loginNextButton"
-              onPress={onPressNext}
-              // accessibilityRole="button"
-              accessibilityLabel="Go to next"
-              accessibilityHint="Navigates to the next screen"
-              label="Next"
-            />
-          ) : undefined}
-        </View>
-        {/* <View>
-        <br />
-        <br />
-        <Text type="sm-bold" style={[pal.text, styles.welcome, pal.textLight]}>
-          Sign in with your Bluesky credentials.
-          <br />
-          <br />
-          <br />
-          Don't have a Bluesky invitation?
-        </Text>
-        <View style={[styles.textBtnFakeInnerBtn]}>
+        <View style={[pal.borderDark, styles.groupContent]}>
+          <FontAwesomeIcon
+            icon="lock"
+            style={[pal.textLight, styles.groupContentIcon]}
+          />
+          <TextInput
+            testID="loginPasswordInput"
+            ref={passwordInputRef}
+            style={[pal.text, styles.textInput]}
+            placeholder="Password"
+            placeholderTextColor={pal.colors.textLight}
+            autoCapitalize="none"
+            autoCorrect={false}
+            autoComplete="password"
+            returnKeyType="done"
+            enablesReturnKeyAutomatically={true}
+            keyboardAppearance={theme.colorScheme}
+            secureTextEntry={true}
+            textContentType="password"
+            clearButtonMode="while-editing"
+            value={password}
+            onChangeText={setPassword}
+            onSubmitEditing={onPressNext}
+            blurOnSubmit={false} // HACK: https://github.com/facebook/react-native/issues/21911#issuecomment-558343069 Keyboard blur behavior is now handled in onSubmitEditing
+            editable={!isProcessing}
+            accessibilityLabel="Password"
+            accessibilityHint={
+              identifier === ''
+                ? 'Input your password'
+                : `Input the password tied to ${identifier}`
+            }
+          />
           <TouchableOpacity
-            accessibilityRole="link"
-            accessibilityLabel="Send feedback"
-            accessibilityHint="Opens Google Forms feedback link"
-            onPress={onPressFeedback}
-            style={[
-              styles.footerBtn,
-              styles.footerBtnFeedback,
-              theme.colorScheme === 'light'
-                ? styles.footerBtnFeedbackLight
-                : styles.footerBtnFeedbackDark,
-            ]}>
-            <FontAwesomeIcon
-              style={pal.link as FontAwesomeIconStyle}
-              size={19}
-              icon={['far', 'message']}
-            />
-            <Text type="2xl-medium" style={[pal.link, s.pl10]}>
-              Request Invite
-            </Text>
+            testID="forgotPasswordButton"
+            style={styles.textInputInnerBtn}
+            onPress={onPressForgotPassword}
+            accessibilityRole="button"
+            accessibilityLabel="Forgot password"
+            accessibilityHint="Opens password reset form">
+            <Text style={pal.link}>Forgot</Text>
           </TouchableOpacity>
         </View>
-      </View> */}
-        <CenteredView style={[styles.container, pal.view]}>
-          <View
-            testID="noSessionView"
-            style={[
-              styles.containerInner,
-              isMobileWeb && styles.containerInnerMobile,
-              pal.border,
-            ]}>
-            <ErrorBoundary>
-              <Text
-                style={isMobileWeb ? styles.subtitleMobile : styles.subtitle}>
-                Don't have an account?
-              </Text>
-              <View testID="signinOrCreateAccount" style={styles.btns}>
-                <TouchableOpacity
-                  testID="createAccountButton"
-                  style={[
-                    styles.btn,
-                    {backgroundColor: colors.splx.primary[50]},
-                  ]}
-                  onPress={onPressCreateAccount}
-                  // TODO: web accessibility
-                  accessibilityRole="button">
-                  <Text style={[s.white, styles.btnLabel]}>
-                    Create a new account
-                  </Text>
-                </TouchableOpacity>
-                {/* <TouchableOpacity
-                  testID="requestInviteButton"
-                  style={[styles.btn]}
-                  onPress={onPressRequestInvite}
-                  // TODO: web accessibility
-                  accessibilityRole="button"
-                >
-                  <Text style={[pal.text, styles.btnLabel]}>
-                    Request Invite
-                  </Text>
-                </TouchableOpacity> */}
-              </View>
-              {/* <Text
-              type="xl"
-              style={[styles.notice, pal.textLight]}
-              lineHeight={1.3}>
-              Bluesky will launch soon.{' '}
-              <TouchableOpacity
-                onPress={onPressWaitlist}
-                // TODO: web accessibility
-                accessibilityRole="button">
-                <Text type="xl" style={pal.link}>
-                  Join the waitlist
-                </Text>
-              </TouchableOpacity>{' '}
-              to try the beta before it's publicly available.
-            </Text> */}
-            </ErrorBoundary>
-          </View>
-        </CenteredView>
       </View>
-    </>
+      {error ? (
+        <View style={styles.error}>
+          <View style={styles.errorIcon}>
+            <FontAwesomeIcon icon="exclamation" style={s.white} size={10} />
+          </View>
+          <View style={s.flex1}>
+            <Text style={[s.white, s.bold]}>{error}</Text>
+          </View>
+        </View>
+      ) : undefined}
+      <View style={[s.flexRow, s.alignCenter, s.pl20, s.pr20]}>
+        <TouchableOpacity onPress={onPressBack} accessibilityRole="button">
+          <Text type="xl" style={[pal.link, s.pl5]}>
+            Back
+          </Text>
+        </TouchableOpacity>
+        <View style={s.flex1} />
+        {!serviceDescription && error ? (
+          <TouchableOpacity
+            testID="loginRetryButton"
+            onPress={onPressRetryConnect}
+            accessibilityRole="button"
+            accessibilityLabel="Retry"
+            accessibilityHint="Retries login">
+            <Text type="xl-bold" style={[pal.link, s.pr5]}>
+              Retry
+            </Text>
+          </TouchableOpacity>
+        ) : !serviceDescription ? (
+          <>
+            <ActivityIndicator />
+            <Text type="xl" style={[pal.textLight, s.pl10]}>
+              Connecting...
+            </Text>
+          </>
+        ) : isProcessing ? (
+          <ActivityIndicator />
+        ) : isReady ? (
+          <TouchableOpacity
+            testID="loginNextButton"
+            onPress={onPressNext}
+            accessibilityRole="button"
+            accessibilityLabel="Go to next"
+            accessibilityHint="Navigates to the next screen">
+            <Text type="xl-bold" style={[pal.link, s.pr5]}>
+              Next
+            </Text>
+          </TouchableOpacity>
+        ) : undefined}
+      </View>
+    </View>
   )
 }
 
@@ -631,6 +547,7 @@ const ForgotPasswordForm = ({
   serviceUrl,
   serviceDescription,
   setError,
+  setServiceUrl,
   onPressBack,
   onEmailSent,
 }: {
@@ -652,6 +569,14 @@ const ForgotPasswordForm = ({
   useEffect(() => {
     screen('Signin:ForgotPassword')
   }, [screen])
+
+  const onPressSelectService = () => {
+    store.shell.openModal({
+      name: 'server-input',
+      initialService: serviceUrl,
+      onSelect: setServiceUrl,
+    })
+  }
 
   const onPressNext = async () => {
     if (!EmailValidator.validate(email)) {
@@ -679,6 +604,8 @@ const ForgotPasswordForm = ({
     }
   }
 
+  const allowSelectService = false
+
   return (
     <>
       <View>
@@ -692,31 +619,31 @@ const ForgotPasswordForm = ({
         <View
           testID="forgotPasswordView"
           style={[pal.borderDark, pal.view, styles.group]}>
-          {/* <TouchableOpacity
-            testID="forgotPasswordSelectServiceButton"
-            style={[pal.borderDark, styles.groupContent, styles.noTopBorder]}
-            onPress={onPressSelectService}
-            accessibilityRole="button"
-            accessibilityLabel="Hosting provider"
-            accessibilityHint="Sets hosting provider for password reset"
-          >
-            <FontAwesomeIcon
-              icon="globe"
-              style={[pal.textLight, styles.groupContentIcon]}
-            />
-            <Text style={[pal.text, styles.textInput]} numberOfLines={1}>
-              {toNiceDomain(serviceUrl)}
-            </Text>
-            <View style={[pal.btn, styles.textBtnFakeInnerBtn]}>
+          {allowSelectService && (
+            <TouchableOpacity
+              testID="forgotPasswordSelectServiceButton"
+              style={[pal.borderDark, styles.groupContent, styles.noTopBorder]}
+              onPress={onPressSelectService}
+              accessibilityRole="button"
+              accessibilityLabel="Hosting provider"
+              accessibilityHint="Sets hosting provider for password reset">
               <FontAwesomeIcon
-                icon="pen"
-                size={12}
-                style={pal.text as FontAwesomeIconStyle}
+                icon="globe"
+                style={[pal.textLight, styles.groupContentIcon]}
               />
-            </View>
-          </TouchableOpacity> */}
-          <View
-            style={[pal.borderDark, styles.groupContent, styles.noTopBorder]}>
+              <Text style={[pal.text, styles.textInput]} numberOfLines={1}>
+                {toNiceDomain(serviceUrl)}
+              </Text>
+              <View style={[pal.btn, styles.textBtnFakeInnerBtn]}>
+                <FontAwesomeIcon
+                  icon="pen"
+                  size={12}
+                  style={pal.text as FontAwesomeIconStyle}
+                />
+              </View>
+            </TouchableOpacity>
+          )}
+          <View style={[pal.borderDark, styles.groupContent]}>
             <FontAwesomeIcon
               icon="envelope"
               style={[pal.textLight, styles.groupContentIcon]}
@@ -916,7 +843,7 @@ const SetNewPasswordForm = ({
           {isProcessing ? (
             <ActivityIndicator />
           ) : !resetCode || !password ? (
-            <Text type="2xl-bold" style={[pal.link, s.pr5, styles.dimmed]}>
+            <Text type="xl-bold" style={[pal.link, s.pr5, styles.dimmed]}>
               Next
             </Text>
           ) : (
@@ -945,9 +872,9 @@ const SetNewPasswordForm = ({
 const PasswordUpdatedForm = ({onPressNext}: {onPressNext: () => void}) => {
   const {screen} = useAnalytics()
 
-  // useEffect(() => {
-  screen('Signin:PasswordUpdatedForm')
-  // }, [screen])
+  useEffect(() => {
+    screen('Signin:PasswordUpdatedForm')
+  }, [screen])
 
   const pal = usePalette('default')
   return (
@@ -984,11 +911,6 @@ const styles = StyleSheet.create({
   instructions: {
     marginBottom: 20,
     marginHorizontal: 20,
-  },
-  welcome: {
-    marginBottom: 20,
-    marginHorizontal: 20,
-    fontSize: 24,
   },
   group: {
     borderWidth: 1,
@@ -1088,92 +1010,4 @@ const styles = StyleSheet.create({
     marginRight: 5,
   },
   dimmed: {opacity: 0.5},
-  footerBtn: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 10,
-    borderRadius: 25,
-  },
-  footerBtnFeedback: {
-    paddingHorizontal: 24,
-  },
-  footerBtnFeedbackLight: {
-    backgroundColor: '#DDEFFF',
-  },
-  footerBtnFeedbackDark: {
-    backgroundColor: colors.blue6,
-  },
-  container: {
-    height: '100%',
-  },
-  containerInner: {
-    height: '100%',
-    justifyContent: 'center',
-    paddingBottom: '20vh',
-    paddingHorizontal: 20,
-  },
-  containerInnerMobile: {
-    paddingBottom: 50,
-  },
-  title: {
-    textAlign: 'center',
-    color: gradients.purple.start,
-    fontSize: 68,
-    fontWeight: 'bold',
-    paddingBottom: 10,
-  },
-  titleMobile: {
-    textAlign: 'center',
-    color: gradients.purple.start,
-    fontSize: 58,
-    fontWeight: 'bold',
-  },
-  subtitle: {
-    textAlign: 'center',
-    color: colors.gray5,
-    fontSize: 24,
-    fontWeight: 'bold',
-    paddingBottom: 30,
-  },
-  subtitleMobile: {
-    textAlign: 'center',
-    color: colors.gray5,
-    fontSize: 18,
-    fontWeight: 'bold',
-    paddingBottom: 30,
-  },
-  btns: {
-    flexDirection: isMobileWeb ? 'column' : 'row',
-    gap: 20,
-    justifyContent: 'center',
-    paddingBottom: 40,
-  },
-  btn: {
-    borderRadius: 30,
-    paddingHorizontal: 24,
-    paddingVertical: 12,
-    minWidth: 220,
-    backgroundColor: colors.purple1,
-  },
-  btnLabel: {
-    textAlign: 'center',
-    fontSize: 18,
-  },
-  notice: {
-    paddingHorizontal: 40,
-    textAlign: 'center',
-    fontSize: 16,
-  },
-  footer: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    bottom: 0,
-    padding: 20,
-    borderTopWidth: 1,
-    flexDirection: 'row',
-  },
-  footerLink: {
-    marginRight: 20,
-  },
 })

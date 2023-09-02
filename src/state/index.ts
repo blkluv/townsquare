@@ -1,15 +1,12 @@
+import {autorun} from 'mobx'
+import {AppState, Platform} from 'react-native'
+import {BskyAgent} from '@atproto/api'
+import {RootStoreModel} from './models/root-store'
 import * as apiPolyfill from 'lib/api/api-polyfill'
 import * as storage from 'lib/storage'
 
-import {AppState, Platform} from 'react-native'
-
-import {BskyAgent} from '@atproto/api'
-import {RootStoreModel} from './models/root-store'
 import {SOLARPLEX_PDS_URL} from 'lib/constants'
-import {autorun} from 'mobx'
 
-// TODO(viksit): make this support local dev env
-// PDS
 export const LOCAL_DEV_SERVICE =
   Platform.OS === 'android' ? 'http://10.0.2.2:2583' : 'http://localhost:2583'
 export const STAGING_SERVICE = 'https://staging.live.solarplex.xyz'

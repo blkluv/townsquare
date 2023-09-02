@@ -1,6 +1,6 @@
 import React, {useCallback} from 'react'
 import {observer} from 'mobx-react-lite'
-import {Pressable, StyleSheet, View} from 'react-native'
+import {Pressable, StyleSheet, View, ActivityIndicator} from 'react-native'
 import {AppBskyGraphDefs as GraphDefs} from '@atproto/api'
 import {
   FontAwesomeIcon,
@@ -16,9 +16,11 @@ import {Button} from '../util/forms/Button'
 import * as Toast from '../util/Toast'
 import {useStores} from 'state/index'
 import {sanitizeDisplayName} from 'lib/strings/display-names'
+import {sanitizeHandle} from 'lib/strings/handles'
 import {s} from 'lib/styles'
 import {usePalette} from 'lib/hooks/usePalette'
 import {isDesktopWeb, isAndroid} from 'platform/detection'
+import isEqual from 'lodash.isequal'
 
 export const snapPoints = ['fullscreen']
 
@@ -36,7 +38,11 @@ export const Component = observer(
     const pal = usePalette('default')
     const palPrimary = usePalette('primary')
     const palInverted = usePalette('inverted')
+    const [originalSelections, setOriginalSelections] = React.useState<
+      string[]
+    >([])
     const [selected, setSelected] = React.useState<string[]>([])
+    const [membershipsLoaded, setMembershipsLoaded] = React.useState(false)
 
     const listsList: ListsListModel = React.useMemo(
       () => new ListsListModel(store, store.me.did),
@@ -50,13 +56,16 @@ export const Component = observer(
       listsList.refresh()
       memberships.fetch().then(
         () => {
-          setSelected(memberships.memberships.map(m => m.value.list))
+          const ids = memberships.memberships.map(m => m.value.list)
+          setOriginalSelections(ids)
+          setSelected(ids)
+          setMembershipsLoaded(true)
         },
         err => {
           store.log.error('Failed to fetch memberships', {err})
         },
       )
-    }, [memberships, listsList, store, setSelected])
+    }, [memberships, listsList, store, setSelected, setMembershipsLoaded])
 
     const onPressCancel = useCallback(() => {
       store.shell.closeModal()
@@ -100,11 +109,16 @@ export const Component = observer(
         return (
           <Pressable
             testID={`toggleBtn-${list.name}`}
-            style={[styles.listItem, pal.border]}
+            style={[
+              styles.listItem,
+              pal.border,
+              {opacity: membershipsLoaded ? 1 : 0.5},
+            ]}
             accessibilityLabel={`${isSelected ? 'Remove from' : 'Add to'} ${
               list.name
             }`}
             accessibilityHint=""
+            disabled={!membershipsLoaded}
             onPress={() => onToggleSelected(list.uri)}>
             <View style={styles.listItemAvi}>
               <UserAvatar size={40} avatar={list.avatar} />
@@ -122,26 +136,36 @@ export const Component = observer(
                 by{' '}
                 {list.creator.did === store.me.did
                   ? 'you'
-                  : `@${list.creator.handle}`}
+                  : sanitizeHandle(list.creator.handle, '@')}
               </Text>
             </View>
-            <View
-              style={
-                isSelected
-                  ? [styles.checkbox, palPrimary.border, palPrimary.view]
-                  : [styles.checkbox, pal.borderDark]
-              }>
-              {isSelected && (
-                <FontAwesomeIcon
-                  icon="check"
-                  style={palInverted.text as FontAwesomeIconStyle}
-                />
-              )}
-            </View>
+            {membershipsLoaded && (
+              <View
+                style={
+                  isSelected
+                    ? [styles.checkbox, palPrimary.border, palPrimary.view]
+                    : [styles.checkbox, pal.borderDark]
+                }>
+                {isSelected && (
+                  <FontAwesomeIcon
+                    icon="check"
+                    style={palInverted.text as FontAwesomeIconStyle}
+                  />
+                )}
+              </View>
+            )}
           </Pressable>
         )
       },
-      [pal, palPrimary, palInverted, onToggleSelected, selected, store.me.did],
+      [
+        pal,
+        palPrimary,
+        palInverted,
+        onToggleSelected,
+        selected,
+        store.me.did,
+        membershipsLoaded,
+      ],
     )
 
     const renderEmptyState = React.useCallback(() => {
@@ -154,6 +178,10 @@ export const Component = observer(
         />
       )
     }, [onPressNewMuteList])
+
+    // Only show changes button if there are some items on the list to choose from AND user has made changes in selection
+    const canSaveChanges =
+      !listsList.isEmpty && !isEqual(selected, originalSelections)
 
     return (
       <View testID="listAddRemoveUserModal" style={s.hContentRegion}>
@@ -177,16 +205,24 @@ export const Component = observer(
             onAccessibilityEscape={onPressCancel}
             label="Cancel"
           />
-          <Button
-            testID="saveBtn"
-            type="primary"
-            onPress={onPressSave}
-            style={styles.footerBtn}
-            accessibilityLabel="Save changes"
-            accessibilityHint=""
-            onAccessibilityEscape={onPressSave}
-            label="Save Changes"
-          />
+          {canSaveChanges && (
+            <Button
+              testID="saveBtn"
+              type="primary"
+              onPress={onPressSave}
+              style={styles.footerBtn}
+              accessibilityLabel="Save changes"
+              accessibilityHint=""
+              onAccessibilityEscape={onPressSave}
+              label="Save Changes"
+            />
+          )}
+
+          {(listsList.isLoading || !membershipsLoaded) && (
+            <View style={styles.loadingContainer}>
+              <ActivityIndicator />
+            </View>
+          )}
         </View>
       </View>
     )
@@ -208,6 +244,7 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
   },
   btns: {
+    position: 'relative',
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
@@ -249,5 +286,12 @@ const styles = StyleSheet.create({
     height: 24,
     borderRadius: 6,
     marginRight: 8,
+  },
+  loadingContainer: {
+    position: 'absolute',
+    top: 10,
+    right: 0,
+    bottom: 0,
+    justifyContent: 'center',
   },
 })

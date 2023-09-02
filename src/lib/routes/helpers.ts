@@ -1,4 +1,4 @@
-import {RouteParams, State} from './types'
+import {State, RouteParams} from './types'
 
 export function getCurrentRoute(state: State) {
   let node = state.routes[state.index || 0]
@@ -17,8 +17,13 @@ export function isStateAtTabRoot(state: State | undefined) {
     return true
   }
   const currentRoute = getCurrentRoute(state)
-
-  return isTab(currentRoute.name, 'PostThread')
+  return (
+    isTab(currentRoute.name, 'Home') ||
+    isTab(currentRoute.name, 'Search') ||
+    isTab(currentRoute.name, 'Feeds') ||
+    isTab(currentRoute.name, 'Notifications') ||
+    isTab(currentRoute.name, 'MyProfile')
+  )
 }
 
 export function isTab(current: string, route: string) {

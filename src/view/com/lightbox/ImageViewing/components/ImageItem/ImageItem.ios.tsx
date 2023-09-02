@@ -18,6 +18,7 @@ import {
   NativeSyntheticEvent,
   TouchableWithoutFeedback,
 } from 'react-native'
+import {Image} from 'expo-image'
 
 import useDoubleTapToZoom from '../../hooks/useDoubleTapToZoom'
 import useImageDimensions from '../../hooks/useImageDimensions'
@@ -41,6 +42,8 @@ type Props = {
   swipeToCloseEnabled?: boolean
   doubleTapToZoomEnabled?: boolean
 }
+
+const AnimatedImage = Animated.createAnimatedComponent(Image)
 
 const ImageItem = ({
   imageSrc,
@@ -128,8 +131,10 @@ const ImageItem = ({
           onPress={doubleTapToZoomEnabled ? handleDoubleTap : undefined}
           onLongPress={onLongPressHandler}
           delayLongPress={delayLongPress}
-          accessibilityRole="image">
-          <Animated.Image
+          accessibilityRole="image"
+          accessibilityLabel={imageSrc.alt}
+          accessibilityHint="">
+          <AnimatedImage
             source={imageSrc}
             style={imageStylesWithOpacity}
             onLoad={() => setLoaded(true)}

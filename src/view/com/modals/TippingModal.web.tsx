@@ -38,9 +38,9 @@ function TipBtn({label, disabled, onPress}: TipBtnProps) {
       type="primary-outline"
       onPress={() => {
         onPress()
-      }}>
-      {label}
-    </Button>
+      }}
+      label={label}
+    />
   )
 }
 
@@ -65,7 +65,9 @@ function ConnectWalletModal({recipientName}: ConnectWalletModalProps) {
   return (
     <CenteredView style={[pal.view, styles.center]}>
       <View style={{paddingVertical: 10}}>
-        <Text type="2xl-bold">Connect Your Wallet to Tip {recipientName}</Text>
+        <Text type="2xl-bold">
+          {`Connect Your Wallet to Tip ${recipientName}`}
+        </Text>
       </View>
       <TipBtn
         disabled={connectWalletIsBusy}
@@ -162,13 +164,13 @@ export const Component = observer(function ({
         <CenteredView style={[pal.view, styles.center]}>
           <View style={{paddingVertical: 10}}>
             <Text type="2xl-bold">
-              Tip {recipientName} with {tokenName} and support their work
+              {`Tip ${recipientName} with ${tokenName} and support their work`}
             </Text>
           </View>
           <View style={[pal.borderDark, styles.inputContainer]}>
             <View style={{paddingRight: 10}}>
               <Image
-                accessibilityIgnoresInvertColors={true}
+                accessibilityIgnoresInvertColors
                 source={{
                   uri: token?.tokenImage,
                 }}

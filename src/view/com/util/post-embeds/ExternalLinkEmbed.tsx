@@ -1,12 +1,11 @@
-import {StyleSheet, View} from 'react-native'
-
-import {AppBskyEmbedExternal} from '@atproto/api'
-import {Image} from 'expo-image'
 import React from 'react'
+import {Image} from 'expo-image'
 import {Text} from '../text/Text'
+import {StyleSheet, View} from 'react-native'
+import {usePalette} from 'lib/hooks/usePalette'
+import {AppBskyEmbedExternal} from '@atproto/api'
 import {isDesktopWeb} from 'platform/detection'
 import {toNiceDomain} from 'lib/strings/url-helpers'
-import {usePalette} from 'lib/hooks/usePalette'
 
 export const ExternalLinkEmbed = ({
   link,

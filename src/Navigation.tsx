@@ -1,83 +1,85 @@
 import * as React from 'react'
-
+import {StyleSheet} from 'react-native'
+import {observer} from 'mobx-react-lite'
 import {
-  AllNavigatorParams,
-  BottomTabNavigatorParams,
-  CommunitiesTabNavigatorParams,
-  FeedsTabNavigatorParams,
-  FlatNavigatorParams,
-  HomeTabNavigatorParams,
-  MyProfileTabNavigatorParams,
-  NotificationsTabNavigatorParams,
-  RewardsTabNavigatorParams,
-  SearchTabNavigatorParams,
-} from 'lib/routes/types'
+  NavigationContainer,
+  createNavigationContainerRef,
+  CommonActions,
+  StackActions,
+  DefaultTheme,
+  DarkTheme,
+} from '@react-navigation/native'
+import {createNativeStackNavigator} from '@react-navigation/native-stack'
 import {
   BottomTabBarProps,
   createBottomTabNavigator,
 } from '@react-navigation/bottom-tabs'
 import {
-  CommonActions,
-  DarkTheme,
-  DefaultTheme,
-  NavigationContainer,
-  StackActions,
-  createNavigationContainerRef,
-} from '@react-navigation/native'
-import {RouteParams, State} from 'lib/routes/types'
-
-import {AppPasswords} from 'view/screens/AppPasswords'
+  HomeTabNavigatorParams,
+  SearchTabNavigatorParams,
+  FeedsTabNavigatorParams,
+  NotificationsTabNavigatorParams,
+  FlatNavigatorParams,
+  AllNavigatorParams,
+  MyProfileTabNavigatorParams,
+  BottomTabNavigatorParams,
+  RewardsTabNavigatorParams,
+  CommunitiesTabNavigatorParams,
+} from 'lib/routes/types'
 import {BottomBar} from './view/shell/bottom-bar/BottomBar'
-import {CommunitiesScreen} from 'view/screens/Communities'
-import {CommunityFeedScreen} from 'view/screens/CommunityFeedScreen'
-import {CommunityGuidelinesScreen} from './view/screens/CommunityGuidelines'
-import {CopyrightPolicyScreen} from './view/screens/CopyrightPolicy'
-import {CustomFeedLikedByScreen} from './view/screens/CustomFeedLikedBy'
-import {CustomFeedScreen} from './view/screens/CustomFeed'
-import {DebugScreen} from './view/screens/Debug'
-import {DiscoverFeedsScreen} from 'view/screens/DiscoverFeeds'
-import {FeedsScreen} from './view/screens/Feeds'
+import {buildStateObject} from 'lib/routes/helpers'
+import {State, RouteParams} from 'lib/routes/types'
+import {colors} from 'lib/styles'
+import {isNative} from 'platform/detection'
+import {useColorSchemeStyle} from 'lib/hooks/useColorSchemeStyle'
+import {router} from './routes'
+import {usePalette} from 'lib/hooks/usePalette'
+import {useStores} from './state'
+
 import {HomeScreen} from './view/screens/Home'
-import {JSX} from 'react/jsx-runtime'
-import {LogScreen} from './view/screens/Log'
-import {LoggedOut} from 'view/com/auth/LoggedOut'
-import {MissionsTab} from 'view/screens/MissionsTab'
-import {ModerationBlockedAccounts} from 'view/screens/ModerationBlockedAccounts'
-import {ModerationMuteListsScreen} from './view/screens/ModerationMuteLists'
-import {ModerationMutedAccounts} from 'view/screens/ModerationMutedAccounts'
-import {ModerationScreen} from './view/screens/Moderation'
-import {NotFoundScreen} from './view/screens/NotFound'
+import {SearchScreen} from './view/screens/Search'
+import {FeedsScreen} from './view/screens/Feeds'
 import {NotificationsScreen} from './view/screens/Notifications'
-import {PostLikedByScreen} from './view/screens/PostLikedBy'
-import {PostRepostedByScreen} from './view/screens/PostRepostedBy'
-import {PostThreadScreen} from './view/screens/PostThread'
-import {PrivacyPolicyScreen} from './view/screens/PrivacyPolicy'
+import {ModerationScreen} from './view/screens/Moderation'
+import {ModerationMuteListsScreen} from './view/screens/ModerationMuteLists'
+import {DiscoverFeedsScreen} from 'view/screens/DiscoverFeeds'
+import {NotFoundScreen} from './view/screens/NotFound'
+import {SettingsScreen} from './view/screens/Settings'
+import {ProfileScreen} from './view/screens/Profile'
 import {ProfileFollowersScreen} from './view/screens/ProfileFollowers'
 import {ProfileFollowsScreen} from './view/screens/ProfileFollows'
+import {CustomFeedScreen} from './view/screens/CustomFeed'
+import {CustomFeedLikedByScreen} from './view/screens/CustomFeedLikedBy'
 import {ProfileListScreen} from './view/screens/ProfileList'
-import {ProfileScreen} from './view/screens/Profile'
+import {PostThreadScreen} from './view/screens/PostThread'
+import {PostLikedByScreen} from './view/screens/PostLikedBy'
+import {PostRepostedByScreen} from './view/screens/PostRepostedBy'
+import {DebugScreen} from './view/screens/Debug'
+import {LogScreen} from './view/screens/Log'
+import {SupportScreen} from './view/screens/Support'
+import {PrivacyPolicyScreen} from './view/screens/PrivacyPolicy'
+import {TermsOfServiceScreen} from './view/screens/TermsOfService'
+import {CommunityGuidelinesScreen} from './view/screens/CommunityGuidelines'
+import {CopyrightPolicyScreen} from './view/screens/CopyrightPolicy'
+import {AppPasswords} from 'view/screens/AppPasswords'
+import {ModerationMutedAccounts} from 'view/screens/ModerationMutedAccounts'
+import {ModerationBlockedAccounts} from 'view/screens/ModerationBlockedAccounts'
+import {SavedFeeds} from 'view/screens/SavedFeeds'
+import {getRoutingInstrumentation} from 'lib/sentry'
+import {bskyTitle} from 'lib/strings/headings'
+import {JSX} from 'react/jsx-runtime'
+import {timeout} from 'lib/async/timeout'
+import {PreferencesHomeFeed} from 'view/screens/PreferencesHomeFeed'
+
+import {CommunitiesScreen} from 'view/screens/Communities'
+import {CommunityFeedScreen} from 'view/screens/CommunityFeedScreen'
+
+import {MissionsTab} from 'view/screens/MissionsTab'
 import {RewardsScreen} from 'view/screens/Rewards'
 import {RewardsTab as RewardsTabScreen} from 'view/screens/RewardsTab'
 import {SOLARPLEX_UI_URL} from 'lib/constants'
-import {SavedFeeds} from 'view/screens/SavedFeeds'
-import {SearchScreen} from './view/screens/Search'
-import {SettingsScreen} from './view/screens/Settings'
-import {StyleSheet} from 'react-native'
-import {SupportScreen} from './view/screens/Support'
-import {TermsOfServiceScreen} from './view/screens/TermsOfService'
 import {Wallets} from 'view/screens/Wallets'
-import {bskyTitle} from 'lib/strings/headings'
-import {buildStateObject} from 'lib/routes/helpers'
-import {colors} from 'lib/styles'
-import {createNativeStackNavigator} from '@react-navigation/native-stack'
-import {getRoutingInstrumentation} from 'lib/sentry'
-import {isNative} from 'platform/detection'
-import {observer} from 'mobx-react-lite'
-import {router} from './routes'
-import {timeout} from 'lib/async/timeout'
-import {useColorSchemeStyle} from 'lib/hooks/useColorSchemeStyle'
-import {usePalette} from 'lib/hooks/usePalette'
-import {useStores} from './state'
+import {LoggedOut} from 'view/com/auth/LoggedOut'
 
 const navigationRef = createNavigationContainerRef<AllNavigatorParams>()
 
@@ -244,6 +246,11 @@ function commonScreens(Stack: typeof HomeTab, unreadCountLabel?: string) {
         options={{title: title('Edit My Feeds')}}
       />
       <Stack.Screen
+        name="PreferencesHomeFeed"
+        component={PreferencesHomeFeed}
+        options={{title: title('Home Feed Preferences')}}
+      />
+      <Stack.Screen
         name="Reactions"
         component={MissionsTab}
         options={{title: title('My Rewards')}}
@@ -300,6 +307,7 @@ function TabsNavigator() {
 
 function HomeTabNavigator() {
   const contentStyle = useColorSchemeStyle(styles.bgLight, styles.bgDark)
+
   return (
     <HomeTab.Navigator
       screenOptions={{

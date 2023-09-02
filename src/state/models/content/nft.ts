@@ -19,47 +19,49 @@ export class NftModel {
   }
 
   setAssets(assets: any) {
-    // turn store.reactions.reactionsSets.genesis with a key of title from each reactoin
-    // console.log(
-    //   "assets",
-    //   Object.values(this.rootStore.reactions.reactionTypes),
-    // );
+    const genesisName = 'Solarplex Genesis Reaction'
+
     const reactionsMap = Object.values(
       this.rootStore.reactions.reactionTypes,
     ).reduce((acc: {[title: string]: SolarplexReaction}, item: any) => {
-      acc[item.reaction_id] = item
+      if (item.collection_id !== 'default') {
+        // Fix genesis nft data.
+        let name = item.nft_metadata.name
+        if (name.startsWith(genesisName)) {
+          name = `${name}-${item.reaction_id}`
+        }
+
+        acc[name] = item
+      }
       return acc
     }, {})
-    // console.log("reactionsMap", reactionsMap);
 
     const reactions: {[reactionPack: string]: SolarplexReaction[]} = {}
     const seenAttributes = new Set()
 
     assets.forEach((item: any) => {
-      // console.log("item", item, item?.content?.metadata);
       const metadata = item?.content?.metadata
       if (!metadata.attributes) return
-      // const collectionId =
-      //   this.rootStore.reactions.reactionNameToCollectionId[item?.name];
-      // console.log("collectionId", item?.name, collectionId);
-      const attributes = item?.content?.metadata?.attributes
+      const name = metadata.name
+      const attributes = metadata.attributes
       for (const attribute of attributes) {
-        // console.log("attribute", attribute);
-        // console.log("reaction", reactionsMap, attribute);
         if (
-          (attribute.trait_type === 'trait' ||
-            attribute.trait_type === 'Trait') &&
-          !seenAttributes.has(attribute.value)
+          attribute.trait_type === 'trait' ||
+          attribute.trait_type === 'Trait'
         ) {
-          seenAttributes.add(attribute.value)
-          const reaction = reactionsMap[attribute.value]
-          if (!reactions[reaction?.collection_id]) {
-            reactions[reaction?.collection_id] = []
+          let key = name
+          if (name.startsWith(genesisName)) {
+            key = `${genesisName}-${attribute.value}`
           }
-          reactionsMap[attribute.value] &&
-            reactions[reaction?.collection_id].push(
-              reactionsMap[attribute.value],
-            )
+          if (!seenAttributes.has(key)) {
+            seenAttributes.add(key)
+            const reaction = reactionsMap[key]
+            if (!reactions[reaction?.collection_id]) {
+              reactions[reaction?.collection_id] = []
+            }
+            reactionsMap[key] &&
+              reactions[reaction?.collection_id].push(reactionsMap[key])
+          }
         }
       }
     })

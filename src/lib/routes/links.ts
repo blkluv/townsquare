@@ -1,4 +1,4 @@
-import {isInvalidHandle} from '../../lib/strings/handles'
+import {isInvalidHandle} from 'lib/strings/handles'
 
 export function makeProfileLink(
   info: {

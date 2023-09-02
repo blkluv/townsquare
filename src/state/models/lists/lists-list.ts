@@ -1,13 +1,12 @@
+import {makeAutoObservable} from 'mobx'
 import {
-  AppBskyGraphGetListMutes as GetListMutes,
   AppBskyGraphGetLists as GetLists,
+  AppBskyGraphGetListMutes as GetListMutes,
   AppBskyGraphDefs as GraphDefs,
 } from '@atproto/api'
-
 import {RootStoreModel} from '../root-store'
-import {bundleAsync} from 'lib/async/bundle'
 import {cleanError} from 'lib/strings/errors'
-import {makeAutoObservable} from 'mobx'
+import {bundleAsync} from 'lib/async/bundle'
 
 const PAGE_SIZE = 30
 

@@ -1,11 +1,10 @@
-import {Pressable, StyleProp, StyleSheet, ViewStyle} from 'react-native'
-
-import {ModerationUI} from '@atproto/api'
 import React from 'react'
-import {ShieldExclamation} from 'lib/icons'
+import {Pressable, StyleProp, StyleSheet, ViewStyle} from 'react-native'
+import {ModerationUI} from '@atproto/api'
 import {Text} from '../text/Text'
-import {describeModerationCause} from 'lib/moderation'
 import {usePalette} from 'lib/hooks/usePalette'
+import {ShieldExclamation} from 'lib/icons'
+import {describeModerationCause} from 'lib/moderation'
 import {useStores} from 'state/index'
 
 export function PostAlerts({

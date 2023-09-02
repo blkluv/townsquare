@@ -1,13 +1,4 @@
-import {BLAZE, BONK, BSOL, GUAC, SOL} from 'lib/tipTokens'
-import {
-  CommentBottomArrow,
-  HeartIcon,
-  HeartIconSolid,
-  MoneyBill,
-  RegularFaceSmileIcon,
-  SolidFaceSmileIcon,
-} from 'lib/icons'
-import React, {useCallback, useEffect, useState} from 'react'
+import React, {useCallback, useState, useEffect} from 'react'
 import {
   StyleProp,
   StyleSheet,
@@ -15,23 +6,31 @@ import {
   View,
   ViewStyle,
 } from 'react-native'
-import {colors, s} from 'lib/styles'
+import {Text} from '../text/Text'
+import {PostDropdownBtn} from '../forms/PostDropdownBtn'
+import {
+  HeartIcon,
+  HeartIconSolid,
+  CommentBottomArrow,
+  MoneyBill,
+  RegularFaceSmileIcon,
+  SolidFaceSmileIcon,
+} from 'lib/icons'
+import {s, colors} from 'lib/styles'
+import {pluralize} from 'lib/strings/helpers'
+import {useTheme} from 'lib/ThemeContext'
+import {useStores} from 'state/index'
+import {RepostButton} from './RepostButton'
+import {Haptics} from 'lib/haptics'
 
 import {HITSLOP_10 as HITSLOP} from 'lib/constants'
-import {Haptics} from 'lib/haptics'
-import {NavigationProp} from 'lib/routes/types'
-import {PostDropdownBtn} from '../forms/PostDropdownBtn'
+import {observer} from 'mobx-react-lite'
 import {ReactionDropdownButton} from '../forms/ReactionDropdownButton'
 import {ReactionList} from 'view/com/reactions/ReactionList'
-import {RepostButton} from './RepostButton'
 import {SolarplexReaction} from 'state/models/media/reactions'
-import {Text} from '../text/Text'
 import {TipDropdownBtn} from '../forms/TipdropdownBtn'
-import {pluralize} from 'lib/strings/helpers'
-import {useNavigation} from '@react-navigation/native'
-import {useObserver} from 'mobx-react-lite'
-import {useStores} from 'state/index'
-import {useTheme} from 'lib/ThemeContext'
+
+import {BLAZE, BONK, BSOL, GUAC, SOL} from 'lib/tipTokens'
 
 interface PostCtrlsOpts {
   itemUri: string
@@ -67,10 +66,9 @@ interface PostCtrlsOpts {
   onDeletePost: () => void
 }
 
-export const PostCtrls = (opts: PostCtrlsOpts) => {
+export const PostCtrls = observer(function PostCtrls(opts: PostCtrlsOpts) {
   const store = useStores()
   const theme = useTheme()
-  const navigation = useNavigation<NavigationProp>()
 
   const [postwallet, setpostWallet] = useState<string>('')
 
@@ -84,10 +82,8 @@ export const PostCtrls = (opts: PostCtrlsOpts) => {
     })()
   }, [opts, store.wallet])
 
-  const defaultReactions = useObserver(() => store.reactions.curReactionsSet)
-  const reactionSet = useObserver(
-    () => store.reactions.earnedReactions[defaultReactions],
-  )
+  const defaultReactions = store.reactions.curReactionsSet
+  const reactionSet = store.reactions.earnedReactions[defaultReactions]
 
   const defaultCtrlColor = React.useMemo(
     () => ({
@@ -127,11 +123,6 @@ export const PostCtrls = (opts: PostCtrlsOpts) => {
   ])
 
   function onTip({tokenName}: {tokenName: string}) {
-    if (store.session.isSolarplexSession) {
-      navigation.navigate('SignIn')
-      return
-    }
-
     store.shell.openModal({
       name: 'tip-modal',
       recipientName: opts.author.displayName
@@ -242,11 +233,7 @@ export const PostCtrls = (opts: PostCtrlsOpts) => {
         accessibilityRole="button"
         accessibilityLabel={opts.viewerReaction ? 'Reacted' : 'React'}
         accessibilityHint=""
-        onPress={
-          store.session.isSolarplexSession
-            ? () => navigation.navigate('SignIn')
-            : onRemoveReaction
-        }>
+        onPress={onRemoveReaction}>
         {reactionSet?.length ? (
           <ReactionDropdownButton
             testID="communityHeaderDropdownBtn"
@@ -275,12 +262,6 @@ export const PostCtrls = (opts: PostCtrlsOpts) => {
                   accessibilityRole="button"
                   onPress={onRemoveReaction}>
                   <SolidFaceSmileIcon />
-                </TouchableOpacity>
-              ) : store.session.isSolarplexSession ? (
-                <TouchableOpacity
-                  accessibilityRole="button"
-                  onPress={() => navigation.navigate('SignIn')}>
-                  <RegularFaceSmileIcon />
                 </TouchableOpacity>
               ) : (
                 <RegularFaceSmileIcon />
@@ -360,7 +341,7 @@ export const PostCtrls = (opts: PostCtrlsOpts) => {
       <View />
     </View>
   )
-}
+})
 
 const styles = StyleSheet.create({
   ctrls: {

@@ -1,8 +1,7 @@
-import {CustomTextProps, Text} from './Text'
-
 import React from 'react'
-import {addStyle} from '../../../../lib/styles'
-import {usePalette} from '../../../../lib/hooks/usePalette'
+import {CustomTextProps, Text} from './Text'
+import {usePalette} from 'lib/hooks/usePalette'
+import {addStyle} from 'lib/styles'
 
 export type ThemedTextProps = CustomTextProps & {
   fg?: 'default' | 'light' | 'error' | 'inverted' | 'inverted-light'

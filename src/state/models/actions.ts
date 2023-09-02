@@ -503,7 +503,7 @@ export class SplxActionModel {
         this.unsetCurrentExectutingActionId(executingActionId)
       })
     }
-    return async (...args: Args): Promise<Res> => {
+    return (async (...args: Args) => {
       return await new Promise(resolve => {
         const statePayload: ActionStatePayload<Args> = {
           store: context,
@@ -532,7 +532,7 @@ export class SplxActionModel {
           })
         this.unsetCurrentExectutingActionId(executingActionId)
       })
-    }
+    }) as typeof fn
   }
 }
 

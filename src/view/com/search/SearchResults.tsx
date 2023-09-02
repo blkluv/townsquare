@@ -1,21 +1,20 @@
+import React from 'react'
+import {StyleSheet, View} from 'react-native'
+import {observer} from 'mobx-react-lite'
+import {SearchUIModel} from 'state/models/ui/search'
 import {CenteredView, ScrollView} from '../util/Views'
 import {Pager, RenderTabBarFnProps} from 'view/com/pager/Pager'
+import {TabBar} from 'view/com/pager/TabBar'
+import {Post} from 'view/com/post/Post'
+import {ProfileCardWithFollowBtn} from 'view/com/profile/ProfileCard'
 import {
   PostFeedLoadingPlaceholder,
   ProfileCardFeedLoadingPlaceholder,
 } from 'view/com/util/LoadingPlaceholder'
-import {StyleSheet, View} from 'react-native'
-
-import {Post} from 'view/com/post/Post'
-import {ProfileCardWithFollowBtn} from 'view/com/profile/ProfileCard'
-import React from 'react'
-import {SearchUIModel} from 'state/models/ui/search'
-import {TabBar} from 'view/com/pager/TabBar'
 import {Text} from 'view/com/util/text/Text'
-import {isDesktopWeb} from 'platform/detection'
-import {observer} from 'mobx-react-lite'
-import {s} from 'lib/styles'
 import {usePalette} from 'lib/hooks/usePalette'
+import {s} from 'lib/styles'
+import {isDesktopWeb} from 'platform/detection'
 
 const SECTIONS = ['Posts', 'Users']
 
@@ -73,12 +72,7 @@ const PostResults = observer(({model}: {model: SearchUIModel}) => {
   return (
     <ScrollView style={[pal.view]}>
       {model.posts.map(post => (
-        <Post
-          key={post.resolvedUri}
-          uri={post.resolvedUri}
-          initView={post}
-          hideError
-        />
+        <Post key={post.resolvedUri} view={post} hideError />
       ))}
       <View style={s.footerSpacer} />
       <View style={s.footerSpacer} />

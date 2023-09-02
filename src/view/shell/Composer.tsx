@@ -1,9 +1,8 @@
-import {Animated, Easing, Platform, StyleSheet, View} from 'react-native'
 import React, {useEffect} from 'react'
-
+import {observer} from 'mobx-react-lite'
+import {Animated, Easing, Platform, StyleSheet, View} from 'react-native'
 import {ComposePost} from '../com/composer/Composer'
 import {ComposerOpts} from 'state/models/ui/shell'
-import {observer} from 'mobx-react-lite'
 import {useAnimatedValue} from 'lib/hooks/useAnimatedValue'
 import {usePalette} from 'lib/hooks/usePalette'
 

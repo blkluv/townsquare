@@ -1,6 +1,6 @@
 import {
-  AppBskyEmbedExternal,
   AppBskyEmbedImages,
+  AppBskyEmbedExternal,
   AppBskyEmbedRecord,
   AppBskyEmbedRecordWithMedia,
   AppBskyRichtextFacet,
@@ -8,13 +8,12 @@ import {
   ComAtprotoRepoUploadBlob,
   RichText,
 } from '@atproto/api'
-
 import {AtUri} from '@atproto/api'
-import {ImageModel} from 'state/models/media/image'
-import {LinkMeta} from '../link-meta/link-meta'
 import {RootStoreModel} from 'state/models/root-store'
 import {isNetworkError} from 'lib/strings/errors'
+import {LinkMeta} from '../link-meta/link-meta'
 import {isWeb} from 'platform/detection'
+import {ImageModel} from 'state/models/media/image'
 import {shortenLinks} from 'lib/strings/rich-text-manip'
 
 export interface ExternalEmbedDraft {

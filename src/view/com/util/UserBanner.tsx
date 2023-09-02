@@ -1,20 +1,19 @@
-import {DropdownItem, NativeDropdown} from './forms/NativeDropdown'
 import React, {useMemo} from 'react'
 import {StyleSheet, View} from 'react-native'
-import {isAndroid, isWeb} from 'platform/detection'
-import {openCamera, openCropper, openPicker} from '../../../lib/media/picker'
-import {
-  useCameraPermission,
-  usePhotoLibraryPermission,
-} from 'lib/hooks/usePermissions'
-
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome'
-import {Image} from 'expo-image'
 import {ModerationUI} from '@atproto/api'
-import {Image as RNImage} from 'react-native-image-crop-picker'
+import {Image} from 'expo-image'
 import {colors} from 'lib/styles'
-import {usePalette} from 'lib/hooks/usePalette'
+import {openCamera, openCropper, openPicker} from '../../../lib/media/picker'
 import {useStores} from 'state/index'
+import {
+  usePhotoLibraryPermission,
+  useCameraPermission,
+} from 'lib/hooks/usePermissions'
+import {usePalette} from 'lib/hooks/usePalette'
+import {isWeb, isAndroid} from 'platform/detection'
+import {Image as RNImage} from 'react-native-image-crop-picker'
+import {NativeDropdown, DropdownItem} from './forms/NativeDropdown'
 
 export function UserBanner({
   banner,

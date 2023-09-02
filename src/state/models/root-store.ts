@@ -2,36 +2,38 @@
  * The root store is the base of all modeled state.
  */
 
-import {DeviceEventEmitter, EmitterSubscription} from 'react-native'
-import {createContext, useContext} from 'react'
-import {hasProp, isObj} from 'lib/type-guards'
-
+import {makeAutoObservable} from 'mobx'
 import {BskyAgent} from '@atproto/api'
-import {CommunitiesModel} from './communities'
-import {HandleResolutionsCache} from './cache/handle-resolutions'
-import {ImageSizesCache} from './cache/image-sizes'
-import {InvitedUsers} from './invited-users'
-import {LinkMetasCache} from './cache/link-metas'
+import {createContext, useContext} from 'react'
+import {DeviceEventEmitter, EmitterSubscription} from 'react-native'
+import {z} from 'zod'
+import {isObj, hasProp} from 'lib/type-guards'
 import {LogModel} from './log'
-import {MeModel} from './me'
-import {MutedThreads} from './muted-threads'
-import {PostsCache} from './cache/posts'
-import {PreferencesModel} from './ui/preferences'
-import {ProfilesCache} from './cache/profiles-view'
-import {RewardsModel} from 'state/rewards'
 import {SessionModel} from './session'
 import {ShellUiModel} from './ui/shell'
-import {SplxApiModel} from './api'
-import {SplxReactionModel} from './media/reactions'
-import {SplxWallet} from '../splx-wallet'
+import {HandleResolutionsCache} from './cache/handle-resolutions'
+import {ProfilesCache} from './cache/profiles-view'
+import {PostsCache} from './cache/posts'
+import {LinkMetasCache} from './cache/link-metas'
+import {MeModel} from './me'
+import {InvitedUsers} from './invited-users'
+import {PreferencesModel} from './ui/preferences'
+import {resetToTab} from '../../Navigation'
+import {ImageSizesCache} from './cache/image-sizes'
+import {MutedThreads} from './muted-threads'
+import {reset as resetNavigation} from '../../Navigation'
+
 // TEMPORARY (APP-700)
 // remove after backend testing finishes
 // -prf
 import {applyDebugHeader} from 'lib/api/debug-appview-proxy-header'
-import {makeAutoObservable} from 'mobx'
-import {reset as resetNavigation} from '../../Navigation'
-import {resetToTab} from '../../Navigation'
-import {z} from 'zod'
+import {OnboardingModel} from './discovery/onboarding'
+
+import {CommunitiesModel} from './communities'
+import {SplxApiModel} from './api'
+import {SplxReactionModel} from './media/reactions'
+import {SplxWallet} from '../splx-wallet'
+import {RewardsModel} from 'state/rewards'
 
 export const appInfo = z.object({
   build: z.string(),
@@ -49,6 +51,7 @@ export class RootStoreModel {
   shell = new ShellUiModel(this)
   preferences = new PreferencesModel(this)
   me = new MeModel(this)
+  onboarding = new OnboardingModel(this)
   invitedUsers = new InvitedUsers(this)
   handleResolutions = new HandleResolutionsCache()
   profiles = new ProfilesCache(this)
@@ -81,11 +84,12 @@ export class RootStoreModel {
       appInfo: this.appInfo,
       session: this.session.serialize(),
       me: this.me.serialize(),
-      communities: this.communities.serialize(),
+      onboarding: this.onboarding.serialize(),
       shell: this.shell.serialize(),
       preferences: this.preferences.serialize(),
       invitedUsers: this.invitedUsers.serialize(),
       mutedThreads: this.mutedThreads.serialize(),
+      communities: this.communities.serialize(),
       reactions: this.reactions.serialize(),
     }
   }

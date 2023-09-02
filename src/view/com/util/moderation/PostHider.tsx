@@ -1,15 +1,14 @@
-import {Pressable, StyleSheet, View} from 'react-native'
 import React, {ComponentProps} from 'react'
-
-import {Link} from '../Link'
+import {StyleSheet, Pressable, View} from 'react-native'
 import {ModerationUI} from '@atproto/api'
-import {ShieldExclamation} from 'lib/icons'
+import {usePalette} from 'lib/hooks/usePalette'
+import {Link} from '../Link'
 import {Text} from '../text/Text'
 import {addStyle} from 'lib/styles'
 import {describeModerationCause} from 'lib/moderation'
-import {isDesktopWeb} from 'platform/detection'
-import {usePalette} from 'lib/hooks/usePalette'
+import {ShieldExclamation} from 'lib/icons'
 import {useStores} from 'state/index'
+import {isDesktopWeb} from 'platform/detection'
 
 interface Props extends ComponentProps<typeof Link> {
   // testID?: string

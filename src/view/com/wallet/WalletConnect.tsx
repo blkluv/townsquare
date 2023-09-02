@@ -49,7 +49,7 @@ export const WalletConnect = observer(function WalletConnect() {
 
   return (
     <>
-      {!(store.session.isResumingSession || !store.session.hasAnySession) ? (
+      {!(store.session.isResumingSession || !store.session) ? (
         <View>
           {!store.me.splxWallet ? (
             linkedWallet ? (

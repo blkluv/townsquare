@@ -1,7 +1,7 @@
 import React from 'react'
-import {ago} from '../../../lib/strings/time'
 import {observer} from 'mobx-react-lite'
-import {useStores} from '../../../state/index'
+import {ago} from 'lib/strings/time'
+import {useStores} from 'state/index'
 
 export const TimeElapsed = observer(function TimeElapsed({
   timestamp,

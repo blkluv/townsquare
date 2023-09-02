@@ -1,3 +1,5 @@
+import React, {MutableRefObject} from 'react'
+import {observer} from 'mobx-react-lite'
 import {
   ActivityIndicator,
   RefreshControl,
@@ -6,30 +8,26 @@ import {
   View,
   ViewStyle,
 } from 'react-native'
-import {MultiFeedItem, PostsMultiFeedModel} from 'state/models/feeds/multi-feed'
-import React, {MutableRefObject} from 'react'
-
-import {CogIcon} from 'lib/icons'
-import {ErrorMessage} from '../util/error/ErrorMessage'
-import {FeedSlice} from './FeedSlice'
-import {FlatList} from '../util/Views'
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome'
-import {Link} from '../util/Link'
-import {OnScrollCb} from 'lib/hooks/useOnMainScroll'
+import {FlatList} from '../util/Views'
 import {PostFeedLoadingPlaceholder} from '../util/LoadingPlaceholder'
+import {ErrorMessage} from '../util/error/ErrorMessage'
+import {PostsMultiFeedModel, MultiFeedItem} from 'state/models/feeds/multi-feed'
+import {FeedSlice} from './FeedSlice'
 import {Text} from '../util/text/Text'
+import {Link} from '../util/Link'
 import {UserAvatar} from '../util/UserAvatar'
-import {isDesktopWeb} from 'platform/detection'
-import {observer} from 'mobx-react-lite'
+import {OnScrollCb} from 'lib/hooks/useOnMainScroll'
 import {s} from 'lib/styles'
 import {useAnalytics} from 'lib/analytics/analytics'
 import {usePalette} from 'lib/hooks/usePalette'
 import {useTheme} from 'lib/ThemeContext'
+import {isDesktopWeb} from 'platform/detection'
+import {CogIcon} from 'lib/icons'
 
 export const MultiFeed = observer(function Feed({
   multifeed,
   style,
-  showPostFollowBtn,
   scrollElRef,
   onScroll,
   scrollEventThrottle,
@@ -39,7 +37,6 @@ export const MultiFeed = observer(function Feed({
 }: {
   multifeed: PostsMultiFeedModel
   style?: StyleProp<ViewStyle>
-  showPostFollowBtn?: boolean
   scrollElRef?: MutableRefObject<FlatList<any> | null>
   onPressTryAgain?: () => void
   onScroll?: OnScrollCb
@@ -106,9 +103,7 @@ export const MultiFeed = observer(function Feed({
           </View>
         )
       } else if (item.type === 'feed-slice') {
-        return (
-          <FeedSlice slice={item.slice} showFollowBtn={showPostFollowBtn} />
-        )
+        return <FeedSlice slice={item.slice} />
       } else if (item.type === 'feed-loading') {
         return <PostFeedLoadingPlaceholder />
       } else if (item.type === 'feed-error') {
@@ -140,7 +135,7 @@ export const MultiFeed = observer(function Feed({
       }
       return null
     },
-    [showPostFollowBtn, pal],
+    [pal],
   )
 
   const ListFooter = React.useCallback(
@@ -168,40 +163,38 @@ export const MultiFeed = observer(function Feed({
 
   return (
     <View testID={testID} style={style}>
-      {!multifeed.isLoading &&
-        !multifeed.rootStore.session.hasAnySession &&
-        multifeed.items.length > 0 && (
-          <FlatList
-            testID={testID ? `${testID}-flatlist` : undefined}
-            ref={scrollElRef}
-            data={multifeed.items}
-            keyExtractor={item => item._reactKey}
-            renderItem={renderItem}
-            ListFooterComponent={ListFooter}
-            ListHeaderComponent={ListHeader}
-            refreshControl={
-              <RefreshControl
-                refreshing={isRefreshing}
-                onRefresh={onRefresh}
-                tintColor={pal.colors.text}
-                titleColor={pal.colors.text}
-                progressViewOffset={headerOffset}
-              />
-            }
-            contentContainerStyle={s.contentContainer}
-            style={[{paddingTop: headerOffset}, pal.view, styles.container]}
-            onScroll={onScroll}
-            scrollEventThrottle={scrollEventThrottle}
-            indicatorStyle={theme.colorScheme === 'dark' ? 'white' : 'black'}
-            onEndReached={onEndReached}
-            onEndReachedThreshold={0.6}
-            removeClippedSubviews={true}
-            contentOffset={{x: 0, y: headerOffset * -1}}
-            extraData={extraData}
-            // @ts-ignore our .web version only -prf
-            desktopFixedHeight
-          />
-        )}
+      {multifeed.items.length > 0 && (
+        <FlatList
+          testID={testID ? `${testID}-flatlist` : undefined}
+          ref={scrollElRef}
+          data={multifeed.items}
+          keyExtractor={item => item._reactKey}
+          renderItem={renderItem}
+          ListFooterComponent={ListFooter}
+          ListHeaderComponent={ListHeader}
+          refreshControl={
+            <RefreshControl
+              refreshing={isRefreshing}
+              onRefresh={onRefresh}
+              tintColor={pal.colors.text}
+              titleColor={pal.colors.text}
+              progressViewOffset={headerOffset}
+            />
+          }
+          contentContainerStyle={s.contentContainer}
+          style={[{paddingTop: headerOffset}, pal.view, styles.container]}
+          onScroll={onScroll}
+          scrollEventThrottle={scrollEventThrottle}
+          indicatorStyle={theme.colorScheme === 'dark' ? 'white' : 'black'}
+          onEndReached={onEndReached}
+          onEndReachedThreshold={0.6}
+          removeClippedSubviews={true}
+          contentOffset={{x: 0, y: headerOffset * -1}}
+          extraData={extraData}
+          // @ts-ignore our .web version only -prf
+          desktopFixedHeight
+        />
+      )}
     </View>
   )
 })

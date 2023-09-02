@@ -13,13 +13,10 @@ import {colors, s} from 'lib/styles'
 
 import {IconProp} from '@fortawesome/fontawesome-svg-core'
 import {Image} from 'expo-image'
-import {NavigationProp} from 'lib/routes/types'
 import RootSiblings from 'react-native-root-siblings'
 import {SolarplexReaction} from 'state/models/media/reactions'
 import {Text} from '../text/Text'
-import {useNavigation} from '@react-navigation/native'
 import {usePalette} from 'lib/hooks/usePalette'
-import {useStores} from 'state/index'
 import {useTheme} from 'lib/ThemeContext'
 
 const HITSLOP = {left: 20, top: 20, right: 20, bottom: 20}
@@ -66,14 +63,8 @@ export function ReactionDropdownButton({
 }: PropsWithChildren<DropdownButtonProps>) {
   const ref1 = useRef<TouchableOpacity>(null)
   const ref2 = useRef<View>(null)
-  const store = useStores()
-  const navigation = useNavigation<NavigationProp>()
 
   const onPress = () => {
-    if (store.session.isSolarplexSession) {
-      navigation.navigate('SignIn')
-      return
-    }
     const ref = ref1.current || ref2.current
     ref?.measure(
       (
@@ -359,7 +350,7 @@ const DropdownItems = ({
                 {/* <Image style={styles.image} source={{uri: (item.emoji as string)}}/> */}
                 {(item?.nft_metadata?.image as string)?.includes('http') ? (
                   <Image
-                    accessibilityIgnoresInvertColors={true}
+                    accessibilityIgnoresInvertColors
                     style={styles.image}
                     source={{
                       uri: item?.nft_metadata?.image as string,

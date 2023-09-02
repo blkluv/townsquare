@@ -56,8 +56,6 @@ export function toShortUrl(url: string): string {
 
 export function toShareUrl(url: string): string {
   if (!url.startsWith('https')) {
-    console.log('###', url)
-    console.log('###', SOLARPLEX_UI_URL)
     const urlp = new URL(SOLARPLEX_UI_URL)
     urlp.pathname = url
     url = urlp.toString()

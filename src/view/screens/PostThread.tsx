@@ -1,23 +1,18 @@
-import {
-  CommonNavigatorParams,
-  NativeStackScreenProps,
-  NavigationProp,
-} from 'lib/routes/types'
 import React, {useMemo} from 'react'
-import {StyleSheet, View} from 'react-native'
-import {useFocusEffect, useNavigation} from '@react-navigation/native'
-
-import {ComposePrompt} from 'view/com/composer/Prompt'
-import {PostThread as PostThreadComponent} from '../com/post-thread/PostThread'
-import {PostThreadModel} from 'state/models/content/post-thread'
-import {ViewHeader} from '../com/util/ViewHeader'
-import {clamp} from 'lodash'
-import {isDesktopWeb} from 'platform/detection'
+import {InteractionManager, StyleSheet, View} from 'react-native'
+import {useFocusEffect} from '@react-navigation/native'
+import {NativeStackScreenProps, CommonNavigatorParams} from 'lib/routes/types'
 import {makeRecordUri} from 'lib/strings/url-helpers'
+import {withAuthRequired} from 'view/com/auth/withAuthRequired'
+import {ViewHeader} from '../com/util/ViewHeader'
+import {PostThread as PostThreadComponent} from '../com/post-thread/PostThread'
+import {ComposePrompt} from 'view/com/composer/Prompt'
+import {PostThreadModel} from 'state/models/content/post-thread'
+import {useStores} from 'state/index'
 import {s} from 'lib/styles'
 import {useSafeAreaInsets} from 'react-native-safe-area-context'
-import {useStores} from 'state/index'
-import {withAuthRequired} from 'view/com/auth/withAuthRequired'
+import {clamp} from 'lodash'
+import {isDesktopWeb} from 'platform/detection'
 
 const SHELL_FOOTER_HEIGHT = 44
 
@@ -25,8 +20,6 @@ type Props = NativeStackScreenProps<CommonNavigatorParams, 'PostThread'>
 export const PostThreadScreen = withAuthRequired(({route}: Props) => {
   const store = useStores()
   const safeAreaInsets = useSafeAreaInsets()
-  const navigation = useNavigation<NavigationProp>()
-
   const {name, rkey} = route.params
   const uri = makeRecordUri(name, 'app.bsky.feed.post', rkey)
   const view = useMemo<PostThreadModel>(
@@ -38,23 +31,24 @@ export const PostThreadScreen = withAuthRequired(({route}: Props) => {
     React.useCallback(() => {
       store.shell.setMinimalShellMode(false)
       const threadCleanup = view.registerListeners()
-      if (!view.hasLoaded && !view.isLoading) {
-        view.setup().catch(err => {
-          store.log.error('Failed to fetch thread', err)
-        })
-      }
+
+      InteractionManager.runAfterInteractions(() => {
+        if (!view.hasLoaded && !view.isLoading) {
+          view.setup().catch(err => {
+            store.log.error('Failed to fetch thread', err)
+          })
+        }
+      })
+
       return () => {
         threadCleanup()
       }
     }, [store, view]),
   )
 
-  const onPressReply = React.useCallback(async () => {
+  const onPressReply = React.useCallback(() => {
     if (!view.thread) {
       return
-    }
-    if (store.session.isSolarplexSession) {
-      return navigation.navigate('SignIn')
     }
     store.shell.openComposer({
       replyTo: {
@@ -69,7 +63,7 @@ export const PostThreadScreen = withAuthRequired(({route}: Props) => {
       },
       onPost: () => view.refresh(),
     })
-  }, [view, store, navigation])
+  }, [view, store])
 
   return (
     <View style={s.hContentRegion}>
@@ -81,7 +75,7 @@ export const PostThreadScreen = withAuthRequired(({route}: Props) => {
           onPressReply={onPressReply}
         />
       </View>
-      {!isDesktopWeb && !store.session.isSolarplexSession && (
+      {!isDesktopWeb && (
         <View
           style={[
             styles.prompt,

@@ -1,24 +1,23 @@
+import React from 'react'
 import {
   ActivityIndicator,
   StyleSheet,
   TouchableOpacity,
   View,
 } from 'react-native'
+import {TextInput} from './util'
 import {
   FontAwesomeIcon,
   FontAwesomeIconStyle,
 } from '@fortawesome/react-native-fontawesome'
-import {gradients, s} from 'lib/styles'
-
-import {ErrorMessage} from '../util/error/ErrorMessage'
 import LinearGradient from 'react-native-linear-gradient'
-import React from 'react'
 import {Text} from '../util/text/Text'
-import {TextInput} from './util'
-import {cleanError} from 'lib/strings/errors'
-import {usePalette} from 'lib/hooks/usePalette'
 import {useStores} from 'state/index'
+import {s, gradients} from 'lib/styles'
+import {usePalette} from 'lib/hooks/usePalette'
 import {useTheme} from 'lib/ThemeContext'
+import {ErrorMessage} from '../util/error/ErrorMessage'
+import {cleanError} from 'lib/strings/errors'
 
 export const snapPoints = ['80%']
 
@@ -59,8 +58,7 @@ export function Component({}: {}) {
   }
 
   return (
-    <View
-      style={[styles.container, {backgroundColor: pal.colors.backgroundLight}]}>
+    <View style={[styles.container, pal.view]}>
       <View style={[styles.innerContainer, pal.view]}>
         <Text type="title-xl" style={[styles.title, pal.text]}>
           Join the waitlist
@@ -108,7 +106,7 @@ export function Component({}: {}) {
               accessibilityRole="button"
               accessibilityHint={`Confirms signing up ${email} to the waitlist`}>
               <LinearGradient
-                colors={[gradients.blueLight.start, gradients.blueLight.end]}
+                colors={[gradients.purple.start, gradients.purple.end]}
                 start={{x: 0, y: 0}}
                 end={{x: 1, y: 1}}
                 style={[styles.btn]}>

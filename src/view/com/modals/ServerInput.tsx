@@ -1,18 +1,17 @@
+import React, {useState} from 'react'
+import {Platform, StyleSheet, TouchableOpacity, View} from 'react-native'
 import {
   FontAwesomeIcon,
   FontAwesomeIconStyle,
 } from '@fortawesome/react-native-fontawesome'
-import {LOCAL_DEV_SERVICE, PROD_SERVICE, STAGING_SERVICE} from 'state/index'
-import {Platform, StyleSheet, TouchableOpacity, View} from 'react-native'
-import React, {useState} from 'react'
 import {ScrollView, TextInput} from './util'
-import {colors, s} from 'lib/styles'
-
-import {LOGIN_INCLUDE_DEV_SERVERS} from 'lib/build-flags'
 import {Text} from '../util/text/Text'
-import {usePalette} from 'lib/hooks/usePalette'
 import {useStores} from 'state/index'
+import {s, colors} from 'lib/styles'
+import {usePalette} from 'lib/hooks/usePalette'
 import {useTheme} from 'lib/ThemeContext'
+import {LOCAL_DEV_SERVICE, STAGING_SERVICE, PROD_SERVICE} from 'state/index'
+import {LOGIN_INCLUDE_DEV_SERVERS} from 'lib/build-flags'
 
 export const snapPoints = ['80%']
 

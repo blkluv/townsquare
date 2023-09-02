@@ -1,11 +1,11 @@
-import {AtUri, ComAtprotoModerationDefs} from '@atproto/api'
-import {RadioGroup, RadioGroupItem} from 'view/com/util/forms/RadioGroup'
-import React, {useMemo} from 'react'
-import {UsePaletteValue, usePalette} from 'lib/hooks/usePalette'
-
-import {CollectionId} from './types'
-import {Text} from '../../util/text/Text'
 import {View} from 'react-native'
+import React, {useMemo} from 'react'
+import {AtUri, ComAtprotoModerationDefs} from '@atproto/api'
+
+import {Text} from '../../util/text/Text'
+import {UsePaletteValue, usePalette} from 'lib/hooks/usePalette'
+import {RadioGroup, RadioGroupItem} from 'view/com/util/forms/RadioGroup'
+import {CollectionId} from './types'
 
 type ReasonMap = Record<string, {title: string; description: string}>
 const CommonReasons = {

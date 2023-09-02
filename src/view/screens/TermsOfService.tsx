@@ -1,15 +1,14 @@
-import {CommonNavigatorParams, NativeStackScreenProps} from 'lib/routes/types'
-
 import React from 'react'
-import {ScrollView} from 'view/com/util/Views'
+import {View} from 'react-native'
+import {useFocusEffect} from '@react-navigation/native'
 import {Text} from 'view/com/util/text/Text'
 import {TextLink} from 'view/com/util/Link'
-import {View} from 'react-native'
+import {NativeStackScreenProps, CommonNavigatorParams} from 'lib/routes/types'
 import {ViewHeader} from '../com/util/ViewHeader'
-import {s} from 'lib/styles'
-import {useFocusEffect} from '@react-navigation/native'
-import {usePalette} from 'lib/hooks/usePalette'
 import {useStores} from 'state/index'
+import {ScrollView} from 'view/com/util/Views'
+import {usePalette} from 'lib/hooks/usePalette'
+import {s} from 'lib/styles'
 
 type Props = NativeStackScreenProps<CommonNavigatorParams, 'TermsOfService'>
 export const TermsOfServiceScreen = (_props: Props) => {

@@ -1,14 +1,13 @@
+import React from 'react'
 import {Keyboard, StyleSheet} from 'react-native'
-
-import {Button} from '../../../../view/com/util/forms/Button'
+import {observer} from 'mobx-react-lite'
+import {Button} from 'view/com/util/forms/Button'
+import {usePalette} from 'lib/hooks/usePalette'
+import {useStores} from 'state/index'
+import {ShieldExclamation} from 'lib/icons'
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome'
 import {FontAwesomeIconStyle} from '@fortawesome/react-native-fontawesome'
-import React from 'react'
-import {ShieldExclamation} from '../../../../lib/icons'
-import {isNative} from '../../../../platform/detection'
-import {observer} from 'mobx-react-lite'
-import {usePalette} from '../../../../lib/hooks/usePalette'
-import {useStores} from '../../../../state/index'
+import {isNative} from 'platform/detection'
 
 export const LabelsBtn = observer(function LabelsBtn({
   labels,

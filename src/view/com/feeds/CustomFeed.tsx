@@ -1,27 +1,19 @@
-import * as Toast from 'view/com/util/Toast'
-
-import {
-  Pressable,
-  StyleProp,
-  StyleSheet,
-  TouchableOpacity,
-  View,
-  ViewStyle,
-} from 'react-native'
-
-import {AtUri} from '@atproto/api'
-import {CustomFeedModel} from 'state/models/feeds/custom-feed'
-import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome'
-import {NavigationProp} from 'lib/routes/types'
 import React from 'react'
+import {Pressable, StyleProp, StyleSheet, View, ViewStyle} from 'react-native'
+import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome'
 import {Text} from '../util/text/Text'
+import {usePalette} from 'lib/hooks/usePalette'
+import {s} from 'lib/styles'
 import {UserAvatar} from '../util/UserAvatar'
 import {observer} from 'mobx-react-lite'
-import {pluralize} from 'lib/strings/helpers'
-import {s} from 'lib/styles'
+import {CustomFeedModel} from 'state/models/feeds/custom-feed'
 import {useNavigation} from '@react-navigation/native'
-import {usePalette} from 'lib/hooks/usePalette'
+import {NavigationProp} from 'lib/routes/types'
 import {useStores} from 'state/index'
+import {pluralize} from 'lib/strings/helpers'
+import {AtUri} from '@atproto/api'
+import * as Toast from 'view/com/util/Toast'
+import {sanitizeHandle} from 'lib/strings/handles'
 
 export const CustomFeed = observer(
   ({
@@ -42,10 +34,6 @@ export const CustomFeed = observer(
     const navigation = useNavigation<NavigationProp>()
 
     const onToggleSaved = React.useCallback(async () => {
-      if (store.session.isSolarplexSession) {
-        navigation.navigate('SignIn')
-        return
-      }
       if (item.isSaved) {
         store.shell.openModal({
           name: 'confirm',
@@ -71,10 +59,11 @@ export const CustomFeed = observer(
           store.log.error('Failed to save community', {e})
         }
       }
-    }, [store, item, navigation])
+    }, [store, item])
 
     return (
-      <TouchableOpacity
+      <Pressable
+        testID={`feed-${item.displayName}`}
         accessibilityRole="button"
         style={[styles.container, pal.border, style]}
         onPress={() => {
@@ -93,7 +82,7 @@ export const CustomFeed = observer(
               {item.displayName}
             </Text>
             <Text style={[pal.textLight]} numberOfLines={3}>
-              by @{item.data.creator.handle}
+              by {sanitizeHandle(item.data.creator.handle, '@')}
             </Text>
           </View>
           {showSaveBtn && (
@@ -139,7 +128,7 @@ export const CustomFeed = observer(
             {pluralize(item.data.likeCount || 0, 'user')}
           </Text>
         ) : null}
-      </TouchableOpacity>
+      </Pressable>
     )
   },
 )

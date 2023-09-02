@@ -1,9 +1,8 @@
-import {NativeScrollEvent, NativeSyntheticEvent} from 'react-native'
-import {useCallback, useRef, useState} from 'react'
-
+import {useState, useCallback, useRef} from 'react'
+import {NativeSyntheticEvent, NativeScrollEvent} from 'react-native'
 import {RootStoreModel} from 'state/index'
-import {isDesktopWeb} from 'platform/detection'
 import {s} from 'lib/styles'
+import {isDesktopWeb} from 'platform/detection'
 
 const DY_LIMIT_UP = isDesktopWeb ? 30 : 10
 const DY_LIMIT_DOWN = isDesktopWeb ? 150 : 10

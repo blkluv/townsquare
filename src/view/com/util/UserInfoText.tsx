@@ -1,15 +1,14 @@
-import React, {useEffect, useState} from 'react'
-import {StyleProp, StyleSheet, TextStyle} from 'react-native'
-
-import {DesktopWebTextLink} from './Link'
+import React, {useState, useEffect} from 'react'
 import {AppBskyActorGetProfile as GetProfile} from '@atproto/api'
-import {LoadingPlaceholder} from './LoadingPlaceholder'
+import {StyleProp, StyleSheet, TextStyle} from 'react-native'
+import {DesktopWebTextLink} from './Link'
 import {Text} from './text/Text'
+import {LoadingPlaceholder} from './LoadingPlaceholder'
+import {useStores} from 'state/index'
 import {TypographyVariant} from 'lib/ThemeContext'
-import {makeProfileLink} from 'lib/routes/links'
 import {sanitizeDisplayName} from 'lib/strings/display-names'
 import {sanitizeHandle} from 'lib/strings/handles'
-import {useStores} from 'state/index'
+import {makeProfileLink} from 'lib/routes/links'
 
 export function UserInfoText({
   type = 'md',

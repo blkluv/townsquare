@@ -26,6 +26,8 @@ import {useStores} from 'state/index'
 import {s} from 'lib/styles'
 import {isDesktopWeb} from 'platform/detection'
 import {ListActions} from './ListActions'
+import {makeProfileLink} from 'lib/routes/links'
+import {sanitizeHandle} from 'lib/strings/handles'
 
 const LOADING_ITEM = {_reactKey: '__loading__'}
 const HEADER_ITEM = {_reactKey: '__header__'}
@@ -43,6 +45,7 @@ export const ListItems = observer(
     onPressEditList,
     onPressDeleteList,
     onPressShareList,
+    onPressReportList,
     renderEmptyState,
     testID,
     headerOffset = 0,
@@ -55,6 +58,7 @@ export const ListItems = observer(
     onPressEditList: () => void
     onPressDeleteList: () => void
     onPressShareList: () => void
+    onPressReportList: () => void
     renderEmptyState?: () => JSX.Element
     testID?: string
     headerOffset?: number
@@ -167,6 +171,7 @@ export const ListItems = observer(
               onPressEditList={onPressEditList}
               onPressDeleteList={onPressDeleteList}
               onPressShareList={onPressShareList}
+              onPressReportList={onPressReportList}
             />
           ) : null
         } else if (item === ERROR_ITEM) {
@@ -206,6 +211,7 @@ export const ListItems = observer(
         onPressEditList,
         onPressDeleteList,
         onPressShareList,
+        onPressReportList,
         onPressTryAgain,
         onPressRetryLoadMore,
       ],
@@ -265,6 +271,7 @@ const ListHeader = observer(
     onPressEditList,
     onPressDeleteList,
     onPressShareList,
+    onPressReportList,
   }: {
     list: AppBskyGraphDefs.ListView
     isOwner: boolean
@@ -272,6 +279,7 @@ const ListHeader = observer(
     onPressEditList: () => void
     onPressDeleteList: () => void
     onPressShareList: () => void
+    onPressReportList: () => void
   }) => {
     const pal = usePalette('default')
     const store = useStores()
@@ -296,8 +304,9 @@ const ListHeader = observer(
                   'you'
                 ) : (
                   <TextLink
-                    text={`@${list.creator.handle}`}
-                    href={`/profile/${list.creator.did}`}
+                    text={sanitizeHandle(list.creator.handle, '@')}
+                    href={makeProfileLink(list.creator)}
+                    style={pal.textLight}
                   />
                 )}
               </Text>
@@ -317,6 +326,7 @@ const ListHeader = observer(
                 onPressEditList={onPressEditList}
                 onToggleSubscribed={onToggleSubscribed}
                 onPressShareList={onPressShareList}
+                onPressReportList={onPressReportList}
               />
             )}
           </View>

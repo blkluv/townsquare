@@ -1,3 +1,13 @@
+import React from 'react'
+import {observer} from 'mobx-react-lite'
+import {useStores} from 'state/index'
+import {usePalette} from 'lib/hooks/usePalette'
+import {Animated} from 'react-native'
+import {useNavigationState} from '@react-navigation/native'
+import {useSafeAreaInsets} from 'react-native-safe-area-context'
+import {getCurrentRoute, isTab} from 'lib/routes/helpers'
+import {styles} from './BottomBarStyles'
+import {clamp} from 'lib/numbers'
 import {
   BellIcon,
   BellIconSolid,
@@ -5,28 +15,25 @@ import {
   HomeIconSolid,
   MagnifyingGlassIcon2,
   MagnifyingGlassIcon2Solid,
+  SatelliteDishIcon,
+  SatelliteDishIconSolid,
+  UserIcon,
   RegularRankingStarIcon,
   RegularReactionIcon,
   SolidRankingStarIcon,
   SolidReactionIcon,
 } from 'lib/icons'
-import {getCurrentRoute, isTab} from 'lib/routes/helpers'
-
-import {Animated} from 'react-native'
 import {Link} from 'view/com/util/Link'
-import React from 'react'
-import {clamp} from 'lib/numbers'
-import {observer} from 'mobx-react-lite'
-import {styles} from './BottomBarStyles'
 import {useMinimalShellMode} from 'lib/hooks/useMinimalShellMode'
-import {useNavigationState} from '@react-navigation/native'
-import {usePalette} from 'lib/hooks/usePalette'
-import {useSafeAreaInsets} from 'react-native-safe-area-context'
+import {makeProfileLink} from 'lib/routes/links'
 
 export const BottomBarWeb = observer(() => {
+  const store = useStores()
   const pal = usePalette('default')
   const safeAreaInsets = useSafeAreaInsets()
   const {footerMinimalShellTransform} = useMinimalShellMode()
+
+  const splx = true
 
   return (
     <Animated.View
@@ -63,18 +70,20 @@ export const BottomBarWeb = observer(() => {
           )
         }}
       </NavItem>
-      {/* <NavItem routeName="Feeds" href="/feeds">
-        {({isActive}) => {
-          const Icon = isActive ? SatelliteDishIconSolid : SatelliteDishIcon
-          return (
-            <Icon
-              size={25}
-              style={[styles.ctrlIcon, pal.text, styles.searchIcon]}
-              strokeWidth={1.8}
-            />
-          )
-        }}
-      </NavItem> */}
+      {!splx && (
+        <NavItem routeName="Feeds" href="/feeds">
+          {({isActive}) => {
+            const Icon = isActive ? SatelliteDishIconSolid : SatelliteDishIcon
+            return (
+              <Icon
+                size={25}
+                style={[styles.ctrlIcon, pal.text, styles.searchIcon]}
+                strokeWidth={1.8}
+              />
+            )
+          }}
+        </NavItem>
+      )}
       <NavItem routeName="Notifications" href="/notifications">
         {({isActive}) => {
           const Icon = isActive ? BellIconSolid : BellIcon
@@ -109,15 +118,17 @@ export const BottomBarWeb = observer(() => {
           )
         }}
       </NavItem>
-      {/* <NavItem routeName="Profile" href={makeProfileLink(store.me)}>
-        {() => (
-          <UserIcon
-            size={28}
-            strokeWidth={1.5}
-            style={[styles.ctrlIcon, pal.text, styles.profileIcon]}
-          />
-        )}
-      </NavItem> */}
+      {!splx && (
+        <NavItem routeName="Profile" href={makeProfileLink(store.me)}>
+          {() => (
+            <UserIcon
+              size={28}
+              strokeWidth={1.5}
+              style={[styles.ctrlIcon, pal.text, styles.profileIcon]}
+            />
+          )}
+        </NavItem>
+      )}
     </Animated.View>
   )
 })

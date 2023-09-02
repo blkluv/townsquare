@@ -1,33 +1,32 @@
+import React, {ComponentProps, useMemo} from 'react'
+import {observer} from 'mobx-react-lite'
 import {
-  GestureResponderEvent,
   Linking,
+  GestureResponderEvent,
   Platform,
-  Pressable,
   StyleProp,
-  TextProps,
   TextStyle,
-  TouchableOpacity,
-  TouchableWithoutFeedback,
+  TextProps,
   View,
   ViewStyle,
+  Pressable,
+  TouchableWithoutFeedback,
+  TouchableOpacity,
 } from 'react-native'
-import React, {ComponentProps, useMemo} from 'react'
-import {RootStoreModel, useStores} from 'state/index'
 import {
-  StackActions,
   useLinkProps,
   useNavigation,
+  StackActions,
 } from '@react-navigation/native'
-import {convertBskyAppUrlIfNeeded, isExternalUrl} from 'lib/strings/url-helpers'
-import {isAndroid, isDesktopWeb} from 'platform/detection'
-
-import FixedTouchableHighlight from '../pager/FixedTouchableHighlight'
-import {NavigationProp} from 'lib/routes/types'
 import {Text} from './text/Text'
 import {TypographyVariant} from 'lib/ThemeContext'
-import {observer} from 'mobx-react-lite'
+import {NavigationProp} from 'lib/routes/types'
 import {router} from '../../../routes'
+import {useStores, RootStoreModel} from 'state/index'
+import {convertBskyAppUrlIfNeeded, isExternalUrl} from 'lib/strings/url-helpers'
+import {isAndroid, isDesktopWeb} from 'platform/detection'
 import {sanitizeUrl} from '@braintree/sanitize-url'
+import FixedTouchableHighlight from '../pager/FixedTouchableHighlight'
 
 type Event =
   | React.MouseEvent<HTMLAnchorElement, MouseEvent>
@@ -260,15 +259,21 @@ function onPressInner(
   e?: Event,
 ) {
   let shouldHandle = false
+  const isLeftClick =
+    // @ts-ignore Web only -prf
+    Platform.OS === 'web' && (e.button == null || e.button === 0)
+  // @ts-ignore Web only -prf
+  const isMiddleClick = Platform.OS === 'web' && e.button === 1
+  const isMetaKey =
+    // @ts-ignore Web only -prf
+    Platform.OS === 'web' && (e.metaKey || e.altKey || e.ctrlKey || e.shiftKey)
+  const newTab = isMetaKey || isMiddleClick
 
   if (Platform.OS !== 'web' || !e) {
     shouldHandle = e ? !e.defaultPrevented : true
   } else if (
     !e.defaultPrevented && // onPress prevented default
-    // @ts-ignore Web only -prf
-    !(e.metaKey || e.altKey || e.ctrlKey || e.shiftKey) && // ignore clicks with modifier keys
-    // @ts-ignore Web only -prf
-    (e.button == null || e.button === 0) && // ignore everything but left clicks
+    (isLeftClick || isMiddleClick) && // ignore everything but left and middle clicks
     // @ts-ignore Web only -prf
     [undefined, null, '', 'self'].includes(e.currentTarget?.target) // let browser handle "target=_blank" etc.
   ) {
@@ -278,7 +283,7 @@ function onPressInner(
 
   if (shouldHandle) {
     href = convertBskyAppUrlIfNeeded(href)
-    if (href.startsWith('http') || href.startsWith('mailto')) {
+    if (newTab || href.startsWith('http') || href.startsWith('mailto')) {
       Linking.openURL(href)
     } else {
       store.shell.closeModal() // close any active modals

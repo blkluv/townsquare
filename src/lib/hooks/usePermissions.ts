@@ -1,14 +1,13 @@
-import * as MediaLibrary from 'expo-media-library'
-
-import {Alert} from 'view/com/util/Alert'
 import {Camera} from 'expo-camera'
+import * as MediaLibrary from 'expo-media-library'
 import {Linking} from 'react-native'
 import {isWeb} from 'platform/detection'
+import {Alert} from 'view/com/util/Alert'
 
 const openPermissionAlert = (perm: string) => {
   Alert.alert(
     'Permission needed',
-    `Solarplex Live does not have permission to access your ${perm}.`,
+    `Solarplex does not have permission to access your ${perm}.`,
     [
       {
         text: 'Cancel',
@@ -30,9 +29,14 @@ export function usePhotoLibraryPermission() {
 
     if (res?.granted) {
       return true
-    } else if (!res || res?.status === 'undetermined' || res?.canAskAgain) {
-      const updatedRes = await requestPermission()
-      return updatedRes?.granted
+    } else if (!res || res.status === 'undetermined' || res?.canAskAgain) {
+      const {canAskAgain, granted, status} = await requestPermission()
+
+      if (!canAskAgain && status === 'undetermined') {
+        openPermissionAlert('photo library')
+      }
+
+      return granted
     } else {
       openPermissionAlert('photo library')
       return false

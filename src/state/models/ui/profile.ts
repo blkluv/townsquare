@@ -1,10 +1,9 @@
 import {makeAutoObservable, runInAction} from 'mobx'
-
+import {RootStoreModel} from '../root-store'
+import {ProfileModel} from '../content/profile'
+import {PostsFeedModel} from '../feeds/posts'
 import {ActorFeedsModel} from '../lists/actor-feeds'
 import {ListsListModel} from '../lists/lists-list'
-import {PostsFeedModel} from '../feeds/posts'
-import {ProfileModel} from '../content/profile'
-import {RootStoreModel} from '../root-store'
 
 export enum Sections {
   PostsNoReplies = 'Posts',
@@ -87,8 +86,8 @@ export class ProfileUiModel {
     const items = [
       Sections.PostsNoReplies,
       Sections.PostsWithReplies,
-      // Sections.PostsWithMedia,
-      // this.isAuthenticatedUser && Sections.Likes,
+      Sections.PostsWithMedia,
+      this.isAuthenticatedUser && Sections.Likes,
     ].filter(Boolean) as string[]
     if (this.algos.hasLoaded && !this.algos.isEmpty) {
       items.push(Sections.CustomAlgorithms)

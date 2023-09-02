@@ -8,12 +8,9 @@
  * version of the app.
  */
 
-import * as Storage from 'lib/storage'
-
-import {useCallback, useEffect, useState} from 'react'
-
+import {useState, useCallback, useEffect} from 'react'
 import {BskyAgent} from '@atproto/api'
-import {isWeb} from 'platform/detection'
+import * as Storage from 'lib/storage'
 
 export function useDebugHeaderSetting(agent: BskyAgent): [boolean, () => void] {
   const [enabled, setEnabled] = useState<boolean>(false)
@@ -53,9 +50,6 @@ export function setDebugHeader(agent: BskyAgent, enabled: boolean) {
 }
 
 export async function applyDebugHeader(agent: BskyAgent) {
-  if (!isWeb) {
-    return
-  }
   if (await isEnabled()) {
     agent.api.xrpc.setHeader('x-appview-proxy', 'true')
   }

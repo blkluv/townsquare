@@ -316,7 +316,7 @@ const DropdownItems = ({
                 accessibilityHint={`Option ${index + 1} of ${numItems}`}>
                 {item.icon && (
                   <Image
-                    accessibilityIgnoresInvertColors={true}
+                    accessibilityIgnoresInvertColors
                     style={styles.icon}
                     source={{
                       uri: item.icon,

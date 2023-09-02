@@ -1,15 +1,14 @@
-import {StyleSheet, View} from 'react-native'
-import Svg, {Circle, Line} from 'react-native-svg'
-
-import {AtUri} from '@atproto/api'
-import {FeedItem} from './FeedItem'
-import {Link} from '../util/Link'
-import {PostsFeedSliceModel} from 'state/models/feeds/posts-slice'
 import React from 'react'
-import {Text} from '../util/text/Text'
-import {makeProfileLink} from 'lib/routes/links'
+import {StyleSheet, View} from 'react-native'
 import {observer} from 'mobx-react-lite'
+import {PostsFeedSliceModel} from 'state/models/feeds/posts-slice'
+import {AtUri} from '@atproto/api'
+import {Link} from '../util/Link'
+import {Text} from '../util/text/Text'
+import Svg, {Circle, Line} from 'react-native-svg'
+import {FeedItem} from './FeedItem'
 import {usePalette} from 'lib/hooks/usePalette'
+import {makeProfileLink} from 'lib/routes/links'
 
 export const FeedSlice = observer(
   ({

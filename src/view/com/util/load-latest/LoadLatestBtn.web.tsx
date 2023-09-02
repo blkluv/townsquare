@@ -1,13 +1,11 @@
-import {StyleSheet, TouchableOpacity} from 'react-native'
-
-import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome'
-import {LoadLatestBtn as LoadLatestBtnMobile} from './LoadLatestBtnMobile'
 import React from 'react'
+import {StyleSheet, TouchableOpacity} from 'react-native'
+import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome'
 import {Text} from '../text/Text'
-import {isMobileWeb} from 'platform/detection'
 import {usePalette} from 'lib/hooks/usePalette'
-
-const HITSLOP = {left: 20, top: 20, right: 20, bottom: 20}
+import {LoadLatestBtn as LoadLatestBtnMobile} from './LoadLatestBtnMobile'
+import {isMobileWeb} from 'platform/detection'
+import {HITSLOP_20} from 'lib/constants'
 
 export const LoadLatestBtn = ({
   onPress,
@@ -41,7 +39,7 @@ export const LoadLatestBtn = ({
             minimalShellMode && styles.loadLatestCenteredMinimal,
           ]}
           onPress={onPress}
-          hitSlop={HITSLOP}
+          hitSlop={HITSLOP_20}
           accessibilityRole="button"
           accessibilityLabel={label}
           accessibilityHint="">
@@ -53,7 +51,7 @@ export const LoadLatestBtn = ({
       <TouchableOpacity
         style={[pal.view, pal.borderDark, styles.loadLatest]}
         onPress={onPress}
-        hitSlop={HITSLOP}
+        hitSlop={HITSLOP_20}
         accessibilityRole="button"
         accessibilityLabel={label}
         accessibilityHint="">
@@ -96,7 +94,7 @@ const styles = StyleSheet.create({
     left: '50vw',
     // @ts-ignore web only -prf
     transform: 'translateX(-50%)',
-    top: 90,
+    top: 60,
     paddingHorizontal: 24,
     paddingVertical: 14,
     borderRadius: 30,

@@ -1,15 +1,14 @@
-import {CenteredView} from '../util/Views'
-import {CreateAccount} from 'view/com/auth/create/CreateAccount'
-import {ErrorBoundary} from 'view/com/util/ErrorBoundary'
-import {Login} from 'view/com/auth/login/Login'
 import React from 'react'
 import {SafeAreaView} from 'react-native'
-import {SplashScreen} from './SplashScreen'
 import {observer} from 'mobx-react-lite'
+import {Login} from 'view/com/auth/login/Login'
+import {CreateAccount} from 'view/com/auth/create/CreateAccount'
+import {ErrorBoundary} from 'view/com/util/ErrorBoundary'
 import {s} from 'lib/styles'
-import {useAnalytics} from 'lib/analytics/analytics'
 import {usePalette} from 'lib/hooks/usePalette'
 import {useStores} from 'state/index'
+import {useAnalytics} from 'lib/analytics/analytics'
+import {SplashScreen} from './SplashScreen'
 
 enum ScreenState {
   S_LoginOrCreateAccount,
@@ -43,24 +42,23 @@ export const LoggedOut = observer(() => {
   }
 
   return (
-    <CenteredView style={[s.hContentRegion, pal.view]}>
-      <SafeAreaView testID="noSessionView" style={s.hContentRegion}>
-        <ErrorBoundary>
-          {screenState === ScreenState.S_Login ? (
-            <Login
-              onPressBack={() => setScreenState(ScreenState.S_Login)}
-              onPressCreateAccount={() =>
-                setScreenState(ScreenState.S_CreateAccount)
-              }
-            />
-          ) : undefined}
-          {screenState === ScreenState.S_CreateAccount ? (
-            <CreateAccount
-              onPressBack={() => setScreenState(ScreenState.S_Login)}
-            />
-          ) : undefined}
-        </ErrorBoundary>
-      </SafeAreaView>
-    </CenteredView>
+    <SafeAreaView testID="noSessionView" style={[s.hContentRegion, pal.view]}>
+      <ErrorBoundary>
+        {screenState === ScreenState.S_Login ? (
+          <Login
+            onPressBack={() =>
+              setScreenState(ScreenState.S_LoginOrCreateAccount)
+            }
+          />
+        ) : undefined}
+        {screenState === ScreenState.S_CreateAccount ? (
+          <CreateAccount
+            onPressBack={() =>
+              setScreenState(ScreenState.S_LoginOrCreateAccount)
+            }
+          />
+        ) : undefined}
+      </ErrorBoundary>
+    </SafeAreaView>
   )
 })

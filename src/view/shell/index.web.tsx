@@ -1,27 +1,25 @@
-import {FlatNavigator, RoutesContainer} from '../../Navigation'
 import React, {useEffect} from 'react'
-import {StyleSheet, TouchableOpacity, View} from 'react-native'
-import {colors, s} from 'lib/styles'
-
-import {BottomBarWeb} from './bottom-bar/BottomBarWeb'
-import {Composer} from './Composer.web'
+import {observer} from 'mobx-react-lite'
+import {View, StyleSheet, TouchableOpacity} from 'react-native'
+import {useStores} from 'state/index'
 import {DesktopLeftNav} from './desktop/LeftNav'
 import {DesktopRightNav} from './desktop/RightNav'
-import {DrawerContent} from './Drawer'
 import {ErrorBoundary} from '../com/util/ErrorBoundary'
 import {Lightbox} from '../com/lightbox/Lightbox'
 import {ModalsContainer} from '../com/modals/Modal'
-import {NavigationProp} from 'lib/routes/types'
-import {observer} from 'mobx-react-lite'
+import {Composer} from './Composer.web'
 import {useColorSchemeStyle} from 'lib/hooks/useColorSchemeStyle'
-import {useNavigation} from '@react-navigation/native'
-import {useStores} from 'state/index'
+import {s, colors} from 'lib/styles'
+import {RoutesContainer, FlatNavigator} from '../../Navigation'
+import {DrawerContent} from './Drawer'
 import {useWebMediaQueries} from '../../lib/hooks/useWebMediaQueries'
+import {BottomBarWeb} from './bottom-bar/BottomBarWeb'
+import {useNavigation} from '@react-navigation/native'
+import {NavigationProp} from 'lib/routes/types'
 
 const ShellInner = observer(() => {
   const store = useStores()
   const {isDesktop} = useWebMediaQueries()
-
   const navigator = useNavigation<NavigationProp>()
 
   useEffect(() => {
@@ -30,6 +28,9 @@ const ShellInner = observer(() => {
     })
   }, [navigator, store.shell])
 
+  const showBottomBar = !isDesktop && !store.onboarding.isActive
+  const showSideNavs =
+    isDesktop && store.session.hasSession && !store.onboarding.isActive
   return (
     <>
       <View style={s.hContentRegion}>
@@ -37,27 +38,24 @@ const ShellInner = observer(() => {
           <FlatNavigator />
         </ErrorBoundary>
       </View>
-      {isDesktop && (
+      {showSideNavs && (
         <>
           <DesktopLeftNav />
           <DesktopRightNav />
         </>
       )}
-
       <Composer
-        active={
-          store.shell.isComposerActive && !store.session.isSolarplexSession
-        }
+        active={store.shell.isComposerActive}
         onClose={() => store.shell.closeComposer()}
         winHeight={0}
         replyTo={store.shell.composerOpts?.replyTo}
         quote={store.shell.composerOpts?.quote}
         onPost={store.shell.composerOpts?.onPost}
+        mention={store.shell.composerOpts?.mention}
       />
-      {!isDesktop && !store.session.isSolarplexSession && <BottomBarWeb />}
+      {showBottomBar && <BottomBarWeb />}
       <ModalsContainer />
       <Lightbox />
-
       {!isDesktop && store.shell.isDrawerOpen && (
         <TouchableOpacity
           onPress={() => store.shell.closeDrawer()}

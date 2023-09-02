@@ -1,12 +1,11 @@
-import {
-  AppBskyEmbedRecord,
-  AppBskyEmbedRecordWithMedia,
-  AppBskyFeedDefs,
-  AppBskyFeedPost,
-} from '@atproto/api'
-
 import {LRUMap} from 'lru_map'
 import {RootStoreModel} from '../root-store'
+import {
+  AppBskyFeedDefs,
+  AppBskyEmbedRecord,
+  AppBskyEmbedRecordWithMedia,
+  AppBskyFeedPost,
+} from '@atproto/api'
 
 type PostView = AppBskyFeedDefs.PostView
 

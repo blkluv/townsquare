@@ -1,24 +1,25 @@
-import {Animated, StyleSheet, TouchableOpacity, View} from 'react-native'
-
-import {CenteredView} from './Views'
-import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome'
-import {NavigationProp} from 'lib/routes/types'
 import React from 'react'
-import {Text} from './text/Text'
-import {UserAvatar} from './UserAvatar'
-import {isDesktopWeb} from 'platform/detection'
 import {observer} from 'mobx-react-lite'
-import {useAnalytics} from 'lib/analytics/analytics'
-import {useAnimatedValue} from 'lib/hooks/useAnimatedValue'
+import {Animated, StyleSheet, TouchableOpacity, View} from 'react-native'
+import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome'
 import {useNavigation} from '@react-navigation/native'
-import {usePalette} from 'lib/hooks/usePalette'
+import {CenteredView} from './Views'
+import {Text} from './text/Text'
 import {useStores} from 'state/index'
+import {usePalette} from 'lib/hooks/usePalette'
+import {useAnimatedValue} from 'lib/hooks/useAnimatedValue'
+import {useAnalytics} from 'lib/analytics/analytics'
+import {NavigationProp} from 'lib/routes/types'
+import {isDesktopWeb} from 'platform/detection'
+
+import {UserAvatar} from './UserAvatar'
 
 const BACK_HITSLOP = {left: 20, top: 20, right: 50, bottom: 20}
 
 export const ViewHeader = observer(function ({
   title,
   canGoBack,
+  showBackButton = true,
   hideOnScroll,
   showOnDesktop,
   showBorder,
@@ -26,6 +27,7 @@ export const ViewHeader = observer(function ({
 }: {
   title: string
   canGoBack?: boolean
+  showBackButton?: boolean
   hideOnScroll?: boolean
   showOnDesktop?: boolean
   showBorder?: boolean
@@ -51,7 +53,13 @@ export const ViewHeader = observer(function ({
 
   if (isDesktopWeb) {
     if (showOnDesktop) {
-      return <DesktopWebHeader title={title} renderButton={renderButton} />
+      return (
+        <DesktopWebHeader
+          title={title}
+          renderButton={renderButton}
+          showBorder={showBorder}
+        />
+      )
     }
     return null
   } else {
@@ -59,28 +67,42 @@ export const ViewHeader = observer(function ({
       canGoBack = navigation.canGoBack()
     }
 
+    const splx = true
+
     return (
       <Container hideOnScroll={hideOnScroll || false} showBorder={showBorder}>
-        <TouchableOpacity
-          testID="viewHeaderDrawerBtn"
-          onPress={canGoBack ? onPressBack : onPressMenu}
-          hitSlop={BACK_HITSLOP}
-          style={canGoBack ? styles.backBtn : styles.backBtnWide}
-          accessibilityRole="button"
-          accessibilityLabel={canGoBack ? 'Back' : 'Menu'}
-          accessibilityHint={
-            canGoBack ? '' : 'Access navigation links and settings'
-          }>
-          {canGoBack ? (
-            <FontAwesomeIcon
-              size={18}
-              icon="angle-left"
-              style={[styles.backIcon, pal.text]}
-            />
-          ) : (
-            <UserAvatar avatar={store.me.avatar} size={27} />
-          )}
-        </TouchableOpacity>
+        {showBackButton ? (
+          <TouchableOpacity
+            testID="viewHeaderDrawerBtn"
+            onPress={canGoBack ? onPressBack : onPressMenu}
+            hitSlop={BACK_HITSLOP}
+            style={canGoBack ? styles.backBtn : styles.backBtnWide}
+            accessibilityRole="button"
+            accessibilityLabel={canGoBack ? 'Back' : 'Menu'}
+            accessibilityHint={
+              canGoBack ? '' : 'Access navigation links and settings'
+            }>
+            {canGoBack ? (
+              <FontAwesomeIcon
+                size={18}
+                icon="angle-left"
+                style={[styles.backIcon, pal.text]}
+              />
+            ) : (
+              <>
+                {splx ? (
+                  <UserAvatar avatar={store.me.avatar} size={27} />
+                ) : (
+                  <FontAwesomeIcon
+                    size={18}
+                    icon="bars"
+                    style={[styles.backIcon, pal.textLight]}
+                  />
+                )}
+              </>
+            )}
+          </TouchableOpacity>
+        ) : null}
         <View style={styles.titleContainer} pointerEvents="none">
           <Text type="title" style={[pal.text, styles.title]}>
             {title}
@@ -88,9 +110,9 @@ export const ViewHeader = observer(function ({
         </View>
         {renderButton ? (
           renderButton()
-        ) : (
+        ) : showBackButton ? (
           <View style={canGoBack ? styles.backBtn : styles.backBtnWide} />
-        )}
+        ) : null}
       </Container>
     )
   }
@@ -99,13 +121,23 @@ export const ViewHeader = observer(function ({
 function DesktopWebHeader({
   title,
   renderButton,
+  showBorder = true,
 }: {
   title: string
   renderButton?: () => JSX.Element
+  showBorder?: boolean
 }) {
   const pal = usePalette('default')
   return (
-    <CenteredView style={[styles.header, styles.desktopHeader, pal.border]}>
+    <CenteredView
+      style={[
+        styles.header,
+        styles.desktopHeader,
+        pal.border,
+        {
+          borderBottomWidth: showBorder ? 1 : 0,
+        },
+      ]}>
       <View style={styles.titleContainer} pointerEvents="none">
         <Text type="title-lg" style={[pal.text, styles.title]}>
           {title}
@@ -193,13 +225,11 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   desktopHeader: {
-    borderBottomWidth: 1,
     paddingVertical: 12,
   },
   border: {
     borderBottomWidth: 1,
   },
-
   titleContainer: {
     marginLeft: 'auto',
     marginRight: 'auto',

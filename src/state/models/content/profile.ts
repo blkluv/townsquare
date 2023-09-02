@@ -1,21 +1,19 @@
-import * as apilib from 'lib/api/index'
-
+import {makeAutoObservable, runInAction} from 'mobx'
 import {
-  AppBskyActorProfile,
-  AppBskyGraphDefs,
   AtUri,
   ComAtprotoLabelDefs,
+  AppBskyGraphDefs,
   AppBskyActorGetProfile as GetProfile,
-  ProfileModeration,
+  AppBskyActorProfile,
   RichText,
   moderateProfile,
+  ProfileModeration,
 } from '@atproto/api'
-import {makeAutoObservable, runInAction} from 'mobx'
-
+import {RootStoreModel} from '../root-store'
+import * as apilib from 'lib/api/index'
+import {cleanError} from 'lib/strings/errors'
 import {FollowState} from '../cache/my-follows'
 import {Image as RNImage} from 'react-native-image-crop-picker'
-import {RootStoreModel} from '../root-store'
-import {cleanError} from 'lib/strings/errors'
 import {track} from 'lib/analytics/analytics'
 
 export class ProfileViewerModel {

@@ -1,8 +1,7 @@
-import * as AppInfo from 'lib/app-info'
-import * as Toast from '../com/util/Toast'
-
+import React from 'react'
 import {
   ActivityIndicator,
+  Linking,
   Platform,
   Pressable,
   StyleSheet,
@@ -11,46 +10,47 @@ import {
   View,
   ViewStyle,
 } from 'react-native'
-import {CommonNavigatorParams, NativeStackScreenProps} from 'lib/routes/types'
-import {DropdownItem, NativeDropdown} from 'view/com/util/forms/NativeDropdown'
+import {
+  useFocusEffect,
+  useNavigation,
+  StackActions,
+} from '@react-navigation/native'
 import {
   FontAwesomeIcon,
   FontAwesomeIconStyle,
 } from '@fortawesome/react-native-fontawesome'
-import {
-  StackActions,
-  useFocusEffect,
-  useNavigation,
-} from '@react-navigation/native'
-import {colors, s} from 'lib/styles'
-
-import {AccountData} from 'state/models/session'
-import Clipboard from '@react-native-clipboard/clipboard'
-import {Link} from '../com/util/Link'
-import {NavigationProp} from 'lib/routes/types'
-import React from 'react'
-// import {STATUS_PAGE_URL} from 'lib/constants'
-import {ScrollView} from '../com/util/Views'
-import {SelectableBtn} from 'view/com/util/forms/SelectableBtn'
-import {Text} from '../com/util/text/Text'
-import {ToggleButton} from 'view/com/util/forms/ToggleButton'
-import {UserAvatar} from '../com/util/UserAvatar'
-import {ViewHeader} from '../com/util/ViewHeader'
-import {formatCount} from 'view/com/util/numeric/format'
-import {isDesktopWeb} from 'platform/detection'
-import {makeProfileLink} from '../../lib/routes/links'
 import {observer} from 'mobx-react-lite'
-import {pluralize} from 'lib/strings/helpers'
-import {reset as resetNavigation} from '../../Navigation'
-import {useAnalytics} from 'lib/analytics/analytics'
+import {NativeStackScreenProps, CommonNavigatorParams} from 'lib/routes/types'
+import {withAuthRequired} from 'view/com/auth/withAuthRequired'
+import * as AppInfo from 'lib/app-info'
+import {useStores} from 'state/index'
+import {s, colors} from 'lib/styles'
+import {ScrollView} from '../com/util/Views'
+import {ViewHeader} from '../com/util/ViewHeader'
+import {Link} from '../com/util/Link'
+import {Text} from '../com/util/text/Text'
+import * as Toast from '../com/util/Toast'
+import {UserAvatar} from '../com/util/UserAvatar'
+import {ToggleButton} from 'view/com/util/forms/ToggleButton'
+import {SelectableBtn} from 'view/com/util/forms/SelectableBtn'
+import {usePalette} from 'lib/hooks/usePalette'
 import {useCustomPalette} from 'lib/hooks/useCustomPalette'
+import {AccountData} from 'state/models/session'
+import {useAnalytics} from 'lib/analytics/analytics'
+import {NavigationProp} from 'lib/routes/types'
+import {isDesktopWeb} from 'platform/detection'
+import {pluralize} from 'lib/strings/helpers'
+import {formatCount} from 'view/com/util/numeric/format'
+import Clipboard from '@react-native-clipboard/clipboard'
+import {reset as resetNavigation} from '../../Navigation'
+import {makeProfileLink} from 'lib/routes/links'
+
 // TEMPORARY (APP-700)
 // remove after backend testing finishes
 // -prf
 import {useDebugHeaderSetting} from 'lib/api/debug-appview-proxy-header'
-import {usePalette} from 'lib/hooks/usePalette'
-import {useStores} from 'state/index'
-import {withAuthRequired} from 'view/com/auth/withAuthRequired'
+import {STATUS_PAGE_URL} from 'lib/constants'
+import {DropdownItem, NativeDropdown} from 'view/com/util/forms/NativeDropdown'
 
 type Props = NativeStackScreenProps<CommonNavigatorParams, 'Settings'>
 export const SettingsScreen = withAuthRequired(
@@ -162,6 +162,11 @@ export const SettingsScreen = withAuthRequired(
       Toast.show('Preferences reset')
     }, [store])
 
+    const onPressResetOnboarding = React.useCallback(async () => {
+      store.onboarding.reset()
+      Toast.show('Onboarding reset')
+    }, [store])
+
     const onPressBuildInfo = React.useCallback(() => {
       Clipboard.setString(
         `Build version: ${AppInfo.appVersion}; Platform: ${Platform.OS}`,
@@ -170,10 +175,8 @@ export const SettingsScreen = withAuthRequired(
     }, [])
 
     const openPreferencesModal = React.useCallback(() => {
-      store.shell.openModal({
-        name: 'preferences-home-feed',
-      })
-    }, [store])
+      navigation.navigate('PreferencesHomeFeed')
+    }, [navigation])
 
     const onPressAppPasswords = React.useCallback(() => {
       navigation.navigate('AppPasswords')
@@ -191,9 +194,11 @@ export const SettingsScreen = withAuthRequired(
       navigation.navigate('SavedFeeds')
     }, [navigation])
 
-    // const onPressStatusPage = React.useCallback(() => {
-    //   Linking.openURL(STATUS_PAGE_URL)
-    // }, [])
+    const onPressStatusPage = React.useCallback(() => {
+      Linking.openURL(STATUS_PAGE_URL)
+    }, [])
+
+    const allowStatus = false
 
     return (
       <View style={[s.hContentRegion]} testID="settingsScreen">
@@ -386,7 +391,7 @@ export const SettingsScreen = withAuthRequired(
             Advanced
           </Text>
           <TouchableOpacity
-            testID="preferencesHomeFeedModalButton"
+            testID="preferencesHomeFeedButton"
             style={[styles.linkCard, pal.view, isSwitching && styles.dimmed]}
             onPress={openPreferencesModal}
             accessibilityRole="button"
@@ -535,6 +540,16 @@ export const SettingsScreen = withAuthRequired(
                   Reset preferences state
                 </Text>
               </TouchableOpacity>
+              <TouchableOpacity
+                style={[pal.view, styles.linkCardNoIcon]}
+                onPress={onPressResetOnboarding}
+                accessibilityRole="button"
+                accessibilityHint="Reset onboarding"
+                accessibilityLabel="Resets the onboarding state">
+                <Text type="lg" style={pal.text}>
+                  Reset onboarding state
+                </Text>
+              </TouchableOpacity>
             </>
           ) : null}
           <View style={[styles.footer]}>
@@ -548,13 +563,15 @@ export const SettingsScreen = withAuthRequired(
             <Text type="sm" style={[pal.textLight]}>
               &middot; &nbsp;
             </Text>
-            {/* <TouchableOpacity
-              accessibilityRole="button"
-              onPress={onPressStatusPage}>
-              <Text type="sm" style={[styles.buildInfo, pal.textLight]}>
-                Status page
-              </Text>
-            </TouchableOpacity> */}
+            {allowStatus && (
+              <TouchableOpacity
+                accessibilityRole="button"
+                onPress={onPressStatusPage}>
+                <Text type="sm" style={[styles.buildInfo, pal.textLight]}>
+                  Status page
+                </Text>
+              </TouchableOpacity>
+            )}
           </View>
           <View style={s.footerSpacer} />
         </ScrollView>

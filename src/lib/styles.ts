@@ -1,6 +1,5 @@
 import {Dimensions, StyleProp, StyleSheet, TextStyle} from 'react-native'
 import {Theme, TypographyVariant} from './ThemeContext'
-
 import {isMobileWeb} from 'platform/detection'
 
 // 1 is lightest, 2 is light, 3 is mid, 4 is dark, 5 is darkest
@@ -26,13 +25,13 @@ export const colors = {
   blue6: '#012561',
   blue7: '#001040',
 
-  red1: '#ffe6f2',
-  red2: '#fba2ce',
-  red3: '#ec4899',
-  red4: '#d1106f',
-  red5: '#97074e',
-  red6: '#690436',
-  red7: '#4F0328',
+  red1: '#ffe6eb',
+  red2: '#fba2b2',
+  red3: '#ec4868',
+  red4: '#d11043',
+  red5: '#970721',
+  red6: '#690419',
+  red7: '#4F0314',
 
   pink1: '#f8ccff',
   pink2: '#e966ff',
@@ -179,6 +178,9 @@ export const s = StyleSheet.create({
   // text decoration
   underline: {textDecorationLine: 'underline'},
 
+  // font variants
+  tabularNum: {fontVariant: ['tabular-nums']},
+
   // font sizes
   f9: {fontSize: 9},
   f10: {fontSize: 10},
@@ -318,6 +320,7 @@ export const s = StyleSheet.create({
   green5: {color: colors.green5},
 
   brandBlue: {color: colors.brandBlue},
+  likeColor: {color: colors.like},
 })
 
 export function lh(

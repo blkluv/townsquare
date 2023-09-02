@@ -1,17 +1,16 @@
+import React, {useState, useEffect} from 'react'
 import {ActivityIndicator, StyleSheet, View} from 'react-native'
-import React, {useEffect, useState} from 'react'
-
-import {InfoCircleIcon} from 'lib/icons'
-import {ProfileHeader} from '../profile/ProfileHeader'
-import {ProfileModel} from 'state/models/content/profile'
-import {ThemedText} from '../util/text/ThemedText'
-import {isIOS} from 'platform/detection'
 import {observer} from 'mobx-react-lite'
-import {s} from 'lib/styles'
-import {useAnalytics} from 'lib/analytics/analytics'
-import {useNavigationState} from '@react-navigation/native'
-import {usePalette} from 'lib/hooks/usePalette'
+import {ThemedText} from '../util/text/ThemedText'
 import {useStores} from 'state/index'
+import {ProfileModel} from 'state/models/content/profile'
+import {usePalette} from 'lib/hooks/usePalette'
+import {useAnalytics} from 'lib/analytics/analytics'
+import {ProfileHeader} from '../profile/ProfileHeader'
+import {InfoCircleIcon} from 'lib/icons'
+import {useNavigationState} from '@react-navigation/native'
+import {isIOS} from 'platform/detection'
+import {s} from 'lib/styles'
 
 export const snapPoints = [520, '100%']
 

@@ -1,3 +1,5 @@
+import React, {MutableRefObject} from 'react'
+import {observer} from 'mobx-react-lite'
 import {
   ActivityIndicator,
   RefreshControl,
@@ -6,16 +8,13 @@ import {
   View,
   ViewStyle,
 } from 'react-native'
-import React, {MutableRefObject} from 'react'
-
-import {ErrorMessage} from '../util/error/ErrorMessage'
-import {FeedSlice} from './FeedSlice'
 import {FlatList} from '../util/Views'
+import {PostFeedLoadingPlaceholder} from '../util/LoadingPlaceholder'
+import {ErrorMessage} from '../util/error/ErrorMessage'
+import {PostsFeedModel} from 'state/models/feeds/posts'
+import {FeedSlice} from './FeedSlice'
 import {LoadMoreRetryBtn} from '../util/LoadMoreRetryBtn'
 import {OnScrollCb} from 'lib/hooks/useOnMainScroll'
-import {PostFeedLoadingPlaceholder} from '../util/LoadingPlaceholder'
-import {PostsFeedModel} from 'state/models/feeds/posts'
-import {observer} from 'mobx-react-lite'
 import {s} from 'lib/styles'
 import {useAnalytics} from 'lib/analytics/analytics'
 import {usePalette} from 'lib/hooks/usePalette'
@@ -85,6 +84,7 @@ export const Feed = observer(function Feed({
     feed.loadMoreError,
     feed.isLoading,
   ])
+
   // events
   // =
 
@@ -141,11 +141,7 @@ export const Feed = observer(function Feed({
       } else if (item === LOADING_ITEM) {
         return <PostFeedLoadingPlaceholder />
       }
-      return (
-        <>
-          <FeedSlice slice={item} />
-        </>
-      )
+      return <FeedSlice slice={item} />
     },
     [feed, onPressTryAgain, onPressRetryLoadMore, renderEmptyState],
   )

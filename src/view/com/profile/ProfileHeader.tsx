@@ -1,44 +1,42 @@
-import * as Toast from '../util/Toast'
-
-import {DropdownItem, NativeDropdown} from '../util/forms/NativeDropdown'
+import React from 'react'
+import {observer} from 'mobx-react-lite'
 import {
   StyleSheet,
   TouchableOpacity,
   TouchableWithoutFeedback,
   View,
 } from 'react-native'
-import {colors, s} from 'lib/styles'
-import {isDesktopWeb, isNative} from 'platform/detection'
-
-import {BACK_HITSLOP} from 'lib/constants'
-import {BlurView} from '../util/BlurView'
-import {FollowState} from 'state/models/cache/my-follows'
 import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome'
-import {LoadingPlaceholder} from '../util/LoadingPlaceholder'
-import {NavigationProp} from 'lib/routes/types'
-import {ProfileHeaderAlerts} from '../util/moderation/ProfileHeaderAlerts'
-import {ProfileImageLightbox} from 'state/models/ui/shell'
+import {useNavigation} from '@react-navigation/native'
+import {BlurView} from '../util/BlurView'
 import {ProfileModel} from 'state/models/content/profile'
-import React from 'react'
-import {RichText} from '../util/text/RichText'
-import {Text} from '../util/text/Text'
-import {ThemedText} from '../util/text/ThemedText'
-import {UserAvatar} from '../util/UserAvatar'
-import {UserBanner} from '../util/UserBanner'
-import {formatCount} from '../util/numeric/format'
-import {isInvalidHandle} from 'lib/strings/handles'
-import {makeProfileLink} from 'lib/routes/links'
-import {navigate} from '../../../Navigation'
-import {observer} from 'mobx-react-lite'
+import {useStores} from 'state/index'
+import {ProfileImageLightbox} from 'state/models/ui/shell'
 import {pluralize} from 'lib/strings/helpers'
+import {toShareUrl} from 'lib/strings/url-helpers'
 import {sanitizeDisplayName} from 'lib/strings/display-names'
 import {sanitizeHandle} from 'lib/strings/handles'
-import {shareUrl} from 'lib/sharing'
-import {toShareUrl} from 'lib/strings/url-helpers'
-import {useAnalytics} from 'lib/analytics/analytics'
-import {useNavigation} from '@react-navigation/native'
+import {s, colors} from 'lib/styles'
+import * as Toast from '../util/Toast'
+import {LoadingPlaceholder} from '../util/LoadingPlaceholder'
+import {Text} from '../util/text/Text'
+import {ThemedText} from '../util/text/ThemedText'
+import {RichText} from '../util/text/RichText'
+import {UserAvatar} from '../util/UserAvatar'
+import {UserBanner} from '../util/UserBanner'
+import {ProfileHeaderAlerts} from '../util/moderation/ProfileHeaderAlerts'
 import {usePalette} from 'lib/hooks/usePalette'
-import {useStores} from 'state/index'
+import {useAnalytics} from 'lib/analytics/analytics'
+import {NavigationProp} from 'lib/routes/types'
+import {isDesktopWeb, isNative} from 'platform/detection'
+import {FollowState} from 'state/models/cache/my-follows'
+import {shareUrl} from 'lib/sharing'
+import {formatCount} from '../util/numeric/format'
+import {navigate} from '../../../Navigation'
+import {NativeDropdown, DropdownItem} from '../util/forms/NativeDropdown'
+import {BACK_HITSLOP} from 'lib/constants'
+import {isInvalidHandle} from 'lib/strings/handles'
+import {makeProfileLink} from 'lib/routes/links'
 
 interface Props {
   view: ProfileModel
@@ -275,17 +273,21 @@ const ProfileHeaderLoaded = observer(
           },
         },
       ]
-      if (!store.session.isSolarplexSession) {
+      if (!isMe) {
+        items.push({label: 'separator'})
+        // Only add "Add to Lists" on other user's profiles, doesn't make sense to mute my own self!
         items.push({
           testID: 'profileHeaderDropdownListAddRemoveBtn',
           label: 'Add to Lists',
           onPress: onPressAddRemoveLists,
+          icon: {
+            ios: {
+              name: 'list.bullet',
+            },
+            android: 'ic_menu_add',
+            web: 'list',
+          },
         })
-      }
-      if (!isMe && !store.session.isSolarplexSession) {
-        items.push({label: 'separator'})
-        // Only add "Add to Lists" on other user's profiles, doesn't make sense to mute my own self!
-
         if (!view.viewer.blocking) {
           items.push({
             testID: 'profileHeaderDropdownMuteBtn',
@@ -341,7 +343,6 @@ const ProfileHeaderLoaded = observer(
       onPressBlockAccount,
       onPressReportAccount,
       onPressAddRemoveLists,
-      store.session.isSolarplexSession,
     ])
 
     const blockHide = !isMe && (view.viewer.blocking || view.viewer.blockedBy)
@@ -354,70 +355,68 @@ const ProfileHeaderLoaded = observer(
         <UserBanner banner={view.banner} moderation={view.moderation.avatar} />
         <View style={styles.content}>
           <View style={[styles.buttonsLine]}>
-            {!store.session.isSolarplexSession ? (
-              isMe ? (
-                <TouchableOpacity
-                  testID="profileHeaderEditProfileButton"
-                  onPress={onPressEditProfile}
-                  style={[styles.btn, styles.mainBtn, pal.btn]}
-                  accessibilityRole="button"
-                  accessibilityLabel="Edit profile"
-                  accessibilityHint="Opens editor for profile display name, avatar, background image, and description">
-                  <Text type="button" style={pal.text}>
-                    Edit Profile
-                  </Text>
-                </TouchableOpacity>
-              ) : view.viewer.blocking ? (
-                <TouchableOpacity
-                  testID="unblockBtn"
-                  onPress={onPressUnblockAccount}
-                  style={[styles.btn, styles.mainBtn, pal.btn]}
-                  accessibilityRole="button"
-                  accessibilityLabel="Unblock"
-                  accessibilityHint="">
-                  <Text type="button" style={[pal.text, s.bold]}>
-                    Unblock
-                  </Text>
-                </TouchableOpacity>
-              ) : !view.viewer.blockedBy ? (
-                <>
-                  {store.me.follows.getFollowState(view.did) ===
-                  FollowState.Following ? (
-                    <TouchableOpacity
-                      testID="unfollowBtn"
-                      onPress={onPressToggleFollow}
-                      style={[styles.btn, styles.mainBtn, pal.btn]}
-                      accessibilityRole="button"
-                      accessibilityLabel={`Unfollow ${view.handle}`}
-                      accessibilityHint={`Hides posts from ${view.handle} in your feed`}>
-                      <FontAwesomeIcon
-                        icon="check"
-                        style={[pal.text, s.mr5]}
-                        size={14}
-                      />
-                      <Text type="button" style={pal.text}>
-                        Following
-                      </Text>
-                    </TouchableOpacity>
-                  ) : (
-                    <TouchableOpacity
-                      testID="followBtn"
-                      onPress={onPressToggleFollow}
-                      style={[styles.btn, styles.mainBtn, palInverted.view]}
-                      accessibilityRole="button"
-                      accessibilityLabel={`Follow ${view.handle}`}
-                      accessibilityHint={`Shows posts from ${view.handle} in your feed`}>
-                      <FontAwesomeIcon
-                        icon="plus"
-                        style={[palInverted.text, s.mr5]}
-                      />
-                      <Text type="button" style={[palInverted.text, s.bold]}>
-                        Follow
-                      </Text>
-                    </TouchableOpacity>
-                  )}
-                </>
-              ) : null
+            {isMe ? (
+              <TouchableOpacity
+                testID="profileHeaderEditProfileButton"
+                onPress={onPressEditProfile}
+                style={[styles.btn, styles.mainBtn, pal.btn]}
+                accessibilityRole="button"
+                accessibilityLabel="Edit profile"
+                accessibilityHint="Opens editor for profile display name, avatar, background image, and description">
+                <Text type="button" style={pal.text}>
+                  Edit Profile
+                </Text>
+              </TouchableOpacity>
+            ) : view.viewer.blocking ? (
+              <TouchableOpacity
+                testID="unblockBtn"
+                onPress={onPressUnblockAccount}
+                style={[styles.btn, styles.mainBtn, pal.btn]}
+                accessibilityRole="button"
+                accessibilityLabel="Unblock"
+                accessibilityHint="">
+                <Text type="button" style={[pal.text, s.bold]}>
+                  Unblock
+                </Text>
+              </TouchableOpacity>
+            ) : !view.viewer.blockedBy ? (
+              <>
+                {store.me.follows.getFollowState(view.did) ===
+                FollowState.Following ? (
+                  <TouchableOpacity
+                    testID="unfollowBtn"
+                    onPress={onPressToggleFollow}
+                    style={[styles.btn, styles.mainBtn, pal.btn]}
+                    accessibilityRole="button"
+                    accessibilityLabel={`Unfollow ${view.handle}`}
+                    accessibilityHint={`Hides posts from ${view.handle} in your feed`}>
+                    <FontAwesomeIcon
+                      icon="check"
+                      style={[pal.text, s.mr5]}
+                      size={14}
+                    />
+                    <Text type="button" style={pal.text}>
+                      Following
+                    </Text>
+                  </TouchableOpacity>
+                ) : (
+                  <TouchableOpacity
+                    testID="followBtn"
+                    onPress={onPressToggleFollow}
+                    style={[styles.btn, styles.mainBtn, palInverted.view]}
+                    accessibilityRole="button"
+                    accessibilityLabel={`Follow ${view.handle}`}
+                    accessibilityHint={`Shows posts from ${view.handle} in your feed`}>
+                    <FontAwesomeIcon
+                      icon="plus"
+                      style={[palInverted.text, s.mr5]}
+                    />
+                    <Text type="button" style={[palInverted.text, s.bold]}>
+                      Follow
+                    </Text>
+                  </TouchableOpacity>
+                )}
+              </>
             ) : null}
             {dropdownItems?.length ? (
               <NativeDropdown

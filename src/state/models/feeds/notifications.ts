@@ -8,6 +8,8 @@ import {
   AppBskyFeedLike,
   AppBskyGraphFollow,
   ComAtprotoLabelDefs,
+  moderatePost,
+  moderateProfile,
 } from '@atproto/api'
 import AwaitLock from 'await-lock'
 import chunk from 'lodash.chunk'
@@ -15,23 +17,11 @@ import {bundleAsync} from 'lib/async/bundle'
 import {RootStoreModel} from '../root-store'
 import {PostThreadModel} from '../content/post-thread'
 import {cleanError} from 'lib/strings/errors'
-import {
-  PostLabelInfo,
-  PostModeration,
-  ModerationBehaviorCode,
-} from 'lib/labeling/types'
-import {
-  getPostModeration,
-  filterAccountLabels,
-  filterProfileLabels,
-} from 'lib/labeling/helpers'
 
 const GROUPABLE_REASONS = ['like', 'repost', 'follow']
 const PAGE_SIZE = 30
 const MS_1HR = 1e3 * 60 * 60
 const MS_2DAY = MS_1HR * 48
-
-let _idCounter = 0
 
 export const MAX_VISIBLE_NOTIFS = 30
 
@@ -100,27 +90,19 @@ export class NotificationsFeedItemModel {
     }
   }
 
-  get labelInfo(): PostLabelInfo {
-    const addedInfo = this.additionalPost?.thread?.labelInfo
-    return {
-      postLabels: (this.labels || []).concat(addedInfo?.postLabels || []),
-      accountLabels: filterAccountLabels(this.author.labels).concat(
-        addedInfo?.accountLabels || [],
-      ),
-      profileLabels: filterProfileLabels(this.author.labels).concat(
-        addedInfo?.profileLabels || [],
-      ),
-      isMuted: this.author.viewer?.muted || addedInfo?.isMuted || false,
-      mutedByList: this.author.viewer?.mutedByList || addedInfo?.mutedByList,
-      isBlocking:
-        !!this.author.viewer?.blocking || addedInfo?.isBlocking || false,
-      isBlockedBy:
-        !!this.author.viewer?.blockedBy || addedInfo?.isBlockedBy || false,
+  get shouldFilter(): boolean {
+    if (this.additionalPost?.thread) {
+      const postMod = moderatePost(
+        this.additionalPost.thread.data.post,
+        this.rootStore.preferences.moderationOpts,
+      )
+      return postMod.content.filter || false
     }
-  }
-
-  get moderation(): PostModeration {
-    return getPostModeration(this.rootStore, this.labelInfo)
+    const profileMod = moderateProfile(
+      this.author,
+      this.rootStore.preferences.moderationOpts,
+    )
+    return profileMod.account.filter || false
   }
 
   get numUnreadInGroup(): number {
@@ -145,7 +127,7 @@ export class NotificationsFeedItemModel {
   }
 
   get isLike() {
-    return this.reason === 'like'
+    return this.reason === 'like' && !this.isCustomFeedLike // the reason property for custom feed likes is also 'like'
   }
 
   get isRepost() {
@@ -166,6 +148,12 @@ export class NotificationsFeedItemModel {
 
   get isFollow() {
     return this.reason === 'follow'
+  }
+
+  get isCustomFeedLike() {
+    return (
+      this.reason === 'like' && this.reasonSubject?.includes('feed.generator')
+    )
   }
 
   get needsAdditionalData() {
@@ -237,10 +225,22 @@ export class NotificationsFeedItemModel {
   }
 
   setAdditionalData(additionalPost: AppBskyFeedDefs.PostView) {
-    this.additionalPost = PostThreadModel.fromPostView(
-      this.rootStore,
-      additionalPost,
-    )
+    if (this.additionalPost) {
+      this.additionalPost._replaceAll({
+        success: true,
+        headers: {},
+        data: {
+          thread: {
+            post: additionalPost,
+          },
+        },
+      })
+    } else {
+      this.additionalPost = PostThreadModel.fromPostView(
+        this.rootStore,
+        additionalPost,
+      )
+    }
   }
 }
 
@@ -253,6 +253,12 @@ export class NotificationsFeedModel {
   loadMoreError = ''
   hasMore = true
   loadMoreCursor?: string
+
+  /**
+   * The last time notifications were seen. Refers to either the
+   * user's machine clock or the value of the `indexedAt` property on their
+   * latest notification, whichever was greater at the time of viewing.
+   */
   lastSync?: Date
 
   // used to linearize async modifications to state
@@ -339,9 +345,6 @@ export class NotificationsFeedModel {
           limit: PAGE_SIZE,
         })
         await this._replaceAll(res)
-        runInAction(() => {
-          this.lastSync = new Date()
-        })
         this._setQueued(undefined)
         this._countUnread()
         this._xIdle()
@@ -401,6 +404,13 @@ export class NotificationsFeedModel {
       this.rootStore.log.error('NotificationsModel:syncQueue failed', {e})
     } finally {
       this.lock.release()
+    }
+
+    // if there are no notifications, we should refresh the list
+    // this will only run for new users who have no notifications
+    // NOTE: needs to be after the lock is released
+    if (this.isEmpty) {
+      this.refresh()
     }
   })
 
@@ -475,34 +485,6 @@ export class NotificationsFeedModel {
     }
   }
 
-  /**
-   * Used in background fetch to trigger notifications
-   */
-  async getNewMostRecent(): Promise<NotificationsFeedItemModel | undefined> {
-    let old = this.mostRecentNotificationUri
-    const res = await this.rootStore.agent.listNotifications({
-      limit: 1,
-    })
-    if (!res.data.notifications[0] || old === res.data.notifications[0].uri) {
-      return
-    }
-    this.mostRecentNotificationUri = res.data.notifications[0].uri
-    const notif = new NotificationsFeedItemModel(
-      this.rootStore,
-      'mostRecent',
-      res.data.notifications[0],
-    )
-    const addedUri = notif.additionalDataUri
-    if (addedUri) {
-      const postsRes = await this.rootStore.agent.app.bsky.feed.getPosts({
-        uris: [addedUri],
-      })
-      notif.setAdditionalData(postsRes.data.posts[0])
-    }
-    const filtered = this._filterNotifications([notif])
-    return filtered[0]
-  }
-
   // state transitions
   // =
 
@@ -533,9 +515,17 @@ export class NotificationsFeedModel {
   // =
 
   async _replaceAll(res: ListNotifications.Response) {
-    if (res.data.notifications[0]) {
-      this.mostRecentNotificationUri = res.data.notifications[0].uri
+    const latest = res.data.notifications[0]
+
+    if (latest) {
+      const now = new Date()
+      const lastIndexed = new Date(latest.indexedAt)
+      const nowOrLastIndexed = now > lastIndexed ? now : lastIndexed
+
+      this.mostRecentNotificationUri = latest.uri
+      this.lastSync = nowOrLastIndexed
     }
+
     return this._appendAll(res, true)
   }
 
@@ -557,8 +547,7 @@ export class NotificationsFeedModel {
   ): NotificationsFeedItemModel[] {
     return items
       .filter(item => {
-        const hideByLabel =
-          item.moderation.list.behavior === ModerationBehaviorCode.Hide
+        const hideByLabel = item.shouldFilter
         let mutedThread = !!(
           item.reasonSubjectRootUri &&
           this.rootStore.mutedThreads.uris.has(item.reasonSubjectRootUri)
@@ -582,7 +571,7 @@ export class NotificationsFeedModel {
     for (const item of items) {
       const itemModel = new NotificationsFeedItemModel(
         this.rootStore,
-        `item-${_idCounter++}`,
+        `notification-${item.uri}`,
         item,
       )
       const uri = itemModel.additionalDataUri
@@ -605,6 +594,7 @@ export class NotificationsFeedModel {
         ),
       )
       for (const post of postsChunks.flat()) {
+        this.rootStore.posts.set(post.uri, post)
         const models = addedPostMap.get(post.uri)
         if (models?.length) {
           for (const model of models) {

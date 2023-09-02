@@ -1,14 +1,13 @@
-import {StyleSheet, TouchableOpacity, View} from 'react-native'
-
-import {CharProgress} from '../../composer/char-progress/CharProgress'
-import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome'
 import React from 'react'
-import {SendReportButton} from './SendReportButton'
-import {Text} from '../../util/text/Text'
+import {View, TouchableOpacity, StyleSheet} from 'react-native'
 import {TextInput} from '../util'
-import {isDesktopWeb} from 'platform/detection'
-import {s} from 'lib/styles'
+import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome'
+import {CharProgress} from '../../composer/char-progress/CharProgress'
+import {Text} from '../../util/text/Text'
 import {usePalette} from 'lib/hooks/usePalette'
+import {s} from 'lib/styles'
+import {SendReportButton} from './SendReportButton'
+import {isDesktopWeb} from 'platform/detection'
 
 export function InputIssueDetails({
   details,

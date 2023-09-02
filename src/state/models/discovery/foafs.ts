@@ -1,6 +1,7 @@
 import {
   AppBskyActorDefs,
   AppBskyGraphGetFollows as GetFollows,
+  moderateProfile,
 } from '@atproto/api'
 import {makeAutoObservable, runInAction} from 'mobx'
 import sampleSize from 'lodash.samplesize'
@@ -52,6 +53,13 @@ export class FoafsModel {
               cursor,
               limit: 100,
             })
+          res.data.follows = res.data.follows.filter(
+            profile =>
+              !moderateProfile(
+                profile,
+                this.rootStore.preferences.moderationOpts,
+              ).account.filter,
+          )
           this.rootStore.me.follows.hydrateProfiles(res.data.follows)
           if (!res.data.cursor) {
             break
@@ -97,11 +105,24 @@ export class FoafsModel {
         const profile = profiles.data.profiles[i]
         const source = this.sources[i]
         if (res.status === 'fulfilled' && profile) {
-          // filter out users already followed by the user or that *is* the user
+          // filter out inappropriate suggestions
           res.value.data.follows = res.value.data.follows.filter(follow => {
-            return (
-              follow.did !== this.rootStore.me.did && !follow.viewer?.following
-            )
+            const viewer = follow.viewer
+            if (viewer) {
+              if (
+                viewer.following ||
+                viewer.muted ||
+                viewer.mutedByList ||
+                viewer.blockedBy ||
+                viewer.blocking
+              ) {
+                return false
+              }
+            }
+            if (follow.did === this.rootStore.me.did) {
+              return false
+            }
+            return true
           })
 
           runInAction(() => {

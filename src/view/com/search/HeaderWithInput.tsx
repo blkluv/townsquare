@@ -1,18 +1,18 @@
+import React from 'react'
+import {StyleSheet, TextInput, TouchableOpacity, View} from 'react-native'
 import {
   FontAwesomeIcon,
   FontAwesomeIconStyle,
 } from '@fortawesome/react-native-fontawesome'
-import {StyleSheet, TextInput, TouchableOpacity, View} from 'react-native'
-
-import {HITSLOP_10} from 'lib/constants'
-import {MagnifyingGlassIcon} from 'lib/icons'
-import React from 'react'
 import {Text} from 'view/com/util/text/Text'
-import {UserAvatar} from '../util/UserAvatar'
-import {useAnalytics} from 'lib/analytics/analytics'
+import {MagnifyingGlassIcon} from 'lib/icons'
+import {useTheme} from 'lib/ThemeContext'
 import {usePalette} from 'lib/hooks/usePalette'
 import {useStores} from 'state/index'
-import {useTheme} from 'lib/ThemeContext'
+import {useAnalytics} from 'lib/analytics/analytics'
+import {HITSLOP_10} from 'lib/constants'
+
+import {UserAvatar} from '../util/UserAvatar'
 
 interface Props {
   isInputFocused: boolean
@@ -50,6 +50,8 @@ export function HeaderWithInput({
     textInput.current?.blur()
   }, [onPressCancelSearch, textInput])
 
+  const splx = true
+
   return (
     <View style={[pal.view, pal.border, styles.header]}>
       {showMenu ? (
@@ -61,8 +63,15 @@ export function HeaderWithInput({
           accessibilityRole="button"
           accessibilityLabel="Menu"
           accessibilityHint="Access navigation links and settings">
-          {/* <FontAwesomeIcon icon="bars" size={18} color={pal.colors.textLight} /> */}
-          <UserAvatar avatar={store.me.avatar} size={27} />
+          {splx ? (
+            <UserAvatar avatar={store.me.avatar} size={27} />
+          ) : (
+            <FontAwesomeIcon
+              icon="bars"
+              size={18}
+              color={pal.colors.textLight}
+            />
+          )}
         </TouchableOpacity>
       ) : null}
       <View

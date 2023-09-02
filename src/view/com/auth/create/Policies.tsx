@@ -1,14 +1,13 @@
+import React from 'react'
+import {StyleSheet, View} from 'react-native'
 import {
   FontAwesomeIcon,
   FontAwesomeIconStyle,
 } from '@fortawesome/react-native-fontawesome'
-import {StyleSheet, View} from 'react-native'
-import {colors, s} from 'lib/styles'
-
-import React from 'react'
-import {ServiceDescription} from 'state/models/session'
-import {Text} from '../../util/text/Text'
 import {TextLink} from '../../util/Link'
+import {Text} from '../../util/text/Text'
+import {s, colors} from 'lib/styles'
+import {ServiceDescription} from 'state/models/session'
 import {usePalette} from 'lib/hooks/usePalette'
 
 export const Policies = ({
@@ -95,7 +94,7 @@ function validWebLink(url?: string): string | undefined {
 const styles = StyleSheet.create({
   policies: {
     flexDirection: 'row',
-    alignItems: 'center',
+    gap: 8,
   },
   errorIcon: {
     borderWidth: 1,

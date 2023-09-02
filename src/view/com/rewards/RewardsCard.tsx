@@ -80,7 +80,7 @@ function RewardClaimedImage({rewardsImg}: RewardClaimedProps) {
         You won a Reward!
       </Text>
       <Image
-        accessibilityIgnoresInvertColors={true}
+        accessibilityIgnoresInvertColors
         source={{
           uri: rewardsImg,
         }}
@@ -349,7 +349,7 @@ function RewardClaimScreen({
             Claim Your {isWeekly ? 'Weekly' : 'Daily'} Reward!
           </Text>
           <Image
-            accessibilityIgnoresInvertColors={true}
+            accessibilityIgnoresInvertColors
             source={source}
             style={styles.DiceRollImage}
           />
@@ -413,7 +413,7 @@ function RewardProgressScreen({
       <View style={styles.leftgroup}>
         <View style={styles.imageContainer}>
           <Image
-            accessibilityIgnoresInvertColors={true}
+            accessibilityIgnoresInvertColors
             style={styles.fireImage}
             source={require('../../../../assets/fire.png')}
           />
@@ -432,12 +432,10 @@ function RewardProgressScreen({
         <View style={styles.dataContainer}>
           <View style={styles.horizontalBox}>
             <DailyPointsProgress
-              count={store.session.isSolarplexSession ? 0 : dailyProgress.count}
+              count={!store.session ? 0 : dailyProgress.count}
             />
             <WeeklyStreakProgress
-              count={
-                store.session.isSolarplexSession ? 0 : weeklyProgress.count
-              }
+              count={!store.session ? 0 : weeklyProgress.count}
             />
           </View>
           <View

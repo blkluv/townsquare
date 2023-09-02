@@ -1,6 +1,5 @@
-import {ForwardedRef, useEffect, useMemo, useRef} from 'react'
+import {useEffect, useRef, useMemo, ForwardedRef} from 'react'
 import {Platform, findNodeHandle} from 'react-native'
-
 import type {ScrollView} from 'react-native'
 import {mergeRefs} from 'lib/merge-refs'
 

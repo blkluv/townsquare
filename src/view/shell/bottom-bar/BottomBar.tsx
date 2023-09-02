@@ -1,33 +1,34 @@
+import React, {ComponentProps} from 'react'
 import {
   Animated,
   GestureResponderEvent,
   TouchableOpacity,
   View,
 } from 'react-native'
+import {StackActions} from '@react-navigation/native'
+import {BottomTabBarProps} from '@react-navigation/bottom-tabs'
+import {useSafeAreaInsets} from 'react-native-safe-area-context'
+import {observer} from 'mobx-react-lite'
+import {Text} from 'view/com/util/text/Text'
+import {useStores} from 'state/index'
+import {useAnalytics} from 'lib/analytics/analytics'
+import {clamp} from 'lib/numbers'
 import {
-  BellIcon,
-  BellIconSolid,
   HomeIcon,
   HomeIconSolid,
   MagnifyingGlassIcon2,
   MagnifyingGlassIcon2Solid,
+  SatelliteDishIcon,
+  SatelliteDishIconSolid,
+  BellIcon,
+  BellIconSolid,
 } from 'lib/icons'
-import React, {ComponentProps} from 'react'
-import {TabState, getTabState} from 'lib/routes/helpers'
-
-import {BottomTabBarProps} from '@react-navigation/bottom-tabs'
-import {StackActions} from '@react-navigation/native'
-import {Text} from 'view/com/util/text/Text'
-import {UserAvatar} from 'view/com/util/UserAvatar'
-import {clamp} from 'lib/numbers'
-import {observer} from 'mobx-react-lite'
+import {usePalette} from 'lib/hooks/usePalette'
+import {getTabState, TabState} from 'lib/routes/helpers'
 import {styles} from './BottomBarStyles'
-import {useAnalytics} from 'lib/analytics/analytics'
 import {useMinimalShellMode} from 'lib/hooks/useMinimalShellMode'
 import {useNavigationTabState} from 'lib/hooks/useNavigationTabState'
-import {usePalette} from 'lib/hooks/usePalette'
-import {useSafeAreaInsets} from 'react-native-safe-area-context'
-import {useStores} from 'state/index'
+import {UserAvatar} from 'view/com/util/UserAvatar'
 
 type TabOptions = 'Home' | 'Search' | 'Notifications' | 'MyProfile' | 'Feeds'
 
@@ -36,7 +37,7 @@ export const BottomBar = observer(({navigation}: BottomTabBarProps) => {
   const pal = usePalette('default')
   const safeAreaInsets = useSafeAreaInsets()
   const {track} = useAnalytics()
-  const {isAtHome, isAtSearch, isAtNotifications, isAtMyProfile} =
+  const {isAtHome, isAtSearch, isAtFeeds, isAtNotifications, isAtMyProfile} =
     useNavigationTabState()
 
   const {footerMinimalShellTransform} = useMinimalShellMode()
@@ -60,6 +61,11 @@ export const BottomBar = observer(({navigation}: BottomTabBarProps) => {
   const onPressHome = React.useCallback(() => onPressTab('Home'), [onPressTab])
   const onPressSearch = React.useCallback(
     () => onPressTab('Search'),
+    [onPressTab],
+  )
+
+  const onPressFeeds = React.useCallback(
+    () => onPressTab('Feeds'),
     [onPressTab],
   )
 
@@ -124,7 +130,7 @@ export const BottomBar = observer(({navigation}: BottomTabBarProps) => {
         accessibilityLabel="Search"
         accessibilityHint=""
       />
-      {/* <Btn
+      <Btn
         testID="bottomBarFeedsBtn"
         icon={
           isAtFeeds ? (
@@ -145,7 +151,7 @@ export const BottomBar = observer(({navigation}: BottomTabBarProps) => {
         accessibilityRole="tab"
         accessibilityLabel="Feeds"
         accessibilityHint=""
-      /> */}
+      />
       <Btn
         testID="bottomBarNotificationsBtn"
         icon={

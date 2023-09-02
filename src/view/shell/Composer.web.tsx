@@ -1,11 +1,10 @@
+import React from 'react'
+import {observer} from 'mobx-react-lite'
 import {StyleSheet, View} from 'react-native'
-
 import {ComposePost} from '../com/composer/Composer'
 import {ComposerOpts} from 'state/models/ui/shell'
-import React from 'react'
-import {isMobileWeb} from 'platform/detection'
-import {observer} from 'mobx-react-lite'
 import {usePalette} from 'lib/hooks/usePalette'
+import {isMobileWeb} from 'platform/detection'
 
 const BOTTOM_BAR_HEIGHT = 61
 

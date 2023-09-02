@@ -1,8 +1,7 @@
-import {Text as RNText, TextProps} from 'react-native'
-import {TypographyVariant, useTheme} from 'lib/ThemeContext'
-import {lh, s} from 'lib/styles'
-
 import React from 'react'
+import {Text as RNText, TextProps} from 'react-native'
+import {s, lh} from 'lib/styles'
+import {useTheme, TypographyVariant} from 'lib/ThemeContext'
 
 export type CustomTextProps = TextProps & {
   type?: TypographyVariant

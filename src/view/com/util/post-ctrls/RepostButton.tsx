@@ -1,12 +1,11 @@
 import React, {useCallback} from 'react'
 import {StyleProp, StyleSheet, TouchableOpacity, ViewStyle} from 'react-native'
-import {colors, s} from 'lib/styles'
-
 import {RepostIcon} from 'lib/icons'
+import {s, colors} from 'lib/styles'
+import {useTheme} from 'lib/ThemeContext'
 import {Text} from '../text/Text'
 import {pluralize} from 'lib/strings/helpers'
 import {useStores} from 'state/index'
-import {useTheme} from 'lib/ThemeContext'
 
 interface Props {
   isReposted: boolean

@@ -1,14 +1,13 @@
 import {AppBskyEmbedRecord, ModerationUI} from '@atproto/api'
-import {StyleProp, ViewStyle} from 'react-native'
-import {hasProp, isObj} from 'lib/type-guards'
+import {RootStoreModel} from '../root-store'
 import {makeAutoObservable, runInAction} from 'mobx'
-
-import {GalleryModel} from '../media/gallery'
+import {ProfileModel} from '../content/profile'
+import {isObj, hasProp} from 'lib/type-guards'
+import {Image as RNImage} from 'react-native-image-crop-picker'
 import {ImageModel} from '../media/image'
 import {ListModel} from '../content/list'
-import {ProfileModel} from '../content/profile'
-import {Image as RNImage} from 'react-native-image-crop-picker'
-import {RootStoreModel} from '../root-store'
+import {GalleryModel} from '../media/gallery'
+import {StyleProp, ViewStyle} from 'react-native'
 import {isWeb} from 'platform/detection'
 
 export type ColorMode = 'system' | 'light' | 'dark'
@@ -144,14 +143,6 @@ export interface PostLanguagesSettingsModal {
   name: 'post-languages-settings'
 }
 
-export interface PreferencesHomeFeed {
-  name: 'preferences-home-feed'
-}
-
-export interface OnboardingModal {
-  name: 'onboarding'
-}
-
 export type Modal =
   // Account
   | AddAppPasswordModal
@@ -164,7 +155,6 @@ export type Modal =
   | ContentFilteringSettingsModal
   | ContentLanguagesSettingsModal
   | PostLanguagesSettingsModal
-  | PreferencesHomeFeed
 
   // Moderation
   | ModerationDetailsModal
@@ -183,9 +173,6 @@ export type Modal =
   // Bluesky access
   | WaitlistModal
   | InviteCodesModal
-
-  // Onboarding
-  | OnboardingModal
 
   // Generic
   | ConfirmModal

@@ -79,6 +79,10 @@ export const SearchScreen = withAuthRequired(
     }, [setQuery, autocompleteView, store])
 
     const onSubmitQuery = React.useCallback(() => {
+      if (query.length === 0) {
+        return
+      }
+
       const model = new SearchUIModel(store)
       model.fetch(query)
       setSearchUIModel(model)
@@ -116,6 +120,8 @@ export const SearchScreen = withAuthRequired(
         Keyboard.dismiss()
       }
     }, [])
+
+    const searchPosts = false
 
     return (
       <TouchableWithoutFeedback onPress={onPress} accessible={false}>
@@ -163,9 +169,15 @@ export const SearchScreen = withAuthRequired(
                 </View>
               ) : isInputFocused ? (
                 <View>
-                  <Text style={[pal.textLight, styles.searchPrompt]}>
-                    Search for users and posts on the network
-                  </Text>
+                  {searchPosts ? (
+                    <Text style={[pal.textLight, styles.searchPrompt]}>
+                      Search for users and posts on the network
+                    </Text>
+                  ) : (
+                    <Text style={[pal.textLight, styles.searchPrompt]}>
+                      Search for users on the network
+                    </Text>
+                  )}
                 </View>
               ) : null}
               <View style={s.footerSpacer} />

@@ -1,7 +1,6 @@
+import React from 'react'
 import {StyleProp, TextStyle, ViewStyle} from 'react-native'
 import Svg, {Circle, Ellipse, Line, Path, Rect} from 'react-native-svg'
-
-import React from 'react'
 
 export function MoneyBill({
   size,

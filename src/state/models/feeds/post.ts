@@ -1,17 +1,16 @@
+import {makeAutoObservable} from 'mobx'
 import {
-  AppBskyFeedDefs,
   AppBskyFeedPost as FeedPost,
-  PostModeration,
+  AppBskyFeedDefs,
   RichText,
   moderatePost,
+  PostModeration,
 } from '@atproto/api'
-
 import {RootStoreModel} from '../root-store'
-import {SOLARPLEX_FEED_API} from 'lib/constants'
-import {hackAddDeletedEmbed} from 'lib/api/hack-add-deleted-embed'
-import {makeAutoObservable} from 'mobx'
-import {track} from 'lib/analytics/analytics'
 import {updateDataOptimistically} from 'lib/async/revertible'
+import {track} from 'lib/analytics/analytics'
+import {hackAddDeletedEmbed} from 'lib/api/hack-add-deleted-embed'
+import {SOLARPLEX_FEED_API} from 'lib/constants'
 
 type FeedViewPost = AppBskyFeedDefs.FeedViewPost
 type ReasonRepost = AppBskyFeedDefs.ReasonRepost

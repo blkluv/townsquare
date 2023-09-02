@@ -1,13 +1,12 @@
-import * as EmailValidator from 'email-validator'
-
-import {ComAtprotoServerCreateAccount} from '@atproto/api'
-import {DEFAULT_SERVICE} from 'state/index'
+import {makeAutoObservable} from 'mobx'
 import {RootStoreModel} from '../root-store'
 import {ServiceDescription} from '../session'
-import {cleanError} from 'lib/strings/errors'
+import {DEFAULT_SERVICE} from 'state/index'
+import {ComAtprotoServerCreateAccount} from '@atproto/api'
+import * as EmailValidator from 'email-validator'
 import {createFullHandle} from 'lib/strings/handles'
+import {cleanError} from 'lib/strings/errors'
 import {getAge} from 'lib/strings/time'
-import {makeAutoObservable} from 'mobx'
 import {track} from 'lib/analytics/analytics'
 
 const DEFAULT_DATE = new Date(Date.now() - 60e3 * 60 * 24 * 365 * 20) // default to 20 years ago
@@ -109,7 +108,10 @@ export class CreateAccountModel {
     }
     this.setError('')
     this.setIsProcessing(true)
+
     try {
+      // NOTE(zfaizal2): need to look into what this is actually doing
+      // this.rootStore.onboarding.start() // start now to avoid flashing the wrong view
       await this.rootStore.session.createAccount({
         service: this.serviceUrl,
         email: this.email,
@@ -117,7 +119,9 @@ export class CreateAccountModel {
         password: this.password,
         inviteCode: this.inviteCode,
       })
+      track('Create Account')
     } catch (e: any) {
+      this.rootStore.onboarding.skip() // undo starting the onboard
       let errMsg = e.toString()
       if (e instanceof ComAtprotoServerCreateAccount.InvalidInviteCodeError) {
         errMsg =
@@ -127,8 +131,6 @@ export class CreateAccountModel {
       this.setIsProcessing(false)
       this.setError(cleanError(errMsg))
       throw e
-    } finally {
-      track('Create Account')
     }
   }
 
@@ -146,8 +148,7 @@ export class CreateAccountModel {
       return (
         (!this.isInviteCodeRequired || this.inviteCode) &&
         !!this.email &&
-        !!this.password &&
-        !!this.handle
+        !!this.password
       )
     }
     return !!this.handle

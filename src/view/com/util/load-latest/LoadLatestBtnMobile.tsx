@@ -1,15 +1,13 @@
-import {StyleSheet, TouchableOpacity, View} from 'react-native'
-
-import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome'
 import React from 'react'
-import {clamp} from 'lodash'
-import {colors} from 'lib/styles'
+import {StyleSheet, TouchableOpacity, View} from 'react-native'
 import {observer} from 'mobx-react-lite'
-import {usePalette} from 'lib/hooks/usePalette'
+import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome'
 import {useSafeAreaInsets} from 'react-native-safe-area-context'
+import {clamp} from 'lodash'
 import {useStores} from 'state/index'
-
-const HITSLOP = {left: 20, top: 90, right: 20, bottom: 20}
+import {usePalette} from 'lib/hooks/usePalette'
+import {colors} from 'lib/styles'
+import {HITSLOP_20} from 'lib/constants'
 
 export const LoadLatestBtn = observer(
   ({
@@ -36,7 +34,7 @@ export const LoadLatestBtn = observer(
           },
         ]}
         onPress={onPress}
-        hitSlop={HITSLOP}
+        hitSlop={HITSLOP_20}
         accessibilityRole="button"
         accessibilityLabel={label}
         accessibilityHint="">
@@ -59,7 +57,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    top: 150,
   },
   indicator: {
     position: 'absolute',

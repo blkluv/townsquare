@@ -1,21 +1,17 @@
-import {Animated, StyleSheet} from 'react-native'
 import React, {useMemo} from 'react'
-
-import {FeedsTabBar as FeedsTabBarMobile} from './FeedsTabBarMobile'
-import {RenderTabBarFnProps} from 'view/com/pager/Pager'
-import {TabBar} from 'view/com/pager/TabBar'
+import {Animated, StyleSheet} from 'react-native'
 import {observer} from 'mobx-react-lite'
-import {useAnimatedValue} from 'lib/hooks/useAnimatedValue'
-import {usePalette} from 'lib/hooks/usePalette'
+import {TabBar} from 'view/com/pager/TabBar'
+import {RenderTabBarFnProps} from 'view/com/pager/Pager'
 import {useStores} from 'state/index'
+import {usePalette} from 'lib/hooks/usePalette'
+import {useAnimatedValue} from 'lib/hooks/useAnimatedValue'
 import {useWebMediaQueries} from 'lib/hooks/useWebMediaQueries'
+import {FeedsTabBar as FeedsTabBarMobile} from './FeedsTabBarMobile'
 
 export const FeedsTabBar = observer(
   (
-    props: RenderTabBarFnProps & {
-      testID?: string
-      onPressSelected: () => void
-    },
+    props: RenderTabBarFnProps & {testID?: string; onPressSelected: () => void},
   ) => {
     const {isDesktop} = useWebMediaQueries()
     if (!isDesktop) {
@@ -28,12 +24,14 @@ export const FeedsTabBar = observer(
 
 const FeedsTabBarDesktop = observer(
   (
-    props: RenderTabBarFnProps & {
-      testID?: string
-      onPressSelected: () => void
-    },
+    props: RenderTabBarFnProps & {testID?: string; onPressSelected: () => void},
   ) => {
     const store = useStores()
+    const items = useMemo(
+      () => ['Following', ...store.me.savedFeeds.pinnedFeedNames],
+      [store.me.savedFeeds.pinnedFeedNames],
+    )
+
     // Get the user's joined communities from joinedCommunities.communities
     // Get the names of that community from this list for display here
     // For each, we can construct the URL of that feed.
@@ -42,6 +40,7 @@ const FeedsTabBarDesktop = observer(
       //   store.me.joinedCommunities.communities.includes(community.id),
       // )
       .map((community: any) => community.name)
+
     const communities = useMemo(
       () => [
         store.session.hasSession ? 'Following' : 'Home',
@@ -71,9 +70,9 @@ const FeedsTabBarDesktop = observer(
       // @ts-ignore the type signature for transform wrong here, translateX and translateY need to be in separate objects -prf
       <Animated.View style={[pal.view, styles.tabBar, transform]}>
         <TabBar
-          key={communities.join(',')}
+          key={(communities ?? items).join(',')}
           {...props}
-          items={communities}
+          items={communities ?? items}
           indicatorColor={pal.colors.link}
         />
       </Animated.View>

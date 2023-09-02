@@ -14,6 +14,8 @@ import {isDesktopWeb} from 'platform/detection'
 import {usePalette} from 'lib/hooks/usePalette'
 import {s} from 'lib/styles'
 import {CustomFeedModel} from 'state/models/feeds/custom-feed'
+import {HeaderWithInput} from 'view/com/search/HeaderWithInput'
+import debounce from 'lodash.debounce'
 
 type Props = NativeStackScreenProps<CommonNavigatorParams, 'DiscoverFeeds'>
 export const DiscoverFeedsScreen = withAuthRequired(
@@ -22,10 +24,44 @@ export const DiscoverFeedsScreen = withAuthRequired(
     const pal = usePalette('default')
     const feeds = React.useMemo(() => new FeedsDiscoveryModel(store), [store])
 
+    // search stuff
+    const [isInputFocused, setIsInputFocused] = React.useState<boolean>(false)
+    const [query, setQuery] = React.useState<string>('')
+    const debouncedSearchFeeds = React.useMemo(
+      () => debounce(q => feeds.search(q), 500), // debounce for 500ms
+      [feeds],
+    )
+    const onChangeQuery = React.useCallback(
+      (text: string) => {
+        setQuery(text)
+        if (text.length > 1) {
+          debouncedSearchFeeds(text)
+        } else {
+          feeds.refresh()
+        }
+      },
+      [debouncedSearchFeeds, feeds],
+    )
+    const onPressClearQuery = React.useCallback(() => {
+      setQuery('')
+      feeds.refresh()
+    }, [feeds])
+    const onPressCancelSearch = React.useCallback(() => {
+      setIsInputFocused(false)
+      setQuery('')
+      feeds.refresh()
+    }, [feeds])
+    const onSubmitQuery = React.useCallback(() => {
+      debouncedSearchFeeds(query)
+      debouncedSearchFeeds.flush()
+    }, [debouncedSearchFeeds, query])
+
     useFocusEffect(
       React.useCallback(() => {
         store.shell.setMinimalShellMode(false)
-        feeds.refresh()
+        if (!feeds.hasLoaded) {
+          feeds.refresh()
+        }
       }, [store, feeds]),
     )
 
@@ -33,23 +69,21 @@ export const DiscoverFeedsScreen = withAuthRequired(
       feeds.refresh()
     }, [feeds])
 
-    const renderListEmptyComponent = React.useCallback(() => {
+    const renderListEmptyComponent = () => {
       return (
-        <View
-          style={[
-            pal.border,
-            !isDesktopWeb && s.flex1,
-            pal.viewLight,
-            styles.empty,
-          ]}>
-          <Text type="lg" style={[pal.text]}>
+        <View style={styles.empty}>
+          <Text type="lg" style={pal.textLight}>
             {feeds.isLoading
-              ? 'Loading...'
+              ? isDesktopWeb
+                ? 'Loading...'
+                : ''
+              : query
+              ? `No results found for "${query}"`
               : `We can't find any feeds for some reason. This is probably an error - try refreshing!`}
           </Text>
         </View>
       )
-    }, [pal, feeds.isLoading])
+    }
 
     const renderItem = React.useCallback(
       ({item}: {item: CustomFeedModel}) => (
@@ -68,6 +102,18 @@ export const DiscoverFeedsScreen = withAuthRequired(
       <CenteredView style={[styles.container, pal.view]}>
         <View style={[isDesktopWeb && styles.containerDesktop, pal.border]}>
           <ViewHeader title="Discover Feeds" showOnDesktop />
+          <View style={{marginTop: isDesktopWeb ? 5 : 0, marginBottom: 4}}>
+            <HeaderWithInput
+              isInputFocused={isInputFocused}
+              query={query}
+              setIsInputFocused={setIsInputFocused}
+              onChangeQuery={onChangeQuery}
+              onPressClearQuery={onPressClearQuery}
+              onPressCancelSearch={onPressCancelSearch}
+              onSubmitQuery={onSubmitQuery}
+              showMenu={false}
+            />
+          </View>
         </View>
         <FlatList
           style={[!isDesktopWeb && s.flex1]}
@@ -85,6 +131,7 @@ export const DiscoverFeedsScreen = withAuthRequired(
           renderItem={renderItem}
           initialNumToRender={10}
           ListEmptyComponent={renderListEmptyComponent}
+          onEndReached={() => feeds.loadMore()}
           extraData={feeds.isLoading}
         />
       </CenteredView>
@@ -104,10 +151,7 @@ const styles = StyleSheet.create({
     borderRightWidth: 1,
   },
   empty: {
-    paddingHorizontal: 18,
-    paddingVertical: 16,
-    borderRadius: 8,
-    marginHorizontal: 18,
-    marginTop: 10,
+    paddingHorizontal: 16,
+    paddingTop: 10,
   },
 })

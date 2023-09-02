@@ -1,15 +1,14 @@
-import {StyleSheet, View} from 'react-native'
-
-import {Button} from '../util/forms/Button'
-import {ModerationUI} from '@atproto/api'
 import React from 'react'
+import {StyleSheet, View} from 'react-native'
+import {ModerationUI} from '@atproto/api'
+import {useStores} from 'state/index'
+import {s} from 'lib/styles'
 import {Text} from '../util/text/Text'
 import {TextLink} from '../util/Link'
+import {usePalette} from 'lib/hooks/usePalette'
 import {isDesktopWeb} from 'platform/detection'
 import {listUriToHref} from 'lib/strings/url-helpers'
-import {s} from 'lib/styles'
-import {usePalette} from 'lib/hooks/usePalette'
-import {useStores} from 'state/index'
+import {Button} from '../util/forms/Button'
 
 export const snapPoints = [300]
 

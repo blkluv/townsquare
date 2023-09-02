@@ -1,10 +1,10 @@
-import {makeAutoObservable, runInAction} from 'mobx'
-
 import {AppBskyFeedDefs} from '@atproto/api'
+import {makeAutoObservable, runInAction} from 'mobx'
 import {RootStoreModel} from 'state/models/root-store'
 import {sanitizeDisplayName} from 'lib/strings/display-names'
-import {track} from 'lib/analytics/analytics'
+import {sanitizeHandle} from 'lib/strings/handles'
 import {updateDataOptimistically} from 'lib/async/revertible'
+import {track} from 'lib/analytics/analytics'
 
 export class CustomFeedModel {
   // data
@@ -43,7 +43,7 @@ export class CustomFeedModel {
     if (this.data.displayName) {
       return sanitizeDisplayName(this.data.displayName)
     }
-    return `Feed by @${this.data.creator.handle}`
+    return `Feed by ${sanitizeHandle(this.data.creator.handle, '@')}`
   }
 
   get isSaved() {
@@ -64,6 +64,19 @@ export class CustomFeedModel {
       this.rootStore.log.error('Failed to save feed', error)
     } finally {
       track('CustomFeed:Save')
+    }
+  }
+
+  async pin() {
+    try {
+      await this.rootStore.preferences.addPinnedFeed(this.uri)
+    } catch (error) {
+      this.rootStore.log.error('Failed to pin feed', error)
+    } finally {
+      track('CustomFeed:Pin', {
+        name: this.data.displayName,
+        uri: this.uri,
+      })
     }
   }
 

@@ -1,11 +1,10 @@
 import React, {useMemo} from 'react'
 import {StyleProp, StyleSheet, View, ViewStyle} from 'react-native'
-
-import {DropdownButton} from '../forms/DropdownButton'
 import {RepostIcon} from 'lib/icons'
-import {Text} from '../text/Text'
+import {DropdownButton} from '../forms/DropdownButton'
 import {colors} from 'lib/styles'
 import {useTheme} from 'lib/ThemeContext'
+import {Text} from '../text/Text'
 
 interface Props {
   isReposted: boolean

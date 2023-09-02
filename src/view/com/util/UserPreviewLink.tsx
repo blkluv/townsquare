@@ -1,10 +1,9 @@
-import {Pressable, StyleProp, ViewStyle} from 'react-native'
-
-import {Link} from './Link'
 import React from 'react'
+import {Pressable, StyleProp, ViewStyle} from 'react-native'
+import {useStores} from 'state/index'
+import {Link} from './Link'
 import {isWeb} from 'platform/detection'
 import {makeProfileLink} from 'lib/routes/links'
-import {useStores} from 'state/index'
 
 interface UserPreviewLinkProps {
   did: string

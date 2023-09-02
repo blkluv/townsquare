@@ -1,14 +1,13 @@
+import React from 'react'
+import LinearGradient from 'react-native-linear-gradient'
 import {
   ActivityIndicator,
   StyleSheet,
   TouchableOpacity,
   View,
 } from 'react-native'
-import {colors, gradients, s} from 'lib/styles'
-
-import LinearGradient from 'react-native-linear-gradient'
-import React from 'react'
 import {Text} from '../../util/text/Text'
+import {s, gradients, colors} from 'lib/styles'
 
 export function SendReportButton({
   onPress,
@@ -35,7 +34,7 @@ export function SendReportButton({
       accessibilityLabel="Report post"
       accessibilityHint={`Reports post with reason and details`}>
       <LinearGradient
-        colors={[gradients.blueLight.start, gradients.blueLight.end]}
+        colors={[gradients.purple.start, gradients.purple.end]}
         start={{x: 0, y: 0}}
         end={{x: 1, y: 1}}
         style={[styles.btn]}>

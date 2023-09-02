@@ -1,4 +1,4 @@
-import {Button, ButtonType} from './Button'
+import React, {PropsWithChildren, useMemo, useRef} from 'react'
 import {
   Dimensions,
   StyleProp,
@@ -8,16 +8,15 @@ import {
   View,
   ViewStyle,
 } from 'react-native'
-import React, {PropsWithChildren, useMemo, useRef} from 'react'
-
-import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome'
-import {HITSLOP_10} from 'lib/constants'
 import {IconProp} from '@fortawesome/fontawesome-svg-core'
 import RootSiblings from 'react-native-root-siblings'
+import {FontAwesomeIcon} from '@fortawesome/react-native-fontawesome'
 import {Text} from '../text/Text'
+import {Button, ButtonType} from './Button'
 import {colors} from 'lib/styles'
 import {usePalette} from 'lib/hooks/usePalette'
 import {useTheme} from 'lib/ThemeContext'
+import {HITSLOP_10} from 'lib/constants'
 
 const ESTIMATED_BTN_HEIGHT = 50
 const ESTIMATED_SEP_HEIGHT = 16
