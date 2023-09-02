@@ -8,7 +8,6 @@ import {s} from 'lib/styles'
 import {usePalette} from 'lib/hooks/usePalette'
 import {TextInput} from '../util/TextInput'
 import {Policies} from './Policies'
-import {ErrorMessage} from 'view/com/util/error/ErrorMessage'
 import {useStores} from 'state/index'
 import {SOLARPLEX_INTENT_LINK} from 'lib/constants'
 
@@ -137,9 +136,6 @@ export const Step2 = observer(({model}: {model: CreateAccountModel}) => {
           </>
         </>
       )}
-      {model.error ? (
-        <ErrorMessage message={model.error} style={styles.error} />
-      ) : undefined}
     </View>
   )
 })
