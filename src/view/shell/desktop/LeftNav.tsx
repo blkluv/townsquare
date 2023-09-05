@@ -47,6 +47,7 @@ import {makeProfileLink} from 'lib/routes/links'
 import * as fa from '@fortawesome/free-solid-svg-icons'
 import {Banner} from '../Banner'
 import {useAnalytics} from 'lib/analytics/analytics'
+import {SOLARPLEX_IS_DEV} from 'lib/constants'
 
 const ProfileCard = observer(() => {
   const store = useStores()
@@ -232,15 +233,134 @@ function ComposeBtn() {
   )
 }
 
-export const DesktopLeftNav = observer(function DesktopLeftNav() {
+const SplxNavItems = observer(function SplxNavItems() {
   const store = useStores()
   const pal = usePalette('default')
   const {track} = useAnalytics()
-
   const onPressSignout = React.useCallback(() => {
     track('Settings:SignOutButtonClicked')
     store.session.logout()
   }, [track, store])
+
+  return (
+    <>
+      <NavItem
+        href="/notifications"
+        count={store.me.notifications.unreadCountLabel}
+        icon={<BellIcon strokeWidth={2} size={24} style={pal.text} />}
+        iconFilled={
+          <BellIconSolid strokeWidth={1.5} size={24} style={pal.text} />
+        }
+        label="Notifications"
+      />
+      <NavItem
+        href={`/communities`}
+        icon={
+          <View style={{width: 21, height: 21}}>
+            <CommunitiesIcon />
+          </View>
+        }
+        iconFilled={
+          <FontAwesomeIcon
+            size={22}
+            icon={fa.faPeopleGroup}
+            style={{...pal.text} as FontAwesomeIconStyle}
+          />
+        }
+        label="Communities"
+      />
+      <NavItem
+        href="/search"
+        icon={
+          <MagnifyingGlassIcon2 strokeWidth={2} size={24} style={pal.text} />
+        }
+        iconFilled={
+          <MagnifyingGlassIcon2Solid
+            strokeWidth={2}
+            size={24}
+            style={pal.text}
+          />
+        }
+        label="Search"
+      />
+      <NavItem
+        href={`/rewards/missions`}
+        icon={<RegularRankingStarIcon />}
+        iconFilled={<SolidRankingStarIcon />}
+        label="Missions"
+      />
+      <NavItem
+        href={`/rewards/reactions`}
+        icon={<RegularReactionIcon />}
+        iconFilled={<SolidReactionIcon />}
+        label="Reactions"
+      />
+      {store.session.hasSession && (
+        <NavItem
+          href={makeProfileLink(store.me)}
+          icon={<UserIcon strokeWidth={1.75} size={28} style={pal.text} />}
+          iconFilled={
+            <UserIconSolid strokeWidth={1.75} size={28} style={pal.text} />
+          }
+          label="Profile"
+        />
+      )}
+      <NavItem
+        href="/wallets"
+        icon={
+          <FontAwesomeIcon
+            size={20}
+            icon={fa.faWallet}
+            style={{...pal.text, marginLeft: 4} as FontAwesomeIconStyle}
+          />
+        }
+        iconFilled={
+          <FontAwesomeIcon
+            size={20}
+            icon={fa.faWallet}
+            style={{...pal.text, marginLeft: 4} as FontAwesomeIconStyle}
+          />
+        }
+        label="Wallets"
+      />
+      {SOLARPLEX_IS_DEV && (
+        <>
+          <NavItem
+            href="/moderation"
+            icon={
+              <HandIcon
+                strokeWidth={5.5}
+                style={pal.text as FontAwesomeIconStyle}
+                size={24}
+              />
+            }
+            iconFilled={
+              <FontAwesomeIcon
+                icon="hand"
+                style={pal.text as FontAwesomeIconStyle}
+                size={20}
+              />
+            }
+            label="Moderation"
+          />
+          <NavItem
+            href="/settings"
+            icon={<CogIcon strokeWidth={1.75} size={28} style={pal.text} />}
+            iconFilled={
+              <CogIconSolid strokeWidth={1.5} size={28} style={pal.text} />
+            }
+            label="Settings"
+          />
+        </>
+      )}
+      <SignOutBtn onPressHandler={() => onPressSignout()} />
+    </>
+  )
+})
+
+export const DesktopLeftNav = observer(function DesktopLeftNav() {
+  const store = useStores()
+  const pal = usePalette('default')
 
   const splx = true
 
@@ -346,92 +466,7 @@ export const DesktopLeftNav = observer(function DesktopLeftNav() {
           />
         </>
       ) : (
-        <>
-          <NavItem
-            href="/notifications"
-            count={store.me.notifications.unreadCountLabel}
-            icon={<BellIcon strokeWidth={2} size={24} style={pal.text} />}
-            iconFilled={
-              <BellIconSolid strokeWidth={1.5} size={24} style={pal.text} />
-            }
-            label="Notifications"
-          />
-          <NavItem
-            href={`/communities`}
-            icon={
-              <View style={{width: 21, height: 21}}>
-                <CommunitiesIcon />
-              </View>
-            }
-            iconFilled={
-              <FontAwesomeIcon
-                size={22}
-                icon={fa.faPeopleGroup}
-                style={{...pal.text} as FontAwesomeIconStyle}
-              />
-            }
-            label="Communities"
-          />
-          <NavItem
-            href="/search"
-            icon={
-              <MagnifyingGlassIcon2
-                strokeWidth={2}
-                size={24}
-                style={pal.text}
-              />
-            }
-            iconFilled={
-              <MagnifyingGlassIcon2Solid
-                strokeWidth={2}
-                size={24}
-                style={pal.text}
-              />
-            }
-            label="Search"
-          />
-          <NavItem
-            href={`/rewards/missions`}
-            icon={<RegularRankingStarIcon />}
-            iconFilled={<SolidRankingStarIcon />}
-            label="Missions"
-          />
-          <NavItem
-            href={`/rewards/reactions`}
-            icon={<RegularReactionIcon />}
-            iconFilled={<SolidReactionIcon />}
-            label="Reactions"
-          />
-          {store.session.hasSession && (
-            <NavItem
-              href={makeProfileLink(store.me)}
-              icon={<UserIcon strokeWidth={1.75} size={28} style={pal.text} />}
-              iconFilled={
-                <UserIconSolid strokeWidth={1.75} size={28} style={pal.text} />
-              }
-              label="Profile"
-            />
-          )}
-          <NavItem
-            href="/wallets"
-            icon={
-              <FontAwesomeIcon
-                size={20}
-                icon={fa.faWallet}
-                style={{...pal.text, marginLeft: 4} as FontAwesomeIconStyle}
-              />
-            }
-            iconFilled={
-              <FontAwesomeIcon
-                size={20}
-                icon={fa.faWallet}
-                style={{...pal.text, marginLeft: 4} as FontAwesomeIconStyle}
-              />
-            }
-            label="Wallets"
-          />
-          <SignOutBtn onPressHandler={() => onPressSignout()} />
-        </>
+        <SplxNavItems />
       )}
       {store.session.hasSession && <ComposeBtn />}
       {!store.session.hasSession && (

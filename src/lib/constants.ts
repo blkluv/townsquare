@@ -143,6 +143,10 @@ export const SOLARPLEX_USER_DID = ACTIVE_CONSTANTS.SPLX_USER_DID
 export const SOLARPLEX_UI_URL = ACTIVE_CONSTANTS.SPLX_UI_URL
 export const SOLARPLEX_PDS_URL = ACTIVE_CONSTANTS.SPLX_PDS_URL
 export const RPC_API = ACTIVE_CONSTANTS.RPC_API
+export const SOLARPLEX_IS_DEV =
+  IS_LOCAL_DEV(currUrl) ||
+  SOLARPLEX_REALM === 'dev' ||
+  SOLARPLEX_REALM === 'local'
 
 export const PROD_TEAM_HANDLES = [
   'viksit.live.solarplex.xyz',

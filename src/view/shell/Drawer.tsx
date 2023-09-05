@@ -45,7 +45,7 @@ import {
 import {UserAvatar} from 'view/com/util/UserAvatar'
 import {Text} from 'view/com/util/text/Text'
 import {useTheme} from 'lib/ThemeContext'
-import {usePalette} from 'lib/hooks/usePalette'
+import {UsePaletteValue, usePalette} from 'lib/hooks/usePalette'
 import {useAnalytics} from 'lib/analytics/analytics'
 import {pluralize} from 'lib/strings/helpers'
 import {getTabState, TabState} from 'lib/routes/helpers'
@@ -55,17 +55,37 @@ import {isWeb} from 'platform/detection'
 import {formatCount, formatCountShortOnly} from 'view/com/util/numeric/format'
 
 import * as fa from '@fortawesome/free-solid-svg-icons'
+import {NotificationsFeedModel} from 'state/models/feeds/notifications'
+import {SOLARPLEX_IS_DEV} from 'lib/constants'
 
-export const DrawerContent = observer(() => {
-  const theme = useTheme()
-  const pal = usePalette('default')
+interface SplxMenuItemsProps {
+  notifications: NotificationsFeedModel
+  onPressHome: () => void
+  onPressModeration: () => void
+  onPressNotifications: () => void
+  onPressProfile: () => void
+  onPressSearch: () => void
+  onPressSettings: () => void
+  onPressTab: (tab: string, params?: ParamListBase) => void
+  pal: UsePaletteValue
+}
+const SplxMenuItems = observer(function SplxMenuItems({
+  notifications,
+  onPressHome,
+  onPressModeration,
+  onPressNotifications,
+  onPressProfile,
+  onPressSearch,
+  onPressSettings,
+  onPressTab,
+  pal,
+}: SplxMenuItemsProps) {
   const store = useStores()
   const navigation = useNavigation<NavigationProp>()
   const {track} = useAnalytics()
   const {
     isAtHome,
     isAtSearch,
-    isAtFeeds,
     isAtNotifications,
     isAtMyProfile,
     isAtCommunities,
@@ -73,6 +93,230 @@ export const DrawerContent = observer(() => {
     isAtReactions,
     isAtMissions,
   } = useNavigationTabState()
+
+  const onPressSignout = React.useCallback(() => {
+    track('Settings:SignOutButtonClicked')
+    store.session.logout()
+  }, [track, store])
+
+  const onPressWallet = React.useCallback(() => {
+    navigation.navigate('Wallets')
+  }, [navigation])
+
+  const onPressCommunities = React.useCallback(
+    () => onPressTab('Communities'),
+    [onPressTab],
+  )
+
+  const onPressReactions = React.useCallback(
+    () => onPressTab('Reactions'),
+    [onPressTab],
+  )
+
+  const onPressMissions = React.useCallback(
+    () => onPressTab('Missions'),
+    [onPressTab],
+  )
+
+  return (
+    <>
+      <MenuItem
+        icon={
+          isAtHome ? (
+            <HomeIconSolid
+              style={pal.text as StyleProp<ViewStyle>}
+              size="24"
+              strokeWidth={3.25}
+            />
+          ) : (
+            <HomeIcon
+              style={pal.text as StyleProp<ViewStyle>}
+              size="24"
+              strokeWidth={3.25}
+            />
+          )
+        }
+        label="Home"
+        accessibilityLabel="Home"
+        accessibilityHint=""
+        bold={isAtHome}
+        onPress={onPressHome}
+      />
+      <MenuItem
+        icon={
+          isAtNotifications ? (
+            <BellIconSolid
+              style={pal.text as StyleProp<ViewStyle>}
+              size="24"
+              strokeWidth={1.7}
+            />
+          ) : (
+            <BellIcon
+              style={pal.text as StyleProp<ViewStyle>}
+              size="24"
+              strokeWidth={1.7}
+            />
+          )
+        }
+        label="Notifications"
+        accessibilityLabel="Notifications"
+        accessibilityHint={
+          notifications.unreadCountLabel === ''
+            ? ''
+            : `${notifications.unreadCountLabel} unread`
+        }
+        count={notifications.unreadCountLabel}
+        bold={isAtNotifications}
+        onPress={onPressNotifications}
+      />
+      <MenuItem
+        icon={isAtCommunities ? <CommunitiesIconSolid /> : <CommunitiesIcon />}
+        label="Communities"
+        accessibilityLabel="Communities"
+        accessibilityHint=""
+        bold={isAtCommunities}
+        onPress={onPressCommunities}
+      />
+      <MenuItem
+        icon={
+          isAtSearch ? (
+            <MagnifyingGlassIcon2Solid
+              style={pal.text as StyleProp<ViewStyle>}
+              size={24}
+              strokeWidth={1.7}
+            />
+          ) : (
+            <MagnifyingGlassIcon2
+              style={pal.text as StyleProp<ViewStyle>}
+              size={24}
+              strokeWidth={1.7}
+            />
+          )
+        }
+        label="Search"
+        accessibilityLabel="Search"
+        accessibilityHint=""
+        bold={isAtSearch}
+        onPress={onPressSearch}
+      />
+      <MenuItem
+        icon={
+          isAtMissions ? <SolidRankingStarIcon /> : <RegularRankingStarIcon />
+        }
+        label="Missions"
+        accessibilityLabel="Missions"
+        accessibilityHint=""
+        bold={isAtMissions}
+        onPress={onPressMissions}
+      />
+      <MenuItem
+        icon={isAtReactions ? <SolidReactionIcon /> : <RegularReactionIcon />}
+        label="Reactions"
+        accessibilityLabel="Reactions"
+        accessibilityHint=""
+        bold={isAtReactions}
+        onPress={onPressReactions}
+      />
+      <MenuItem
+        icon={
+          isAtMyProfile ? (
+            <UserIconSolid
+              style={pal.text as StyleProp<ViewStyle>}
+              size="26"
+              strokeWidth={1.5}
+            />
+          ) : (
+            <UserIcon
+              style={pal.text as StyleProp<ViewStyle>}
+              size="26"
+              strokeWidth={1.5}
+            />
+          )
+        }
+        label="Profile"
+        accessibilityLabel="Profile"
+        accessibilityHint=""
+        onPress={onPressProfile}
+      />
+      <MenuItem
+        icon={
+          isAtWallets ? (
+            <FontAwesomeIcon
+              size={20}
+              icon={fa.faWallet}
+              style={{...pal.text, marginLeft: 4} as FontAwesomeIconStyle}
+            />
+          ) : (
+            <FontAwesomeIcon
+              size={20}
+              icon={fa.faWallet}
+              style={{...pal.text, marginLeft: 4} as FontAwesomeIconStyle}
+            />
+          )
+        }
+        label="Wallet"
+        accessibilityLabel="Wallet"
+        accessibilityHint="user wallets"
+        bold={isAtWallets}
+        onPress={onPressWallet}
+      />
+      {SOLARPLEX_IS_DEV && (
+        <>
+          <MenuItem
+            icon={<HandIcon strokeWidth={5} style={pal.text} size={24} />}
+            label="Moderation"
+            accessibilityLabel="Moderation"
+            accessibilityHint=""
+            onPress={onPressModeration}
+          />
+          <MenuItem
+            icon={
+              <CogIcon
+                style={pal.text as StyleProp<ViewStyle>}
+                size="26"
+                strokeWidth={1.75}
+              />
+            }
+            label="Settings"
+            accessibilityLabel="Settings"
+            accessibilityHint=""
+            onPress={onPressSettings}
+          />
+        </>
+      )}
+      {!store.session.hasSession ? (
+        <MenuItem
+          icon={<UserIcon />}
+          label="Sign in"
+          accessibilityLabel="Home"
+          accessibilityHint=""
+          onPress={() => navigation.navigate('SignIn')}
+        />
+      ) : (
+        <MenuItem
+          onPress={onPressSignout}
+          icon={
+            <FontAwesomeIcon
+              size={20}
+              icon={fa.faSignOut}
+              style={{...pal.text, marginLeft: 4} as FontAwesomeIconStyle}
+            />
+          }
+          label={'Sign Out'}
+        />
+      )}
+    </>
+  )
+})
+
+export const DrawerContent = observer(() => {
+  const theme = useTheme()
+  const pal = usePalette('default')
+  const store = useStores()
+  const navigation = useNavigation<NavigationProp>()
+  const {track} = useAnalytics()
+  const {isAtHome, isAtSearch, isAtFeeds, isAtNotifications, isAtMyProfile} =
+    useNavigationTabState()
 
   const {notifications} = store.me
 
@@ -149,30 +393,6 @@ export const DrawerContent = observer(() => {
     track('Menu:HelpClicked')
     Linking.openURL(HELP_DESK_URL)
   }, [track])
-
-  const onPressSignout = React.useCallback(() => {
-    track('Settings:SignOutButtonClicked')
-    store.session.logout()
-  }, [track, store])
-
-  const onPressWallet = React.useCallback(() => {
-    navigation.navigate('Wallets')
-  }, [navigation])
-
-  const onPressCommunities = React.useCallback(
-    () => onPressTab('Communities'),
-    [onPressTab],
-  )
-
-  const onPressReactions = React.useCallback(
-    () => onPressTab('Reactions'),
-    [onPressTab],
-  )
-
-  const onPressMissions = React.useCallback(
-    () => onPressTab('Missions'),
-    [onPressTab],
-  )
 
   // rendering
   // =
@@ -359,198 +579,17 @@ export const DrawerContent = observer(() => {
               />
             </>
           ) : (
-            <>
-              <MenuItem
-                icon={
-                  isAtHome ? (
-                    <HomeIconSolid
-                      style={pal.text as StyleProp<ViewStyle>}
-                      size="24"
-                      strokeWidth={3.25}
-                    />
-                  ) : (
-                    <HomeIcon
-                      style={pal.text as StyleProp<ViewStyle>}
-                      size="24"
-                      strokeWidth={3.25}
-                    />
-                  )
-                }
-                label="Home"
-                accessibilityLabel="Home"
-                accessibilityHint=""
-                bold={isAtHome}
-                onPress={onPressHome}
-              />
-              <MenuItem
-                icon={
-                  isAtNotifications ? (
-                    <BellIconSolid
-                      style={pal.text as StyleProp<ViewStyle>}
-                      size="24"
-                      strokeWidth={1.7}
-                    />
-                  ) : (
-                    <BellIcon
-                      style={pal.text as StyleProp<ViewStyle>}
-                      size="24"
-                      strokeWidth={1.7}
-                    />
-                  )
-                }
-                label="Notifications"
-                accessibilityLabel="Notifications"
-                accessibilityHint={
-                  notifications.unreadCountLabel === ''
-                    ? ''
-                    : `${notifications.unreadCountLabel} unread`
-                }
-                count={notifications.unreadCountLabel}
-                bold={isAtNotifications}
-                onPress={onPressNotifications}
-              />
-              <MenuItem
-                icon={
-                  isAtCommunities ? (
-                    <CommunitiesIconSolid />
-                  ) : (
-                    <CommunitiesIcon />
-                  )
-                }
-                label="Communities"
-                accessibilityLabel="Communities"
-                accessibilityHint=""
-                bold={isAtCommunities}
-                onPress={onPressCommunities}
-              />
-              <MenuItem
-                icon={
-                  isAtSearch ? (
-                    <MagnifyingGlassIcon2Solid
-                      style={pal.text as StyleProp<ViewStyle>}
-                      size={24}
-                      strokeWidth={1.7}
-                    />
-                  ) : (
-                    <MagnifyingGlassIcon2
-                      style={pal.text as StyleProp<ViewStyle>}
-                      size={24}
-                      strokeWidth={1.7}
-                    />
-                  )
-                }
-                label="Search"
-                accessibilityLabel="Search"
-                accessibilityHint=""
-                bold={isAtSearch}
-                onPress={onPressSearch}
-              />
-              <MenuItem
-                icon={
-                  isAtMissions ? (
-                    <SolidRankingStarIcon />
-                  ) : (
-                    <RegularRankingStarIcon />
-                  )
-                }
-                label="Missions"
-                accessibilityLabel="Missions"
-                accessibilityHint=""
-                bold={isAtMissions}
-                onPress={onPressMissions}
-              />
-              <MenuItem
-                icon={
-                  isAtReactions ? (
-                    <SolidReactionIcon />
-                  ) : (
-                    <RegularReactionIcon />
-                  )
-                }
-                label="Reactions"
-                accessibilityLabel="Reactions"
-                accessibilityHint=""
-                bold={isAtReactions}
-                onPress={onPressReactions}
-              />
-              <MenuItem
-                icon={
-                  isAtMyProfile ? (
-                    <UserIconSolid
-                      style={pal.text as StyleProp<ViewStyle>}
-                      size="26"
-                      strokeWidth={1.5}
-                    />
-                  ) : (
-                    <UserIcon
-                      style={pal.text as StyleProp<ViewStyle>}
-                      size="26"
-                      strokeWidth={1.5}
-                    />
-                  )
-                }
-                label="Profile"
-                accessibilityLabel="Profile"
-                accessibilityHint=""
-                onPress={onPressProfile}
-              />
-              <MenuItem
-                icon={
-                  isAtWallets ? (
-                    <FontAwesomeIcon
-                      size={20}
-                      icon={fa.faWallet}
-                      style={
-                        {...pal.text, marginLeft: 4} as FontAwesomeIconStyle
-                      }
-                    />
-                  ) : (
-                    <FontAwesomeIcon
-                      size={20}
-                      icon={fa.faWallet}
-                      style={
-                        {...pal.text, marginLeft: 4} as FontAwesomeIconStyle
-                      }
-                    />
-                  )
-                }
-                label="Wallet"
-                accessibilityLabel="Wallet"
-                accessibilityHint="user wallets"
-                bold={isAtWallets}
-                onPress={onPressWallet}
-              />
-              {!store.session.hasSession ? (
-                // <NavItem
-                //   href="/signin"
-                //   count={store.me.notifications.unreadCountLabel}
-                //   label="Sign in"
-                //   icon={<UserIcon />}
-                //   iconFilled={<UserIconSolid />}
-                // />
-                <MenuItem
-                  icon={<UserIcon />}
-                  label="Sign in"
-                  accessibilityLabel="Home"
-                  accessibilityHint=""
-                  onPress={() => navigation.navigate('SignIn')}
-                />
-              ) : (
-                <MenuItem
-                  onPress={onPressSignout}
-                  icon={
-                    <FontAwesomeIcon
-                      size={20}
-                      icon={fa.faSignOut}
-                      style={
-                        {...pal.text, marginLeft: 4} as FontAwesomeIconStyle
-                      }
-                    />
-                  }
-                  label={'Sign Out'}
-                />
-              )}
-            </>
+            <SplxMenuItems
+              notifications={notifications}
+              onPressHome={onPressHome}
+              onPressModeration={onPressModeration}
+              onPressNotifications={onPressNotifications}
+              onPressProfile={onPressProfile}
+              onPressSearch={onPressSearch}
+              onPressSettings={onPressSettings}
+              onPressTab={onPressTab}
+              pal={pal}
+            />
           )}
 
           <View style={styles.smallSpacer} />
